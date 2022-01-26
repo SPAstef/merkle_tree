@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils/bit_pack.hpp"
 #include "utils/sha256.hpp"
 #include "utils/sha512.hpp"
 #include "utils/sha_version.hpp"
@@ -17,55 +18,23 @@
 #include <string>
 #include <type_traits>
 
-static inline void unpack_bits(libff::bit_vector &bv, const uint8_t *v)
-{
-    for (size_t i = 0, sz = bv.size() / CHAR_BIT; i < sz; ++i)
-    {
-        bv[i * 8 + 0] = v[i] >> 7 & 1;
-        bv[i * 8 + 1] = v[i] >> 6 & 1;
-        bv[i * 8 + 2] = v[i] >> 5 & 1;
-        bv[i * 8 + 3] = v[i] >> 4 & 1;
-        bv[i * 8 + 4] = v[i] >> 3 & 1;
-        bv[i * 8 + 5] = v[i] >> 2 & 1;
-        bv[i * 8 + 6] = v[i] >> 1 & 1;
-        bv[i * 8 + 7] = v[i] >> 0 & 1;
-    }
-}
-
-static inline void pack_bits(uint8_t *v, const libff::bit_vector &bv)
-{
-    for (size_t i = 0, sz = bv.size() / CHAR_BIT; i < sz; ++i)
-    {
-        v[i] = 0;
-        v[i] |= bv[i * 8 + 0] << 7;
-        v[i] |= bv[i * 8 + 1] << 6;
-        v[i] |= bv[i * 8 + 2] << 5;
-        v[i] |= bv[i * 8 + 3] << 4;
-        v[i] |= bv[i * 8 + 4] << 3;
-        v[i] |= bv[i * 8 + 5] << 2;
-        v[i] |= bv[i * 8 + 6] << 1;
-        v[i] |= bv[i * 8 + 7] << 0;
-    }
-}
-
 #if defined(__INTELLISENSE__) && 0
-using ppT = libsnark::default_r1cs_ppzksnark_pp;
+using FieldT = libff::Fr<libsnark::default_r1cs_ppzksnark_pp>;
 static constexpr Sha_version sha_version = Sha_version::SHA256;
 #else
-template<typename ppT = libsnark::default_r1cs_ppzksnark_pp,
-         Sha_version sha_version = Sha_version::SHA256>
+template<typename FieldT, Sha_version sha_version>
 #endif
-class MTree_Gadget
+class MTree_Gadget : public libsnark::gadget<FieldT>
 {
 public:
-    using Fr = libff::Fr<ppT>;
-    using DigVar = libsnark::digest_variable<Fr>;
-    using BlockVar = libsnark::block_variable<Fr>;
+    using DigVar = libsnark::digest_variable<FieldT>;
+    using BlockVar = libsnark::block_variable<FieldT>;
     using Keypair = libsnark::r1cs_gg_ppzksnark_keypair<ppT>;
-    using Protoboard = libsnark::protoboard<Fr>;
-    using GadSha = typename std::conditional<
-        sha_version == Sha_version::SHA256, libsnark::sha256_two_to_one_hash_gadget<libff::Fr<ppT>>,
-        libsnark::sha512::sha512_two_to_one_hash_gadget<libff::Fr<ppT>>>::type;
+    using Protoboard = libsnark::protoboard<FieldT>;
+    using GadSha =
+        typename std::conditional<sha_version == Sha_version::SHA256,
+                                  libsnark::sha256_two_to_one_hash_gadget<FieldT>,
+                                  libsnark::sha512::sha512_two_to_one_hash_gadget<FieldT>>::type;
     using Proof = libsnark::r1cs_gg_ppzksnark_proof<ppT>;
 
 
@@ -90,10 +59,11 @@ public:
                                               ? sha256::hash_oneblock
                                               : ::sha512::hash_oneblock;
 
-    MTree_Gadget(size_t height, size_t trans_idx) :
-        pb{},                          //
-        keypair{},                     //
-        hash_out{pb, DIGEST_SZ, "out"} //
+    MTree_Gadget(libsnark::protoboard<FieldT> &pb, size_t height, size_t trans_idx,
+                 const std::string &annotation_prefix) :
+        libsnark::gadget<FieldT>(pb, annotation_prefix), //
+        keypair{},                                       //
+        hash_out{pb, DIGEST_SZ, "out"}                   //
     {
         std::string name_l{"hashL_"};
         std::string name_r{"hashR_"};
@@ -108,15 +78,15 @@ public:
 
             trans_idx >>= 1;
 
-            hash_l.emplace_back(pb, DIGEST_SZ, name_l + ext);
-            hash_r.emplace_back(pb, DIGEST_SZ, name_r + ext);
+            hash_l.emplace_back(pb, DIGEST_SZ, FMT(name_l, ext));
+            hash_r.emplace_back(pb, DIGEST_SZ, FMT(name_r, ext));
 
             hash_f.emplace_back(pb,                                            //
                                 hash_l[i], hash_r[i],                          //
-                                trans_idx & 1 ? hash_r[i + 1] : hash_l[i + 1], //
-                                name_f + ext);
+                                trans_idx & 1 ? hash_r.back() : hash_l.back(), //
+                                FMT(name_f, ext));
 
-            hash_f[i].generate_r1cs_constraints();
+            hash_f.back().generate_r1cs_constraints();
         }
         hash_f.emplace_back(pb, hash_l.back(), hash_r.back(), hash_out, "hashF_last");
         hash_f.back().generate_r1cs_constraints();

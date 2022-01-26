@@ -2,6 +2,7 @@
     "files.associations": {
         "*.cu": "cpp",
         "*.cuh": "cpp",
+        "*.tcc": "cpp",
         "*.h": "c",
         "xutility": "cpp",
         "vector": "cpp",
@@ -103,6 +104,12 @@
         "__locale": "cpp",
         "__threading_support": "cpp",
         "string_view": "cpp",
-        "*.tcc": "cpp"
+        "climits": "cpp",
+        "__split_buffer": "cpp",
+        "__config": "cpp",
+        "__tree": "cpp",
+        "*.ipp": "cpp",
+        "regex": "cpp",
+        "memory_resource": "cpp"
     }
 }

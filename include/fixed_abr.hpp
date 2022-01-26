@@ -45,7 +45,7 @@ public:
         sha256::hash_oneblock(this->digest, block);
     }
 
-    FixedAbrNode(const uint8_t *left, const uint8_t *right, const uint8_t *extra, size_t depth) :
+    FixedAbrNode(const uint8_t *left, const uint8_t *right, const uint8_t *middle, size_t depth) :
         depth{depth}
     {
         uint8_t block[sha256::BLOCK_SIZE];
@@ -53,11 +53,13 @@ public:
         memcpy(block, left, sha256::DIGEST_SIZE);
         memcpy(block + sha256::DIGEST_SIZE, right, sha256::DIGEST_SIZE);
 
+        // xoring left
         for (size_t i = 0; i < sha256::DIGEST_SIZE; ++i)
-            block[i] ^= extra[i];
+            block[i] ^= middle[i];
 
+        // xoring right
         for (size_t i = 0; i < sha256::DIGEST_SIZE; ++i)
-            block[sha256::DIGEST_SIZE + i] ^= extra[i];
+            block[sha256::DIGEST_SIZE + i] ^= middle[i];
 
         sha256::hash_oneblock(this->digest, block);
 
@@ -101,10 +103,15 @@ requires(height > 0) class FixedAbr
 {
 private:
     static constexpr size_t INTERNAL_N = (1ULL << (height - 2)) - 1;
+    static constexpr size_t LEAVES_N = 1ULL << (height - 1);
+    static constexpr size_t INPUT_BLKS = LEAVES_N + INTERNAL_N;
+
     std::vector<FixedAbrNode> nodes{};
     FixedAbrNode *root = nullptr;
 
 public:
+    static constexpr size_t INPUT_SZ = INPUT_BLKS * sha256::BLOCK_SIZE;
+
     template<std::ranges::range Range>
     FixedAbr(const Range &range) :
         FixedAbr(std::ranges::cdata(range),
@@ -119,9 +126,7 @@ public:
     FixedAbr(const void *vdata, size_t sz) :
         nodes((1ULL << height) - 1 + INTERNAL_N), root{&nodes.back()}
     {
-        static constexpr size_t LEAVES_N = 1ULL << (height - 1);
-
-        if (sz / sha256::BLOCK_SIZE != LEAVES_N + INTERNAL_N || sz % sha256::BLOCK_SIZE != 0)
+        if (sz / sha256::BLOCK_SIZE != INPUT_BLKS || sz % sha256::BLOCK_SIZE != 0)
         {
             std::cerr << "FixedAbr: Bad size of input data\n";
             return;
@@ -132,7 +137,7 @@ public:
         size_t last = 0;
 
         // add leaves and internal hashes
-        for (size_t i = 0; i < LEAVES_N + INTERNAL_N; ++i)
+        for (size_t i = 0; i < INPUT_BLKS; ++i)
             this->nodes[last++] = {data + sha256::BLOCK_SIZE * i, depth};
 
 
@@ -140,7 +145,8 @@ public:
         --depth;
         for (size_t i = 0; i < LEAVES_N; i += 2)
         {
-            this->nodes[last] = {this->nodes[i].digest, this->nodes[i + 1].digest, depth};
+            this->nodes[last] = FixedAbrNode{this->nodes[i].digest, this->nodes[i + 1].digest,
+                                             depth};
 
             this->nodes[last].l = &this->nodes[i];
             this->nodes[last].r = &this->nodes[i + 1];
@@ -149,14 +155,14 @@ public:
             ++last;
         }
 
-        for (size_t i = LEAVES_N + INTERNAL_N, len = i + LEAVES_N / 2, e = LEAVES_N; depth > 0;
+        for (size_t i = INPUT_BLKS, len = i + LEAVES_N / 2, e = LEAVES_N; depth > 0;
              len += 1ULL << depth)
         {
             --depth;
             while (i < len)
             {
-                this->nodes[last] = {this->nodes[i].digest, this->nodes[i + 1].digest,
-                                     this->nodes[e].digest, depth};
+                this->nodes[last] = FixedAbrNode{this->nodes[i].digest, this->nodes[i + 1].digest,
+                                                 this->nodes[e].digest, depth};
 
                 this->nodes[last].l = &this->nodes[i];
                 this->nodes[last].e = &this->nodes[e];
