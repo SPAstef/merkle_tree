@@ -3,18 +3,15 @@
 #include "utils/sha256.hpp"
 #include "utils/sha512.hpp"
 #include "utils/sha_version.hpp"
-#if __cplusplus >= 202002L
-    #include "utils/string_utils.hpp"
-#endif
+#include "utils/string_utils.hpp"
 
-#include <array>
-#include <bit>
 #include <cstring>
 #include <iostream>
-#include <ranges>
-#include <stdexcept>
-#include <variant>
 #include <vector>
+
+#if __cplusplus >= 202002L
+    #include <ranges>
+#endif
 
 template<Sha_version sha_version>
 class FixedMTreeNode
@@ -56,13 +53,12 @@ public:
 
     const uint8_t *get_digest() const { return digest; }
 
-#if __cplusplus >= 202002L
     friend std::ostream &operator<<(std::ostream &os, const FixedMTreeNode &node)
     {
         for (size_t i = 0; i < node.depth; ++i)
             os << "    ";
 
-        os << "*: " << hexdump(node.digest) << '\n';
+        os << "*: " << hexdump(node.digest, DIG_SZ) << '\n';
 
         if (node.l)
             os << *node.l;
@@ -71,7 +67,6 @@ public:
 
         return os;
     }
-#endif
 };
 
 
@@ -141,7 +136,6 @@ public:
 
     const Node *get_node(size_t i) const { return &nodes[i]; }
 
-#if __cplusplus >= 202002L
     friend std::ostream &operator<<(std::ostream &os, const FixedMTree &tree)
     {
         if (!tree.root)
@@ -149,5 +143,4 @@ public:
 
         return os << *tree.root;
     }
-#endif
 };

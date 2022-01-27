@@ -12,9 +12,10 @@ class XOR_gadget : public libsnark::gadget<FieldT>
 {
 public:
     using PbLC = libsnark::pb_linear_combination<FieldT>;
-    PbLC A;
-    PbLC B;
-    PbLC out;
+    
+    const PbLC A;
+    const PbLC B;
+    const PbLC out;
 
     XOR_gadget(libsnark::protoboard<FieldT> &pb, const PbLC &A, const PbLC &B, const PbLC &out,
                const std::string &annotation_prefix) :
@@ -51,9 +52,9 @@ class LongXOR_gadget : public libsnark::gadget<FieldT>
 public:
     using DigVar = libsnark::digest_variable<FieldT>;
 
-    DigVar A;
-    DigVar B;
-    DigVar out;
+    const DigVar A;
+    const DigVar B;
+    const DigVar out;
     std::vector<XOR_gadget<FieldT>> xor_gad;
 
     LongXOR_gadget(libsnark::protoboard<FieldT> &pb, const DigVar &A, const DigVar &B,

@@ -5,15 +5,11 @@
 #include <iomanip>
 #include <ostream>
 #include <random>
-#include <ranges>
 #include <string>
 
-// Print pairs
-template<typename T1, typename T2>
-std::ostream &operator<<(std::ostream &os, const std::pair<T1, T2> &pair)
-{
-    return os << '(' << pair.first << ", " << pair.second << ')';
-}
+#if __cplusplus >= 202002L
+
+    #include <ranges>
 
 // Print iterables (except std::string, std::string_view and char arrays)
 template<std::ranges::range Iter,
@@ -48,21 +44,6 @@ std::ostream &operator<<(std::ostream &os, const Iter &it)
     return os << '}';
 }
 
-// Print char16_t
-inline std::ostream &operator<<(std::ostream &os, const char16_t *str)
-{
-    while (*str)
-        os << (char)*str++;
-
-    return os;
-}
-
-// Print hexadeciaml numbers in a compact way without leaking
-#define hexout(x) std::hex << std::setw(sizeof(x) * 2) << std::setfill('0') << (x) << std::dec
-
-// Print hexadeciaml ranges in a compact way without leaking
-#define hexoutit(x) std::hex << std::setw(sizeof(*std::begin(x)) * 2) << (x) << std::dec
-
 // Convert an ASCII character to an hex digit
 constexpr inline uint8_t ascii_to_digit(char c)
 {
@@ -80,7 +61,8 @@ constexpr inline uint8_t ascii_to_digit(char c)
 
 namespace detail
 {
-    template<size_t sz> struct StrToHex
+    template<size_t sz>
+    struct StrToHex
     {
         std::array<uint8_t, sz / 2> v;
 
@@ -91,7 +73,8 @@ namespace detail
         }
     };
 
-    template<typename T, bool reverse = false> consteval T str_to_t(const char *s, size_t sz)
+    template<typename T, bool reverse = false>
+    consteval T str_to_t(const char *s, size_t sz)
     {
         T x = 0;
 
@@ -107,26 +90,29 @@ namespace detail
 
 // Convert (at compile time) a string literal of hexadecimal digits to an std::array of
 // hexadecimal values.
-template<detail::StrToHex cvt> consteval auto operator""_x()
+template<detail::StrToHex cvt>
+consteval auto operator""_x()
 {
     return cvt.v;
 }
 
+    #define CAT0(x, y) x##y
+    #define CAT(x, y) CAT0(x, y)
 
-#define CAT0(x, y) x##y
-#define CAT(x, y) CAT0(x, y)
-
-#define OPERATOR_STR_TO_INTTYPE_NAMED(sign, size, type, name)                                      \
-    consteval type name(const char *s, size_t sz) { return detail::str_to_t<type, false>(s, sz); } \
+    #define OPERATOR_STR_TO_INTTYPE_NAMED(sign, size, type, name)                                  \
+        consteval type name(const char *s, size_t sz)                                              \
+        {                                                                                          \
+            return detail::str_to_t<type, false>(s, sz);                                           \
+        }                                                                                          \
                                                                                                    \
-    consteval type CAT(name, r)(const char *s, size_t sz)                                          \
-    {                                                                                              \
-        return detail::str_to_t<type, true>(s, sz);                                                \
-    }
+        consteval type CAT(name, r)(const char *s, size_t sz)                                      \
+        {                                                                                          \
+            return detail::str_to_t<type, true>(s, sz);                                            \
+        }
 
-#define OPERATOR_STR_TO_INTTYPE(sign, size)                                                        \
-    OPERATOR_STR_TO_INTTYPE_NAMED(sign, size, CAT(CAT(CAT(sign, int), size), _t),                  \
-                                  CAT(CAT(operator""_, sign), size))
+    #define OPERATOR_STR_TO_INTTYPE(sign, size)                                                    \
+        OPERATOR_STR_TO_INTTYPE_NAMED(sign, size, CAT(CAT(CAT(sign, int), size), _t),              \
+                                      CAT(CAT(operator""_, sign), size))
 
 OPERATOR_STR_TO_INTTYPE(, 64)  // ""_64, ""_64r
 OPERATOR_STR_TO_INTTYPE(u, 64) // ""_u64, ""_u64r
@@ -137,10 +123,34 @@ OPERATOR_STR_TO_INTTYPE(u, 16) // ""_u16, ""_u16r
 OPERATOR_STR_TO_INTTYPE(, 8)   // ""_8, ""_8r
 OPERATOR_STR_TO_INTTYPE(u, 8)  // ""_u8, ""_u8r
 
-#undef OPERATOR_STR_TO_INTTYPE
-#undef OPERATOR_STR_TO_INTTYPE_NAMED
-#undef CAT
-#undef CAT0
+    #undef OPERATOR_STR_TO_INTTYPE
+    #undef OPERATOR_STR_TO_INTTYPE_NAMED
+    #undef CAT
+    #undef CAT0
+
+#endif
+
+// Print pairs
+template<typename T1, typename T2>
+std::ostream &operator<<(std::ostream &os, const std::pair<T1, T2> &pair)
+{
+    return os << '(' << pair.first << ", " << pair.second << ')';
+}
+
+// Print char16_t
+inline std::ostream &operator<<(std::ostream &os, const char16_t *str)
+{
+    while (*str)
+        os << (char)*str++;
+
+    return os;
+}
+
+// Print hexadeciaml numbers in a compact way without leaking
+#define hexout(x) std::hex << std::setw(sizeof(x) * 2) << std::setfill('0') << (x) << std::dec
+
+// Print hexadeciaml ranges in a compact way without leaking
+#define hexoutit(x) std::hex << std::setw(sizeof(*std::begin(x)) * 2) << (x) << std::dec
 
 template<bool reverse = false, typename T>
 std::string hexdump(T *arr, size_t sz, bool upper = false, size_t spacing = 0)
@@ -150,7 +160,7 @@ std::string hexdump(T *arr, size_t sz, bool upper = false, size_t spacing = 0)
     std::string s(sz * sizeof(T) * 2, 0);
     uint8_t *d = (uint8_t *)arr;
 
-    if constexpr (reverse)
+    if (reverse)
         for (size_t i = 0; i < sz; ++i)
         {
             size_t k = i * sizeof(T);
@@ -175,6 +185,8 @@ std::string hexdump(T *arr, size_t sz, bool upper = false, size_t spacing = 0)
     return s;
 }
 
+#if __cplusplus >= 202002L
+
 template<bool reverse = false, std::ranges::range Range>
 std::string hexdump(const Range &it, bool upper = false, size_t spacing = 0)
 {
@@ -182,10 +194,10 @@ std::string hexdump(const Range &it, bool upper = false, size_t spacing = 0)
                             spacing);
 }
 
-inline std::string random_string(size_t len, std::string_view alphabet)
+inline std::string random_string(size_t len, const std::string &alphabet)
 {
     static std::mt19937_64 rng{std::random_device{}()};
-    
+
     std::uniform_int_distribution<size_t> dist{0, alphabet.size() - 1};
     std::string str(len, 0);
 
@@ -194,3 +206,5 @@ inline std::string random_string(size_t len, std::string_view alphabet)
 
     return str;
 }
+
+#endif

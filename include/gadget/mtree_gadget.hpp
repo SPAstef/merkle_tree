@@ -29,21 +29,13 @@ class MTree_Gadget : public libsnark::gadget<FieldT>
 public:
     using DigVar = libsnark::digest_variable<FieldT>;
     using BlockVar = libsnark::block_variable<FieldT>;
-    using Keypair = libsnark::r1cs_gg_ppzksnark_keypair<ppT>;
     using Protoboard = libsnark::protoboard<FieldT>;
     using GadSha =
         typename std::conditional<sha_version == Sha_version::SHA256,
                                   libsnark::sha256_two_to_one_hash_gadget<FieldT>,
                                   libsnark::sha512::sha512_two_to_one_hash_gadget<FieldT>>::type;
-    using Proof = libsnark::r1cs_gg_ppzksnark_proof<ppT>;
-
 
 private:
-    Protoboard pb;
-    Keypair keypair;
-
-    DigVar hash_out;
-
     std::vector<DigVar> hash_l;
     std::vector<DigVar> hash_r;
     std::vector<GadSha> hash_f;
@@ -59,10 +51,11 @@ public:
                                               ? sha256::hash_oneblock
                                               : ::sha512::hash_oneblock;
 
+    const DigVar hash_out;
+
     MTree_Gadget(libsnark::protoboard<FieldT> &pb, size_t height, size_t trans_idx,
                  const std::string &annotation_prefix) :
         libsnark::gadget<FieldT>(pb, annotation_prefix), //
-        keypair{},                                       //
         hash_out{pb, DIGEST_SZ, "out"}                   //
     {
         std::string name_l{"hashL_"};
@@ -81,27 +74,38 @@ public:
             hash_l.emplace_back(pb, DIGEST_SZ, FMT(name_l, ext));
             hash_r.emplace_back(pb, DIGEST_SZ, FMT(name_r, ext));
 
-            hash_f.emplace_back(pb,                                            //
-                                hash_l[i], hash_r[i],                          //
-                                trans_idx & 1 ? hash_r.back() : hash_l.back(), //
-                                FMT(name_f, ext));
-
-            hash_f.back().generate_r1cs_constraints();
+            if (trans_idx & 1)
+            {
+                hash_f.emplace_back(pb, hash_l[i], hash_r[i], hash_r.back(), FMT(name_f, ext));
+            }
+            else
+            {
+                hash_f.emplace_back(pb, hash_l[i], hash_r[i], hash_l.back(), FMT(name_f, ext));
+            }
         }
         hash_f.emplace_back(pb, hash_l.back(), hash_r.back(), hash_out, "hashF_last");
-        hash_f.back().generate_r1cs_constraints();
 
         pb.set_input_sizes(DIGEST_SZ);
 
-        // Generate keys when finished
+/*        // Generate keys when finished
         Keypair tmp = libsnark::r1cs_gg_ppzksnark_generator<ppT>(pb.get_constraint_system());
         keypair.pk = tmp.pk;
-        keypair.vk = tmp.vk;
+        keypair.vk = tmp.vk;*/
     }
 
-    Proof generate_proof(libff::bit_vector my_hash_v,                        //
-                         const std::vector<libff::bit_vector> &other_hash_v, //
-                         size_t trans_idx                                    //
+    void generate_r1cs_constraints()
+    {
+        for (auto &&x : hash_l)
+            x.generate_r1cs_constraints();
+        for (auto &&x : hash_r)
+            x.generate_r1cs_constraints();
+        for (auto &&x : hash_f)
+            x.generate_r1cs_constraints();
+    }
+
+    void generate_r1cs_witness(libff::bit_vector my_hash_v,                        //
+                               const std::vector<libff::bit_vector> &other_hash_v, //
+                               size_t trans_idx                                    //
     )
     {
         static constexpr size_t DIG_SZ = DIGEST_SZ / CHAR_BIT;
@@ -109,8 +113,7 @@ public:
         uint8_t block[BLK_SZ];
         uint8_t digest[DIG_SZ];
 
-        pb.clear_values();
-        hash_out.generate_r1cs_witness(other_hash_v.back());
+        const_cast<DigVar*>(&hash_out)->generate_r1cs_witness(other_hash_v.back());
 
         if (trans_idx & 1)
         {
@@ -159,7 +162,11 @@ public:
             hash_oneblock(digest, block);
             unpack_bits(my_hash_v, digest);
         }
+    }
 
+/*
+    Proof generate_proof()
+    {
         return libsnark::r1cs_gg_ppzksnark_prover<ppT>(keypair.pk, pb.primary_input(),
                                                        pb.auxiliary_input());
     }
@@ -172,5 +179,5 @@ public:
 
         return libsnark::r1cs_gg_ppzksnark_online_verifier_strong_IC<ppT>(pvk, pb.primary_input(),
                                                                           proof);
-    }
+    }*/
 };

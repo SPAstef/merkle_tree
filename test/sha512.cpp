@@ -1,5 +1,4 @@
 #include "utils/string_utils.hpp"
-#include "utils/sha256.hpp"
 #include "utils/sha512.hpp"
 #include <iostream>
 

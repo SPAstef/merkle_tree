@@ -110,6 +110,10 @@
         "__tree": "cpp",
         "*.ipp": "cpp",
         "regex": "cpp",
-        "memory_resource": "cpp"
+        "memory_resource": "cpp",
+        "unordered_set": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp",
+        "cfenv": "cpp"
     }
 }

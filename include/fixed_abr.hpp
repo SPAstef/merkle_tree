@@ -1,21 +1,31 @@
 #pragma once
 
 #include "utils/sha256.hpp"
+#include "utils/sha512.hpp"
+#include "utils/sha_version.hpp"
 #include "utils/string_utils.hpp"
 
-#include <array>
-#include <bit>
 #include <cstring>
 #include <iostream>
-#include <ranges>
-#include <stdexcept>
-#include <variant>
 #include <vector>
 
+#if __cplusplus >= 202002L
+    #include <ranges>
+#endif
+
+template<Sha_version sha_version>
 class FixedAbrNode
 {
 private:
-    uint8_t digest[sha256::DIGEST_SIZE];
+    static constexpr size_t DIG_SZ = sha_version == Sha_version::SHA256 ? sha256::DIGEST_SIZE
+                                                                        : sha512::DIGEST_SIZE;
+    static constexpr size_t BLK_SZ = sha_version == Sha_version::SHA256 ? sha256::BLOCK_SIZE
+                                                                        : sha512::BLOCK_SIZE;
+    static constexpr auto hash_oneblock = sha_version == Sha_version::SHA256
+                                              ? sha256::hash_oneblock
+                                              : sha512::hash_oneblock;
+
+    uint8_t digest[DIG_SZ];
     FixedAbrNode *f = nullptr;
     FixedAbrNode *l = nullptr;
     FixedAbrNode *e = nullptr;
@@ -30,40 +40,38 @@ public:
 
     FixedAbrNode(const uint8_t *block, size_t depth) : depth{depth}
     {
-        sha256::hash_oneblock(this->digest, block);
+        hash_oneblock(this->digest, block);
     }
 
     FixedAbrNode(const uint8_t *left, const uint8_t *right, size_t depth) : depth{depth}
     {
-        static constexpr size_t HBLOCK_SZ = sha256::BLOCK_SIZE / 2;
+        uint8_t block[BLK_SZ];
 
-        uint8_t block[sha256::BLOCK_SIZE];
+        memcpy(block, left, DIG_SZ);
+        memcpy(block + DIG_SZ, right, DIG_SZ);
 
-        memcpy(block, left, HBLOCK_SZ);
-        memcpy(block + HBLOCK_SZ, right, HBLOCK_SZ);
-
-        sha256::hash_oneblock(this->digest, block);
+        hash_oneblock(this->digest, block);
     }
 
     FixedAbrNode(const uint8_t *left, const uint8_t *right, const uint8_t *middle, size_t depth) :
         depth{depth}
     {
-        uint8_t block[sha256::BLOCK_SIZE];
+        uint8_t block[BLK_SZ];
 
-        memcpy(block, left, sha256::DIGEST_SIZE);
-        memcpy(block + sha256::DIGEST_SIZE, right, sha256::DIGEST_SIZE);
+        memcpy(block, left, DIG_SZ);
+        memcpy(block + DIG_SZ, right, DIG_SZ);
 
         // xoring left
-        for (size_t i = 0; i < sha256::DIGEST_SIZE; ++i)
+        for (size_t i = 0; i < DIG_SZ; ++i)
             block[i] ^= middle[i];
 
         // xoring right
-        for (size_t i = 0; i < sha256::DIGEST_SIZE; ++i)
-            block[sha256::DIGEST_SIZE + i] ^= middle[i];
+        for (size_t i = 0; i < DIG_SZ; ++i)
+            block[DIG_SZ + i] ^= middle[i];
 
-        sha256::hash_oneblock(this->digest, block);
+        hash_oneblock(this->digest, block);
 
-        for (size_t i = 0; i < sha256::DIGEST_SIZE; ++i)
+        for (size_t i = 0; i < DIG_SZ; ++i)
             this->digest[i] ^= right[i];
     }
 
@@ -85,7 +93,7 @@ public:
         else
             os << '*';
 
-        os << ": " << hexdump(node.digest) << '\n';
+        os << ": " << hexdump(node.digest, DIG_SZ) << '\n';
         if (node.l)
             os << *node.l;
         if (node.e)
@@ -98,10 +106,13 @@ public:
 };
 
 
-template<size_t height>
-requires(height > 0) class FixedAbr
+template<size_t height, Sha_version sha_version>
+class FixedAbr
 {
 private:
+    static constexpr size_t BLK_SZ = sha_version == Sha_version::SHA256 ? sha256::BLOCK_SIZE
+                                                                        : sha512::BLOCK_SIZE;
+
     static constexpr size_t INTERNAL_N = (1ULL << (height - 2)) - 1;
     static constexpr size_t LEAVES_N = 1ULL << (height - 1);
     static constexpr size_t INPUT_BLKS = LEAVES_N + INTERNAL_N;
@@ -110,13 +121,15 @@ private:
     FixedAbrNode *root = nullptr;
 
 public:
-    static constexpr size_t INPUT_SZ = INPUT_BLKS * sha256::BLOCK_SIZE;
+    static constexpr size_t INPUT_SZ = INPUT_BLKS * BLK_SZ;
 
+#if __cplusplus >= 202002L
     template<std::ranges::range Range>
     FixedAbr(const Range &range) :
         FixedAbr(std::ranges::cdata(range),
                  std::ranges::size(range) * sizeof(*std::ranges::cdata(range)))
     {}
+#endif
 
     template<typename Iter>
     FixedAbr(const Iter begin, const Iter end) :
@@ -126,7 +139,7 @@ public:
     FixedAbr(const void *vdata, size_t sz) :
         nodes((1ULL << height) - 1 + INTERNAL_N), root{&nodes.back()}
     {
-        if (sz / sha256::BLOCK_SIZE != INPUT_BLKS || sz % sha256::BLOCK_SIZE != 0)
+        if (sz / BLK_SZ != INPUT_BLKS || sz % BLK_SZ != 0)
         {
             std::cerr << "FixedAbr: Bad size of input data\n";
             return;
@@ -138,7 +151,7 @@ public:
 
         // add leaves and internal hashes
         for (size_t i = 0; i < INPUT_BLKS; ++i)
-            this->nodes[last++] = {data + sha256::BLOCK_SIZE * i, depth};
+            this->nodes[last++] = {data + BLK_SZ * i, depth};
 
 
         // build first internal layer

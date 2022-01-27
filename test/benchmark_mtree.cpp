@@ -14,12 +14,13 @@
 
 struct GadgetTiming
 {
-    double gen;
-    double ver;
-    bool ans;
+    double gen; // time to generate the constraints
+    double ver; // time to verify the constraints
+    bool ans;   // whether the constraints are satisfiedd
 };
 
 static constexpr size_t TRANS_IDX = 0;
+static constexpr size_t TREE_HEIGHT = 10;
 
 template<typename ppT, Sha_version sha_version>
 GadgetTiming run_inner_circuit(size_t tree_height, const libff::bit_vector &my_trans_bv,
@@ -116,7 +117,7 @@ int main()
 {
     libsnark::default_r1cs_gg_ppzksnark_pp::init_public_params();
 
-    run_mtree_circuit<libsnark::default_r1cs_gg_ppzksnark_pp, 28>();
+    run_mtree_circuit<libsnark::default_r1cs_gg_ppzksnark_pp, TREE_HEIGHT>();
 
     return 0;
 }
