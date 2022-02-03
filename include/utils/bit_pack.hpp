@@ -2,6 +2,7 @@
 
 #include <climits>
 #include <cstdint>
+#include <cstddef>
 #include <vector>
 
 static inline void pack_bits(uint8_t *v, const std::vector<bool> &bv)

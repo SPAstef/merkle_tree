@@ -2,7 +2,6 @@
 
 #include "utils/sha256.hpp"
 #include "utils/sha512.hpp"
-#include "utils/sha_version.hpp"
 #include "utils/string_utils.hpp"
 
 #include <cstring>
@@ -13,24 +12,17 @@
     #include <ranges>
 #endif
 
-template<Sha_version sha_version>
+template<typename Hash>
 class FixedMTreeNode
 {
 private:
-    static constexpr size_t DIG_SZ = sha_version == Sha_version::SHA256 ? sha256::DIGEST_SIZE
-                                                                        : sha512::DIGEST_SIZE;
-    static constexpr size_t BLK_SZ = sha_version == Sha_version::SHA256 ? sha256::BLOCK_SIZE
-                                                                        : sha512::BLOCK_SIZE;
-    static constexpr auto hash_oneblock = sha_version == Sha_version::SHA256
-                                              ? sha256::hash_oneblock
-                                              : sha512::hash_oneblock;
-    uint8_t digest[DIG_SZ];
+    uint8_t digest[Hash::DIGEST_SIZE];
     FixedMTreeNode *f = nullptr;
     FixedMTreeNode *l = nullptr;
     FixedMTreeNode *r = nullptr;
     size_t depth = 0;
 
-    template<size_t, Sha_version>
+    template<size_t, typename>
     friend class FixedMTree;
 
 public:
@@ -38,17 +30,17 @@ public:
 
     FixedMTreeNode(const uint8_t *block, size_t depth) : depth{depth}
     {
-        hash_oneblock(this->digest, block);
+        Hash::hash_oneblock(this->digest, block);
     }
 
     FixedMTreeNode(const uint8_t *left, const uint8_t *right, size_t depth) : depth{depth}
     {
-        uint8_t block[BLK_SZ];
+        uint8_t block[Hash::BLOCK_SIZE];
 
-        memcpy(block, left, DIG_SZ);
-        memcpy(block + DIG_SZ, right, DIG_SZ);
+        memcpy(block, left, Hash::DIGEST_SIZE);
+        memcpy(block + Hash::DIGEST_SIZE, right, Hash::DIGEST_SIZE);
 
-        hash_oneblock(this->digest, block);
+        Hash::hash_oneblock(this->digest, block);
     }
 
     const uint8_t *get_digest() const { return digest; }
@@ -58,7 +50,7 @@ public:
         for (size_t i = 0; i < node.depth; ++i)
             os << "    ";
 
-        os << "*: " << hexdump(node.digest, DIG_SZ) << '\n';
+        os << "*: " << hexdump(node.digest, Hash::DIGEST_SIZE) << '\n';
 
         if (node.l)
             os << *node.l;
@@ -70,20 +62,20 @@ public:
 };
 
 
-template<size_t height, Sha_version sha_version>
+template<size_t height, typename Hash>
 class FixedMTree
 {
 public:
-    using Node = FixedMTreeNode<sha_version>;
+    using Node = FixedMTreeNode<Hash>;
 
 private:
-    static constexpr size_t BLK_SZ = sha_version == Sha_version::SHA256 ? sha256::BLOCK_SIZE
-                                                                        : sha512::BLOCK_SIZE;
+    static constexpr size_t LEAVES_N = 1ULL << (height - 1);
 
     std::vector<Node> nodes{};
     Node *root = nullptr;
 
 public:
+    static constexpr size_t INPUT_SIZE = LEAVES_N * Hash::BLOCK_SIZE;
 #if __cplusplus >= 202002L
     template<std::ranges::range Range>
     FixedMTree(const Range &range) :
@@ -99,9 +91,7 @@ public:
 
     FixedMTree(const void *vdata, size_t sz) : nodes((1ULL << height) - 1), root{&nodes.back()}
     {
-        static constexpr size_t LEAVES_N = 1ULL << (height - 1);
-
-        if (sz / BLK_SZ != LEAVES_N || sz % BLK_SZ != 0)
+        if (sz / Hash::BLOCK_SIZE != LEAVES_N || sz % Hash::BLOCK_SIZE != 0)
         {
             std::cerr << "FixedMTree: Bad size of input data\n";
             return;
@@ -112,7 +102,7 @@ public:
 
         // add leaves
         for (size_t i = 0; i < LEAVES_N; ++i)
-            this->nodes[i] = {data + BLK_SZ * i, depth};
+            this->nodes[i] = {data + Hash::BLOCK_SIZE * i, depth};
 
         // build tree bottom-up
         for (size_t i = 0, last = LEAVES_N, len = LEAVES_N; depth > 0; len += 1ULL << depth)

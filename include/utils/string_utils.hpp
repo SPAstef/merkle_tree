@@ -59,6 +59,16 @@ constexpr inline uint8_t ascii_to_digit(char c)
     return x;
 }
 
+template<std::ranges::range Range>
+constexpr void hexstring_to_range(std::string_view str, Range &out)
+{
+    auto out_it = std::ranges::begin(out);
+
+    for (size_t i = 0; i < str.size(); i += 2)
+        *out_it++ = ascii_to_digit(str[i]) << 4 | ascii_to_digit(str[i + 1]);
+}
+
+
 namespace detail
 {
     template<size_t sz>

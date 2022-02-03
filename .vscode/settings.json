@@ -114,6 +114,7 @@
         "unordered_set": "cpp",
         "numbers": "cpp",
         "semaphore": "cpp",
-        "cfenv": "cpp"
+        "cfenv": "cpp",
+        "__bit_reference": "cpp"
     }
 }

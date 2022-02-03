@@ -2,7 +2,6 @@
 
 #include "utils/sha256.hpp"
 #include "utils/sha512.hpp"
-#include "utils/sha_version.hpp"
 #include "utils/string_utils.hpp"
 
 #include <cstring>
@@ -13,65 +12,57 @@
     #include <ranges>
 #endif
 
-template<Sha_version sha_version>
+template<typename Hash>
 class FixedAbrNode
 {
 private:
-    static constexpr size_t DIG_SZ = sha_version == Sha_version::SHA256 ? sha256::DIGEST_SIZE
-                                                                        : sha512::DIGEST_SIZE;
-    static constexpr size_t BLK_SZ = sha_version == Sha_version::SHA256 ? sha256::BLOCK_SIZE
-                                                                        : sha512::BLOCK_SIZE;
-    static constexpr auto hash_oneblock = sha_version == Sha_version::SHA256
-                                              ? sha256::hash_oneblock
-                                              : sha512::hash_oneblock;
-
-    uint8_t digest[DIG_SZ];
+    uint8_t digest[Hash::DIGEST_SIZE];
     FixedAbrNode *f = nullptr;
     FixedAbrNode *l = nullptr;
     FixedAbrNode *e = nullptr;
     FixedAbrNode *r = nullptr;
     size_t depth = 0;
 
-    template<size_t height>
-    requires(height > 0) friend class FixedAbr;
+    template<size_t, typename>
+    friend class FixedAbr;
 
 public:
     FixedAbrNode() = default;
 
     FixedAbrNode(const uint8_t *block, size_t depth) : depth{depth}
     {
-        hash_oneblock(this->digest, block);
+        Hash::hash_oneblock(this->digest, block);
     }
 
     FixedAbrNode(const uint8_t *left, const uint8_t *right, size_t depth) : depth{depth}
     {
-        uint8_t block[BLK_SZ];
+        uint8_t block[Hash::BLOCK_SIZE];
 
-        memcpy(block, left, DIG_SZ);
-        memcpy(block + DIG_SZ, right, DIG_SZ);
+        memcpy(block, left, Hash::DIGEST_SIZE);
+        memcpy(block + Hash::DIGEST_SIZE, right, Hash::DIGEST_SIZE);
 
-        hash_oneblock(this->digest, block);
+        Hash::hash_oneblock(this->digest, block);
     }
 
     FixedAbrNode(const uint8_t *left, const uint8_t *right, const uint8_t *middle, size_t depth) :
         depth{depth}
     {
-        uint8_t block[BLK_SZ];
+        uint8_t block[Hash::BLOCK_SIZE];
 
-        memcpy(block, left, DIG_SZ);
-        memcpy(block + DIG_SZ, right, DIG_SZ);
+        memcpy(block, left, Hash::DIGEST_SIZE);
+        memcpy(block + Hash::DIGEST_SIZE, right, Hash::DIGEST_SIZE);
 
         // xoring left
-        for (size_t i = 0; i < DIG_SZ; ++i)
+        for (size_t i = 0; i < Hash::DIGEST_SIZE; ++i)
             block[i] ^= middle[i];
 
         // xoring right
-        for (size_t i = 0; i < DIG_SZ; ++i)
-            block[DIG_SZ + i] ^= middle[i];
+        for (size_t i = 0; i < Hash::DIGEST_SIZE; ++i)
+            block[Hash::DIGEST_SIZE + i] ^= middle[i];
 
-        hash_oneblock(this->digest, block);
+        Hash::hash_oneblock(this->digest, block);
 
-        for (size_t i = 0; i < DIG_SZ; ++i)
+        for (size_t i = 0; i < Hash::DIGEST_SIZE; ++i)
             this->digest[i] ^= right[i];
     }
 
@@ -93,7 +84,7 @@ public:
         else
             os << '*';
 
-        os << ": " << hexdump(node.digest, DIG_SZ) << '\n';
+        os << ": " << hexdump(node.digest, Hash::DIGEST_SIZE) << '\n';
         if (node.l)
             os << *node.l;
         if (node.e)
@@ -106,22 +97,21 @@ public:
 };
 
 
-template<size_t height, Sha_version sha_version>
+template<size_t height, typename Hash>
 class FixedAbr
 {
 private:
-    static constexpr size_t BLK_SZ = sha_version == Sha_version::SHA256 ? sha256::BLOCK_SIZE
-                                                                        : sha512::BLOCK_SIZE;
+    using Node = FixedAbrNode<Hash>;
 
     static constexpr size_t INTERNAL_N = (1ULL << (height - 2)) - 1;
     static constexpr size_t LEAVES_N = 1ULL << (height - 1);
     static constexpr size_t INPUT_BLKS = LEAVES_N + INTERNAL_N;
 
-    std::vector<FixedAbrNode> nodes{};
-    FixedAbrNode *root = nullptr;
+    std::vector<Node> nodes{};
+    Node *root = nullptr;
 
 public:
-    static constexpr size_t INPUT_SZ = INPUT_BLKS * BLK_SZ;
+    static constexpr size_t INPUT_SIZE = INPUT_BLKS * Hash::BLOCK_SIZE;
 
 #if __cplusplus >= 202002L
     template<std::ranges::range Range>
@@ -139,7 +129,7 @@ public:
     FixedAbr(const void *vdata, size_t sz) :
         nodes((1ULL << height) - 1 + INTERNAL_N), root{&nodes.back()}
     {
-        if (sz / BLK_SZ != INPUT_BLKS || sz % BLK_SZ != 0)
+        if (sz / Hash::BLOCK_SIZE != INPUT_BLKS || sz % Hash::BLOCK_SIZE != 0)
         {
             std::cerr << "FixedAbr: Bad size of input data\n";
             return;
@@ -151,15 +141,14 @@ public:
 
         // add leaves and internal hashes
         for (size_t i = 0; i < INPUT_BLKS; ++i)
-            this->nodes[last++] = {data + BLK_SZ * i, depth};
+            this->nodes[last++] = {data + Hash::BLOCK_SIZE * i, depth};
 
 
         // build first internal layer
         --depth;
         for (size_t i = 0; i < LEAVES_N; i += 2)
         {
-            this->nodes[last] = FixedAbrNode{this->nodes[i].digest, this->nodes[i + 1].digest,
-                                             depth};
+            this->nodes[last] = Node{this->nodes[i].digest, this->nodes[i + 1].digest, depth};
 
             this->nodes[last].l = &this->nodes[i];
             this->nodes[last].r = &this->nodes[i + 1];
@@ -174,8 +163,8 @@ public:
             --depth;
             while (i < len)
             {
-                this->nodes[last] = FixedAbrNode{this->nodes[i].digest, this->nodes[i + 1].digest,
-                                                 this->nodes[e].digest, depth};
+                this->nodes[last] = Node{this->nodes[i].digest, this->nodes[i + 1].digest,
+                                         this->nodes[e].digest, depth};
 
                 this->nodes[last].l = &this->nodes[i];
                 this->nodes[last].e = &this->nodes[e];
@@ -194,7 +183,7 @@ public:
         }
     }
 
-    const uint8_t digest() const { return root->digest; }
+    const uint8_t *digest() const { return root->digest; }
 
     friend std::ostream &operator<<(std::ostream &os, const FixedAbr &tree)
     {

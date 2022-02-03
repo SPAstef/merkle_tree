@@ -31,35 +31,47 @@ double measure(Fn foo, size_t repeat = 1, size_t times = 1, const char *name = n
         uint64_t c_start = __rdtsc();
         auto start = clk::now();
 
-        // assigning elements to v avoids elision of the loop
+#if __cplusplus >= 201703L
         if constexpr (threads > 1)
+#else
+        if (threads > 1)
+#endif
         {
 #pragma omp parallel for num_threads(threads)
             for (size_t j = 0; j < repeat; ++j)
             {
-                if constexpr (std::is_invocable_v<Fn, size_t>)
+#if __cplusplus >= 201703L
+                if constexpr (std::is_invocable<Fn, size_t>::value)
                     foo(j);
                 else
                     foo();
+#else
+                foo();
+#endif
             }
         }
         else
         {
             for (size_t j = 0; j < repeat; ++j)
             {
-                if constexpr (std::is_invocable_v<Fn, size_t>)
-                    foo(j);
-                else
-                    foo();
+#if __cplusplus >= 201703L
+                if constexpr (std::is_invocable<Fn, size_t>::value)
+                    if (std::is_invocable<Fn, size_t>::value)
+                        foo(j);
+                    else
+                        foo();
+#else
+                foo();
+#endif
             }
         }
 
         uint64_t clocks = __rdtsc() - c_start;
         uint64_t elap = (clk::now() - start).count();
 
-        double elap_ms = elap / 1'000'000.;
+        double elap_ms = elap / 1000000.;
         double cpi = (double)clocks / repeat;
-        double ops = repeat * 1'000'000'000. / elap;
+        double ops = repeat * 1000000000. / elap;
 
         clocks_avg = (clocks_avg * i + clocks) / (i + 1);
         elap_avg = (elap_avg * i + elap) / (i + 1);
@@ -70,7 +82,7 @@ double measure(Fn foo, size_t repeat = 1, size_t times = 1, const char *name = n
                 << ops << '\n';
     }
 
-    elap_avg /= 1'000'000;
+    elap_avg /= 1000000;
     if (output)
     {
         if (times > 1)

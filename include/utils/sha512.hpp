@@ -7,12 +7,15 @@
 #endif
 #include <cinttypes>
 
-namespace sha512
+class Sha512
 {
+public:
     static constexpr size_t BLOCK_SIZE = 128;
     static constexpr size_t DIGEST_SIZE = 64;
 
-    inline void hash_oneblock(uint8_t *digest, const void *message)
+    Sha512() = delete;
+
+    static void hash_oneblock(uint8_t *digest, const void *message)
     {
         static constexpr uint64_t sha512_k[80] = {
             0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
@@ -48,7 +51,7 @@ namespace sha512
         };
 
         for (uint64_t i = 0; i < 16; ++i)
-            w[i] = _bswap64(((const uint64_t*)message)[i]);
+            w[i] = _bswap64(((const uint64_t *)message)[i]);
 
         for (uint64_t i = 16; i < 80; ++i)
             w[i] = (_lrotr(w[i - 2], 19) ^ _lrotr(w[i - 2], 61) ^ w[i - 2] >> 6) + w[i - 7] +
@@ -83,4 +86,4 @@ namespace sha512
         for (uint64_t i = 0; i < 8; i++)
             ((uint64_t *)digest)[i] = _bswap64(wv[i]);
     }
-} // namespace sha512
+};

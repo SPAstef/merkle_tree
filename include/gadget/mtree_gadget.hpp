@@ -3,7 +3,6 @@
 #include "utils/bit_pack.hpp"
 #include "utils/sha256.hpp"
 #include "utils/sha512.hpp"
-#include "utils/sha_version.hpp"
 
 #include <libsnark/common/default_types/r1cs_ppzksnark_pp.hpp>
 #include <libsnark/gadgetlib1/gadget.hpp>
@@ -20,9 +19,9 @@
 
 #if defined(__INTELLISENSE__) && 0
 using FieldT = libff::Fr<libsnark::default_r1cs_ppzksnark_pp>;
-static constexpr Sha_version sha_version = Sha_version::SHA256;
+using Hash = Sha256;
 #else
-template<typename FieldT, Sha_version sha_version>
+template<typename FieldT, typename Hash>
 #endif
 class MTree_Gadget : public libsnark::gadget<FieldT>
 {
@@ -31,7 +30,7 @@ public:
     using BlockVar = libsnark::block_variable<FieldT>;
     using Protoboard = libsnark::protoboard<FieldT>;
     using GadSha =
-        typename std::conditional<sha_version == Sha_version::SHA256,
+        typename std::conditional<std::is_same<Hash, Sha256>::value,
                                   libsnark::sha256_two_to_one_hash_gadget<FieldT>,
                                   libsnark::sha512::sha512_two_to_one_hash_gadget<FieldT>>::type;
 
@@ -41,29 +40,19 @@ private:
     std::vector<GadSha> hash_f;
 
 public:
-    static constexpr size_t DIGEST_SZ = sha_version == Sha_version::SHA256
-                                            ? libsnark::SHA256_digest_size
-                                            : libsnark::sha512::SHA512_digest_size;
-    static constexpr size_t BLOCK_SZ = sha_version == Sha_version::SHA256
-                                           ? libsnark::SHA256_block_size
-                                           : libsnark::sha512::SHA512_block_size;
-    static constexpr auto hash_oneblock = sha_version == Sha_version::SHA256
-                                              ? sha256::hash_oneblock
-                                              : ::sha512::hash_oneblock;
-
     const DigVar hash_out;
 
     MTree_Gadget(libsnark::protoboard<FieldT> &pb, size_t height, size_t trans_idx,
                  const std::string &annotation_prefix) :
-        libsnark::gadget<FieldT>(pb, annotation_prefix), //
-        hash_out{pb, DIGEST_SZ, "out"}                   //
+        libsnark::gadget<FieldT>(pb, annotation_prefix),
+        hash_out{pb, Hash::DIGEST_SIZE * CHAR_BIT, "out"}
     {
         std::string name_l{"hashL_"};
         std::string name_r{"hashR_"};
         std::string name_f{"hashF_"};
 
-        hash_l.emplace_back(pb, DIGEST_SZ, "trans_l");
-        hash_r.emplace_back(pb, DIGEST_SZ, "trans_r");
+        hash_l.emplace_back(pb, Hash::DIGEST_SIZE * CHAR_BIT, "trans_l");
+        hash_r.emplace_back(pb, Hash::DIGEST_SIZE * CHAR_BIT, "trans_r");
 
         for (size_t i = 0; i < height - 2; ++i)
         {
@@ -71,8 +60,8 @@ public:
 
             trans_idx >>= 1;
 
-            hash_l.emplace_back(pb, DIGEST_SZ, FMT(name_l, ext));
-            hash_r.emplace_back(pb, DIGEST_SZ, FMT(name_r, ext));
+            hash_l.emplace_back(pb, Hash::DIGEST_SIZE * CHAR_BIT, FMT(name_l, ext));
+            hash_r.emplace_back(pb, Hash::DIGEST_SIZE * CHAR_BIT, FMT(name_r, ext));
 
             if (trans_idx & 1)
             {
@@ -85,12 +74,7 @@ public:
         }
         hash_f.emplace_back(pb, hash_l.back(), hash_r.back(), hash_out, "hashF_last");
 
-        pb.set_input_sizes(DIGEST_SZ);
-
-/*        // Generate keys when finished
-        Keypair tmp = libsnark::r1cs_gg_ppzksnark_generator<ppT>(pb.get_constraint_system());
-        keypair.pk = tmp.pk;
-        keypair.vk = tmp.vk;*/
+        pb.set_input_sizes(Hash::DIGEST_SIZE * CHAR_BIT);
     }
 
     void generate_r1cs_constraints()
@@ -108,12 +92,10 @@ public:
                                size_t trans_idx                                    //
     )
     {
-        static constexpr size_t DIG_SZ = DIGEST_SZ / CHAR_BIT;
-        static constexpr size_t BLK_SZ = BLOCK_SZ / CHAR_BIT;
-        uint8_t block[BLK_SZ];
-        uint8_t digest[DIG_SZ];
+        uint8_t block[Hash::BLOCK_SIZE];
+        uint8_t digest[Hash::DIGEST_SIZE];
 
-        const_cast<DigVar*>(&hash_out)->generate_r1cs_witness(other_hash_v.back());
+        const_cast<DigVar *>(&hash_out)->generate_r1cs_witness(other_hash_v.back());
 
         if (trans_idx & 1)
         {
@@ -121,7 +103,7 @@ public:
             hash_r[0].generate_r1cs_witness(my_hash_v);
 
             pack_bits(block, other_hash_v[0]);
-            pack_bits(block + DIG_SZ, my_hash_v);
+            pack_bits(block + Hash::DIGEST_SIZE, my_hash_v);
         }
         else
         {
@@ -129,10 +111,10 @@ public:
             hash_r[0].generate_r1cs_witness(other_hash_v[0]);
 
             pack_bits(block, my_hash_v);
-            pack_bits(block + DIG_SZ, other_hash_v[0]);
+            pack_bits(block + Hash::DIGEST_SIZE, other_hash_v[0]);
         }
 
-        hash_oneblock(digest, block);
+        Hash::hash_oneblock(digest, block);
         unpack_bits(my_hash_v, digest);
         hash_f[0].generate_r1cs_witness();
 
@@ -147,7 +129,7 @@ public:
                 hash_f[i].generate_r1cs_witness();
 
                 pack_bits(block, other_hash_v[i]);
-                pack_bits(block + DIG_SZ, my_hash_v);
+                pack_bits(block + Hash::DIGEST_SIZE, my_hash_v);
             }
             else
             {
@@ -156,15 +138,15 @@ public:
                 hash_f[i].generate_r1cs_witness();
 
                 pack_bits(block, my_hash_v);
-                pack_bits(block + DIG_SZ, other_hash_v[i]);
+                pack_bits(block + Hash::DIGEST_SIZE, other_hash_v[i]);
             }
 
-            hash_oneblock(digest, block);
+            Hash::hash_oneblock(digest, block);
             unpack_bits(my_hash_v, digest);
         }
     }
 
-/*
+    /*
     Proof generate_proof()
     {
         return libsnark::r1cs_gg_ppzksnark_prover<ppT>(keypair.pk, pb.primary_input(),

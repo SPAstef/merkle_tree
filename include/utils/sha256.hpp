@@ -7,12 +7,15 @@
 #endif
 #include <cinttypes>
 
-namespace sha256
+class Sha256
 {
+public:
     static constexpr size_t BLOCK_SIZE = 64;
     static constexpr size_t DIGEST_SIZE = 32;
 
-    inline void hash_oneblock(uint8_t *digest, const void *message)
+    Sha256() = delete;
+
+    static void hash_oneblock(uint8_t *digest, const void *message)
     {
         static constexpr uint32_t sha256_k[BLOCK_SIZE] = {
             0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4,
@@ -33,7 +36,7 @@ namespace sha256
                                                        0x1f83d9ab, 0x5be0cd19};
 
         for (uint32_t i = 0; i < 16; ++i)
-            w[i] = _bswap(((const uint32_t*)message)[i]);
+            w[i] = _bswap(((const uint32_t *)message)[i]);
 
         for (uint32_t i = 16; i < 64; ++i)
             w[i] = (_rotr(w[i - 2], 17) ^ _rotr(w[i - 2], 19) ^ w[i - 2] >> 10) + w[i - 7] +
@@ -68,4 +71,4 @@ namespace sha256
         for (uint32_t i = 0; i < 8; i++)
             ((uint32_t *)digest)[i] = _bswap(wv[i]);
     }
-} // namespace sha256
+}; // namespace sha256
