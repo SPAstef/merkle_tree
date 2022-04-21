@@ -1,7 +1,5 @@
 #pragma once
 
-#include "utils/sha256.hpp"
-#include "utils/sha512.hpp"
 #include "utils/string_utils.hpp"
 
 #include <cstring>
@@ -52,25 +50,18 @@ public:
         memcpy(block, left, Hash::DIGEST_SIZE);
         memcpy(block + Hash::DIGEST_SIZE, right, Hash::DIGEST_SIZE);
 
-        // xoring left
-        for (size_t i = 0; i < Hash::DIGEST_SIZE; ++i)
-            block[i] ^= middle[i];
-
-        // xoring right
-        for (size_t i = 0; i < Hash::DIGEST_SIZE; ++i)
-            block[Hash::DIGEST_SIZE + i] ^= middle[i];
-
+        Hash::field_add(block, middle);
+        Hash::field_add(block + Hash::DIGEST_SIZE, middle);
         Hash::hash_oneblock(this->digest, block);
-
-        for (size_t i = 0; i < Hash::DIGEST_SIZE; ++i)
-            this->digest[i] ^= right[i];
+        Hash::field_add(this->digest, right);
     }
+
+    const uint8_t *get_digest() const { return digest; }
 
     friend std::ostream &operator<<(std::ostream &os, const FixedAbrNode &node)
     {
         for (size_t i = 0; i < node.depth; ++i)
             os << "    ";
-
 
         if (node.f)
         {
@@ -79,7 +70,7 @@ public:
             else if (&node == node.f->r)
                 os << 'R';
             else if (&node == node.f->e)
-                os << 'E';
+                os << 'M';
         }
         else
             os << '*';
@@ -103,15 +94,14 @@ class FixedAbr
 private:
     using Node = FixedAbrNode<Hash>;
 
-    static constexpr size_t INTERNAL_N = (1ULL << (height - 2)) - 1;
-    static constexpr size_t LEAVES_N = 1ULL << (height - 1);
-    static constexpr size_t INPUT_BLKS = LEAVES_N + INTERNAL_N;
-
     std::vector<Node> nodes{};
     Node *root = nullptr;
 
 public:
-    static constexpr size_t INPUT_SIZE = INPUT_BLKS * Hash::BLOCK_SIZE;
+    static constexpr size_t INTERNAL_N = (1ULL << (height - 2)) - 1;
+    static constexpr size_t LEAVES_N = 1ULL << (height - 1);
+    static constexpr size_t INPUT_N = LEAVES_N + INTERNAL_N;
+    static constexpr size_t INPUT_SIZE = INPUT_N * Hash::BLOCK_SIZE;
 
 #if __cplusplus >= 202002L
     template<std::ranges::range Range>
@@ -129,7 +119,7 @@ public:
     FixedAbr(const void *vdata, size_t sz) :
         nodes((1ULL << height) - 1 + INTERNAL_N), root{&nodes.back()}
     {
-        if (sz / Hash::BLOCK_SIZE != INPUT_BLKS || sz % Hash::BLOCK_SIZE != 0)
+        if (sz / Hash::BLOCK_SIZE != INPUT_N || sz % Hash::BLOCK_SIZE != 0)
         {
             std::cerr << "FixedAbr: Bad size of input data\n";
             return;
@@ -140,7 +130,7 @@ public:
         size_t last = 0;
 
         // add leaves and internal hashes
-        for (size_t i = 0; i < INPUT_BLKS; ++i)
+        for (size_t i = 0; i < INPUT_N; ++i)
             this->nodes[last++] = {data + Hash::BLOCK_SIZE * i, depth};
 
 
@@ -157,7 +147,7 @@ public:
             ++last;
         }
 
-        for (size_t i = INPUT_BLKS, len = i + LEAVES_N / 2, e = LEAVES_N; depth > 0;
+        for (size_t i = INPUT_N, len = i + LEAVES_N / 2, e = LEAVES_N; depth > 0;
              len += 1ULL << depth)
         {
             --depth;
@@ -184,6 +174,8 @@ public:
     }
 
     const uint8_t *digest() const { return root->digest; }
+
+    const Node *get_node(size_t i) const { return &nodes[i]; }
 
     friend std::ostream &operator<<(std::ostream &os, const FixedAbr &tree)
     {

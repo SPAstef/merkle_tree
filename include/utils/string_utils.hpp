@@ -195,15 +195,28 @@ std::string hexdump(T *arr, size_t sz, bool upper = false, size_t spacing = 0)
     return s;
 }
 
-#if __cplusplus >= 202002L
+template<bool reverse = false, typename Iter>
+std::string hexdump(const Iter &first, const Iter &last, bool upper = false, size_t spacing = 0)
+{
+    return hexdump<reverse>(&*first, std::distance(first, last), upper, spacing);
+}
 
+
+#if __cplusplus >= 202002L
 template<bool reverse = false, std::ranges::range Range>
 std::string hexdump(const Range &it, bool upper = false, size_t spacing = 0)
 {
-    return hexdump<reverse>(&*std::begin(it), std::distance(std::begin(it), std::end(it)), upper,
-                            spacing);
+    return hexdump<reverse>(std::ranges::begin(it), std::ranges::end(it), upper, spacing);
 }
+#else
+template<bool reverse = false, typename T, size_t sz>
+std::string hexdump(const T (&arr)[sz], bool upper = false, size_t spacing = 0)
+{
+    return hexdump<reverse>(arr, sz, upper, spacing);
+}
+#endif
 
+#if __cplusplus >= 202002L
 inline std::string random_string(size_t len, const std::string &alphabet)
 {
     static std::mt19937_64 rng{std::random_device{}()};

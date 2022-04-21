@@ -1,6 +1,7 @@
 #pragma once
 
 #include <libsnark/gadgetlib1/gadgets/basic_gadgets.hpp>
+#include <libsnark/gadgetlib1/gadgets/hashes/hash_io.hpp>
 
 #if defined(__INTELLISENSE__) && 0
     #include <libff/common/default_types/ec_pp.hpp>
@@ -11,26 +12,30 @@ template<typename FieldT>
 class XOR_gadget : public libsnark::gadget<FieldT>
 {
 public:
+    using Parent = libsnark::gadget<FieldT>;
     using PbLC = libsnark::pb_linear_combination<FieldT>;
-    
+
     const PbLC A;
     const PbLC B;
     const PbLC out;
 
     XOR_gadget(libsnark::protoboard<FieldT> &pb, const PbLC &A, const PbLC &B, const PbLC &out,
                const std::string &annotation_prefix) :
-        libsnark::gadget<FieldT>(pb, annotation_prefix),
+        Parent(pb, annotation_prefix),
         A(A), B(B), out(out)
     {}
 
     void generate_r1cs_constraints()
     {
-        // (A + B) - out = (A + A)B  i.e. out = A xor B
-        libsnark::generate_boolean_r1cs_constraint<FieldT>(pb, A,
-                                                           FMT(this->annotation_prefix, "_A_bool"));
-        libsnark::generate_boolean_r1cs_constraint<FieldT>(pb, B,
-                                                           FMT(this->annotation_prefix, "_B_bool"));
+        // A(1 - A) = 0, i.e. A must be 0 or 1
+        this->pb.add_r1cs_constraint(libsnark::r1cs_constraint<FieldT>(A, 1 - A, 0),
+                                     FMT(this->annotation_prefix, "_A_bool"));
 
+        // same for B
+        this->pb.add_r1cs_constraint(libsnark::r1cs_constraint<FieldT>(B, 1 - B, 0),
+                                     FMT(this->annotation_prefix, "_B_bool"));
+
+        // (A + B) - out = (A + A)B  i.e. out = A xor B
         this->pb.add_r1cs_constraint(libsnark::r1cs_constraint<FieldT>(A + A, B, A + B - out),
                                      FMT(this->annotation_prefix, "_out"));
     }
@@ -50,6 +55,7 @@ template<typename FieldT>
 class LongXOR_gadget : public libsnark::gadget<FieldT>
 {
 public:
+    using Parent = libsnark::gadget<FieldT>;
     using DigVar = libsnark::digest_variable<FieldT>;
 
     const DigVar A;
@@ -59,7 +65,7 @@ public:
 
     LongXOR_gadget(libsnark::protoboard<FieldT> &pb, const DigVar &A, const DigVar &B,
                    const DigVar &out, const std::string &annotation_prefix) :
-        libsnark::gadget<FieldT>(pb, annotation_prefix),
+        Parent(pb, annotation_prefix),
         A(A), B(B), out(out), xor_gad()
     {
         for (size_t i = 0; i < this->A.digest_size; ++i)
@@ -69,13 +75,13 @@ public:
 
     void generate_r1cs_constraints()
     {
-        for (size_t i = 0; i < xor_gad.size(); ++i)
-            xor_gad[i].generate_r1cs_constraints();
+        for (auto &&x : xor_gad)
+            x.generate_r1cs_constraints();
     }
 
     void generate_r1cs_witness()
     {
-        for (size_t i = 0; i < xor_gad.size(); ++i)
-            xor_gad[i].generate_r1cs_witness();
+        for (auto &&x : xor_gad)
+            x.generate_r1cs_witness();
     }
 };

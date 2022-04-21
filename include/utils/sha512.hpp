@@ -86,4 +86,13 @@ public:
         for (uint64_t i = 0; i < 8; i++)
             ((uint64_t *)digest)[i] = _bswap64(wv[i]);
     }
+
+    static void field_add(void *x, const void *y)
+    {
+        uint8_t *xb = (uint8_t *)x;
+        const uint8_t *yb = (const uint8_t *)y;
+
+        for (size_t i = 0; i < DIGEST_SIZE; ++i)
+            xb[i] ^= yb[i];
+    }
 };

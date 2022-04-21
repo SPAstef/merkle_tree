@@ -1,7 +1,5 @@
 #pragma once
 
-#include "utils/sha256.hpp"
-#include "utils/sha512.hpp"
 #include "utils/string_utils.hpp"
 
 #include <cstring>
@@ -35,7 +33,7 @@ public:
 
     FixedMTreeNode(const uint8_t *left, const uint8_t *right, size_t depth) : depth{depth}
     {
-        uint8_t block[Hash::BLOCK_SIZE];
+        uint8_t block[Hash::BLOCK_SIZE]{};
 
         memcpy(block, left, Hash::DIGEST_SIZE);
         memcpy(block + Hash::DIGEST_SIZE, right, Hash::DIGEST_SIZE);
@@ -76,6 +74,8 @@ private:
 
 public:
     static constexpr size_t INPUT_SIZE = LEAVES_N * Hash::BLOCK_SIZE;
+
+    FixedMTree() = default;
 #if __cplusplus >= 202002L
     template<std::ranges::range Range>
     FixedMTree(const Range &range) :

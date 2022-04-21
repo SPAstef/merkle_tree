@@ -1,0 +1,668 @@
+make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 3.81
+# Copyright (C) 2006  Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+# This program built for i386-pc-mingw32
+ 
+
+# Make data base, printed on Mon Apr 04 17:27:24 2022
+
+# Variables
+
+# environment
+POWERSHELL_DISTRIBUTION_CHANNEL = MSI:Windows 10 Home
+# automatic
+?F = $(notdir $?)
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# makefile (from `makefile', line 60)
+OBJ := build/benchmark.o
+# makefile (from `makefile', line 30)
+SRC := src/benchmark.cpp
+# makefile
+MAKEFLAGS = Rrqp
+# environment
+VSCODE_LOG_NATIVE = false
+# environment
+CUDA_PATH_V11_5 = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5
+# environment
+VTUN 
+E_PROFILER_2022_DIR = C:\Program Files (x86)\Intel\oneAPI\vtune\2022.0.0
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# makefile (from `makefile', line 57)
+CXX20FLAGS := -O3 -march=native -std=c++11 -fopenmp -Iinclude -std=c++20
+# makefile (from `makefile', line 44)
+LIBEXT := a
+# makefile (from `makefile', line 35)
+BUILDPATH := build
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+HOMEDRIVE = C:
+# automatic
+@F = $(notdir $@)
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# makefile
+CURDIR := c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree
+# default
+SHELL := sh.exe
+# environment
+JRE_HOME = C:\Program Files (x86)\Java\jre1.8.0_311
+# environment
+WINDIR = C:\WINDOWS
+# environment
+VSCODE_NLS_CONFIG = {"locale":"it","availableLanguages":{"*":"it"},"_languagePackId":"d1d25c7f7d2034a833b54c6d4a618d2c.it","_translationsConfigFile":"C:\\Users\\stefa\\AppData\\Roaming\\Code\\clp\\d1d25c7f7d2034a833b54c6d4a618d2c.it\\tcf.json","_cacheRoot":"C:\\Users\\stefa\\AppData\\Roaming\\Code\\clp\\d1d25c7f7d2034a833b54c6d4a618d2c.it","_resolvedLanguagePackCoreLocation":"C:\\Users\\stefa\\AppData\\Roaming\\Code\\clp\\d1d25c7f7d2034a833b54c6d4a618d2c.it\\e18005f0f1b33c29e81d732535d8c0e47cafb0b5","_corruptedFile":"C:\\Users\\stefa\\AppData\\Roaming\\Code\\clp\\d1d25c7f7d2034a833b54c6d4a618d2c.it\\corrupted.info","_languagePackSupport":true}
+# environment
+VBOX_MSI_INSTALL_PATH = C:\Program Files\Oracle\VirtualBox\
+# environment
+ONEDRIVE = C:\Users\stefa\OneDrive
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+# makefile (from `makefile', line 1)
+MAKEFILE_LIST :=  makefile
+# makefile (from `makefile', line 50)
+CP = cp $(1) $(2)/
+# makefile (from `makefile', line 33)
+INC := include/fixed_abr.hpp include/fixed_mtree.hpp include/gadget/abr_gadget.hpp include/gadget/mtree_gadget.hpp include/gadget/pmtree_gadget.hpp include/gadget/xor_gadget.hpp include/utils/bit_pack.hpp include/utils/measure.hpp include/utils/mimc256.hpp include/utils/mimcf512.hpp include/utils/sha256 
+.hpp include/utils/sha512.hpp include/utils/string_utils.hpp
+# makefile (from `makefile', line 2)
+DEBUG := 0
+# environment
+TMP = C:\Users\stefa\AppData\Local\Temp
+# makefile (from `makefile', line 56)
+CXXFLAGS := -O3 -march=native -std=c++11 -fopenmp -Iinclude
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# makefile (from `makefile', line 43)
+OEXT := o
+# environment
+PROGRAMW6432 = C:\Program Files
+# environment
+PROGRAMDATA = C:\ProgramData
+# environment
+AUTINSTLOG = C:\ProgramData\Siemens\Automation\Logfiles\Setup\
+# environment
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-5a516af8-1afc-47cf-8115-1fd26e872825-sock
+# environment
+VSCODE_CWD = C:\Users\stefa\AppData\Local\Programs\Microsoft VS Code
+# environment
+PATH = C:\Program Files (x86)\Intel\oneAPI\tbb\latest\redist\intel64\vc_mt\;C:\Program Files (x86)\Intel\oneAPI\tbb\latest\redist\ia32\vc_mt\;C:\Program Files (x86)\Intel\oneAPI\compiler\latest\windows\redist\intel64_win\compiler;C:\Program Files (x86)\Intel\oneAPI\compiler\latest\windows\redist\ia32_win\compiler;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\libnvvp;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\NVIDIA Corporation\Nsight Compute 2021.3.0\;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Program Files\MATLAB\R2021b\bin;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\Git\cmd;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PowerShell\7\;C:\Program Files\dotnet\;C:\Users\stefa\.cargo\bin;C:\Users\stefa\AppData\Local\Microsoft\WindowsApps;C:\Users\stefa\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files (x86)\GnuWin32\bin;C:\Users\stefa\AppData\Roaming\Python\Python37\Scripts;C:\Users\stefa\AppData\Local\Programs\MiKTeX\miktex\bin\x64\;C:\Program Files\ffmpeg\bin;C:\Program Files\CMake\bin;C:\Program Files (x86)\android-platform-tools;
+# environment
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
+# environment
+ZES_ENABLE_SYSMAN = 1
+# makefile (from `makefile', line 68)
+DEP := build/benchmark.d 
+# makefile (from `makefile', line 29)
+SRCPATH := src
+# environment
+PROCESSOR_ARCHITECTURE = x86
+# environment
+USERPROFILE = C:\Users\stefa
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# makefile (from `makefile', line 36)
+BINPATH := bin
+# environment
+ONEAPI_ROOT = C:\Program Files (x86)\Intel\oneAPI\
+# makefile (from `makefile', line 64)
+LIBSNAMES :=  benchmark
+# makefile (from `makefile', line 40)
+AR := ar
+# makefile (from `makefile', line 4)
+OVERRIDE_DEFAULT_CXX := 1
+# environment
+VSCODE_LOG_STACK = false
+# environment
+NUMBER_OF_PROCESSORS = 16
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# makefile (from `makefile', line 39)
+LDFLAGS := -lff -lgmp -lgmpxx -lsnark -lprocps
+# default
+.FEATURES := target-specific order-only second-expansion else-if archives
+# environment
+NVTOOLSEXT_PATH = C:\Program Files\NVIDIA Corporation\NvToolsExt\
+# 
+ automatic
+%F = $(notdir $%)
+# environment
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_11120_MQQEUFMSWLMAKGOC
+# environment
+I_MPI_ONEAPI_ROOT = C:\Program Files (x86)\Intel\oneAPI\mpi\2021.5.1
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+COMPUTERNAME = M15R6
+# environment
+PROGRAMFILES = C:\Program Files (x86)
+# environment
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
+# environment
+NVCUDASAMPLES_ROOT = C:\ProgramData\NVIDIA Corporation\CUDA Samples\v11.5
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+USERNAME = stefa
+# environment
+PUBLIC = C:\Users\Public
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+VSCODE_CODE_CACHE_PATH = C:\Users\stefa\AppData\Roaming\Code\CachedData\e18005f0f1b33c29e81d732535d8c0e47cafb0b5
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# makefile (from `makefile', line 59)
+SRCNAMES := benchmark.cpp
+# environment
+COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
+# environment
+L 
+OGONSERVER = \\M15R6
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# environment
+USERDOMAIN = M15R6
+# makefile (from `makefile', line 47)
+MKDIR = mkdir -p $(1)
+# makefile (from `makefile', line 10)
+TARGETS_ONLYTEST := abr abr_gadget mimc256 mimcf512 mtree mtree_gadget pmtree_gadget sha256 sha512
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# makefile (from `makefile', line 45)
+PDB := 
+# makefile (from `makefile', line 37)
+LIBPATH := lib
+# environment
+JAVA_HOME = C:\Program Files\Java\jdk-17.0.1
+# default
+MAKE_VERSION := 3.81
+# makefile
+.DEFAULT_GOAL := all
+# environment
+CFG_RELEASE_CHANNEL = nightly
+# environment
+PROGRAMFILES(X86) = C:\Program Files (x86)
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# makefile (from `makefile', line 11)
+TARGETS_TEST := 
+# environment
+LOCALAPPDATA = C:\Users\stefa\AppData\Local
+# environment
+PSMODULEPATH = C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+# makefile (from `makefile', line 41)
+ARFLAGS := r
+# def 
+ault
+MAKE_COMMAND := make.exe
+# environment
+NVCUDASAMPLES11_5_ROOT = C:\ProgramData\NVIDIA Corporation\CUDA Samples\v11.5
+# environment
+PROCESSOR_ARCHITEW6432 = AMD64
+# default
+.VARIABLES := 
+# automatic
+*F = $(notdir $*)
+# environment
+PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 141 Stepping 1, GenuineIntel
+# environment
+OS = Windows_NT
+# environment
+VSCODE_IPC_HOOK = \\.\pipe\f57d5358d50d7bd3fdb875c4d71c42c5-1.66.0-main-sock
+# makefile (from `makefile', line 62)
+TARGETS := abr abr_gadget mimc256 mimcf512 
+ mtree mtree_gadget pmtree_gadget sha256 sha512  benchmark
+# makefile (from `makefile', line 48)
+RM = rm -rf $(1)/*
+# environment
+HOMEPATH = \Users\stefa
+# environment
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
+# environment
+PROMPT = $P$G
+# environment
+MFLAGS = -Rrqp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+SYSTEMROOT = C:\WINDOWS
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# makefile (from `makefile', line 46)
+TARGETS_TEST_COMMAND := $$SCRIPTPATH/abr;\n $$SCRIPTPATH/abr_gadget;\n $$SCRIPTPATH/mimc256;\n $$SCRIPTPATH/mimcf512;\n $$SCRIPTPATH/mtree;\n $$SCRIPTPATH/mtree_gadget;\n $$SCRIPTPATH/pmtree_gadget;\n $$SCRIPTPATH/sha256;\n $$SCRIPTPATH/sha512;\n
+# makefile (from `makefile', line 6)
+MEASURE_PERFORMANCE := 0
+# automatic
++F = $(notdir $+)
+# environment
+VS2019INSTALLDIR = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise
+# environment
+APPDATA = C:\Users\stefa\AppData\Roaming
+# environment
+TEMP = C:\Users\stefa\AppData\Local\Temp
+# makefile (from `makefile', 
+ line 28)
+TESTPATH := test
+# environment
+COMSPEC = C:\WINDOWS\system32\cmd.exe
+# environment
+ADVISOR_2022_DIR = C:\Program Files (x86)\Intel\oneAPI\advisor\2022.0.0
+# default
+MAKEFILES := 
+# automatic
+<F = $(notdir $<)
+# environment
+SRCC_PATH = "C:\Program Files (x86)\Siemens\Automation\SINEMA RC Client"
+# makefile (from `makefile', line 20)
+CXX := c++
+# environment
+LC_ALL = C
+# makefile (from `makefile', line 12)
+TARGETS_NOTEST := benchmark
+# makefile (from `makefile', line 66)
+LIBS := build/benchmark.o
+# automatic
+^F = $(notdir $^)
+# environment
+CUDA_PATH = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5
+# makefile (from `makefile', line 49)
+MV = mv $(1) $(2)/
+# default
+SUFFIXES := 
+# environment
+SYSTEMDRIVE = C:
+# environment
+SESSIONNAME = Console
+# makefile (from `makefile', line 8)
+LIBNAME := libabr
+# environment
+PROCESSOR_REVISION = 8d01
+# makefile (from `makefile', line 32)
+INCPATH := include
+# environment
+MAKELEVEL := 0
+# environment
+LANG = C
+# environment
+PROCESSOR_LEVEL = 6
+# environment
+VS 
+CODE_PID = 11120
+# environment
+USERDOMAIN_ROAMINGPROFILE = M15R6
+# variable set hash-table stats:
+# Load=139/1024=14%, Rehash=0, Collisions=24/239=10%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# C:\Program Files\Common Files\Oracle\Java\javapath (key C:/Program Files/Common Files/Oracle/Java/javapath, mtime 1641297657): 6 files, no impossibilities.
+# C:\Program Files\Microsoft SQL Server\150\Tools\Binn\ (key C:/Program Files/Microsoft SQL Server/150/Tools/Bi 
+nn/, mtime 1644846907): 4 files, no impossibilities.
+# include (key c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree/include, mtime 1641545254): 6 files, no impossibilities.
+# C:\Users\stefa\AppData\Roaming\Python\Python37\Scripts: could not be stat'd.
+# C:\Windows\System32\WindowsPowerShell\v1.0\ (key C:/Windows/System32/WindowsPowerShell/v1.0/, mtime 1648200596): 31 files, no impossibilities.
+# C:\Windows\System32\Wbem (key C:/Windows/System32/Wbem, mtime 1648200587 
+): 171 files, no impossibilities.
+# . (key c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree, mtime 1648729666): 20 files, no impossibilities.
+# C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common (key C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common, mtime 1640212392): 10 files, no impossibilities.
+# test/cpp20 (key c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree/test/cpp20, mtime 1648652036): No files, no impossibilit 
+ies so far.
+# C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\bin (key C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5/bin, mtime 1640546268): 61 files, no impossibilities.
+# test (key c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree/test, mtime 1648137935): No files, no impossibilities so far.
+# C:\Program Files\dotnet\ (key C:/Program Files/dotnet/, mtime 1648988500): 8 files, no impossibilities.
+# C:\Program Files\PowerShell\7\ (key C:/Program Fil 
+es/PowerShell/7/, mtime 1648719192): 478 files, no impossibilities.
+# C:\Windows\System32\OpenSSH\: could not be stat'd.
+# C:\Strawberry\c\bin (key C:/Strawberry/c/bin, mtime 1635503531): 115 files, no impossibilities.
+# C:\Program Files (x86)\Common Files\Oracle\Java\javapath (key C:/Program Files (x86)/Common Files/Oracle/Java/javapath, mtime 1641242485): 5 files, no impossibilities.
+# C:\Program Files\ffmpeg\bin (key C:/Program Files/ffmpeg/bin, mtime 1642325447): 5 files, no impossibilities.
+# src/**: c 
+ould not be stat'd.
+# C:\Program Files\Microsoft SQL Server\130\Tools\Binn\ (key C:/Program Files/Microsoft SQL Server/130/Tools/Binn/, mtime 1634987589): 4 files, no impossibilities.
+# C:\Windows (key C:/Windows, mtime 1648769129): 135 files, no impossibilities.
+# include/fixed_mtree.hpp (key c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree/include/fixed_mtree.hpp, mtime 1648567400): could not be opened.
+# C:\Program Files (x86)\Intel\oneAPI\compiler\latest\windows\r 
+edist\ia32_win\compiler (key C:/Program Files (x86)/Intel/oneAPI/compiler/latest/windows/redist/ia32_win/compiler, mtime 1643718742): 16 files, no impossibilities.
+# C:\Users\stefa\AppData\Local\Programs\Microsoft VS Code\bin (key C:/Users/stefa/AppData/Local/Programs/Microsoft VS Code/bin, mtime 1648722774): 4 files, no impossibilities.
+# C:\Program Files\MATLAB\R2021b\bin (key C:/Program Files/MATLAB/R2021b/bin, mtime 1648646677): 15 files, no impossibilities.
+# C:\Program Files\NVIDIA Corporation\Nsight  
+Compute 2021.3.0\ (key C:/Program Files/NVIDIA Corporation/Nsight Compute 2021.3.0/, mtime 1635005789): 12 files, no impossibilities.
+# C:\Strawberry\perl\site\bin (key C:/Strawberry/perl/site/bin, mtime 1635503529): 2 files, no impossibilities.
+# C:\Program Files (x86)\Intel\oneAPI\compiler\latest\windows\redist\intel64_win\compiler (key C:/Program Files (x86)/Intel/oneAPI/compiler/latest/windows/redist/intel64_win/compiler, mtime 1643718742): 16 files, no impossibilities.
+# C:\Strawberry\perl\bin (key C:/ 
+Strawberry/perl/bin, mtime 1635503541): 184 files, no impossibilities.
+# C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\ (key C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/, mtime 1643725795): 403 files, no impossibilities.
+# src (key c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree/src, mtime 1648373627): 3 files, no impossibilities.
+# C:\Program Files (x86)\Intel\oneAPI\tbb\latest\redist\ia32\vc_mt\ (key C:/Program Files (x86 
+)/Intel/oneAPI/tbb/latest/redist/ia32/vc_mt/, mtime 1643718842): 28 files, no impossibilities.
+# include/gadget (key c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree/include/gadget, mtime 1647970842): 8 files, no impossibilities.
+# include/utils (key c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree/include/utils, mtime 1648647434): 9 files, no impossibilities.
+# C:\Program Files (x86)\android-platform-tools (key C:/Program Files (x86)/android-platform-tools, mtime 1645298054): 18 files, no impossibilities.
+# C:\Program Files\Git\cmd (key C:/Program Files/Git/cmd, mtime 1644085669): 8 files, no impossibilities.
+# C:\Windows\system32 (key C:/Windows/system32, mtime 1649061231): 3109 files, no impossibilities.
+# src/benchmark.cpp (key c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree/src/benchmark.cpp, mtime 1648572055): could not be opened.
+# C:\Program Files (x86)\Intel\oneAPI\tbb\latest\redis 
+t\intel64\vc_mt\ (key C:/Program Files (x86)/Intel/oneAPI/tbb/latest/redist/intel64/vc_mt/, mtime 1643718841): 28 files, no impossibilities.
+# C:\Users\stefa\AppData\Local\Programs\MiKTeX\miktex\bin\x64\ (key C:/Users/stefa/AppData/Local/Programs/MiKTeX/miktex/bin/x64/, mtime 1635503643): 681 files, no impossibilities.
+# C:\Users\stefa\.cargo\bin (key C:/Users/stefa/.cargo/bin, mtime 1641840233): 14 files, no impossibilities.
+# include/fixed_abr.hpp (key c:/Users/stefa/Documents/universita/Quinto_Anno/primo_semestre/small_project/merkle_tree/include/fixed_abr.hpp, mtime 1644785489): could not be opened.
+# C:\Program Files\CMake\bin (key C:/Program Files/CMake/bin, mtime 1636909564): 7 files, no impossibilities.
+# C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\libnvvp (key C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5/libnvvp, mtime 1635005888): 14 files, no impossibilities.
+# C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR (key C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR, mtime  
+1632411582): 5 files, no impossibilities.
+# C:\Users\stefa\AppData\Local\Microsoft\WindowsApps (key C:/Users/stefa/AppData/Local/Microsoft/WindowsApps, mtime 1648906642): 32 files, no impossibilities.
+# C:\Program Files (x86)\GnuWin32\bin (key C:/Program Files (x86)/GnuWin32/bin, mtime 1635002432): 5 files, no impossibilities.
+
+# 5680 files, no impossibilities in 46 directories.
+
+# Implicit Rules
+
+build/test_%.o: test/%.cpp
+#  commands to execute (from `makefile', line 131):
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+ 
+	
+
+build/test_%.o: test/cpp20/%.cpp
+#  commands to execute (from `makefile', line 134):
+	$(CXX) $(CXX20FLAGS) -c $< -o $@
+	
+
+build/%.o: src/%.cpp
+#  commands to execute (from `makefile', line 137):
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+	
+
+build/%.o: src/**/%.cpp
+#  commands to execute (from `makefile', line 140):
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+	
+
+# 4 implicit rules, 0 (0,0%) terminal.
+
+# Files
+
+# Not a target:
+build/test_mtree_gadget.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+mimcf512: build/test_mimcf512.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `mimcf512'
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 104):
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+	
+
+all: dirs testsuite abr abr_gadget mimc256 mimcf512 mtree mtree_gadget pmtree_gadget sha256 sha512 benchmark library
+#  Command-line target.
+#  Implicit rule search has been done.
+#  File 
+ does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/11=0%
+
+# Not a target:
+build/test_abr_gadget.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+build/test_pmtree_gadget.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+build/test_mtree.o:
+#  Implicit r 
+ule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+build/test_abr.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+build/test_sha256.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not bee 
+n updated.
+
+# Not a target:
+build/test_sha512.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+sha256: build/test_sha256.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `sha256'
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 116):
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+	
+
+# Not a target:
+build/test_mimcf512.o:
+#  Implicit rule search has n 
+ot been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+sha512: build/test_sha512.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `sha512'
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 119):
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+	
+
+# Not a target:
+makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-03-30 16:56:11
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+benchmark: build/benchmark.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `benchmark'
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 124):
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+	
+
+dirs:
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `'
+#  File does not exist.
+#  File has been updated.
+#   
+Needs to be updated (-q is set).
+# automatic
+# @ := dirs
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := 
+# automatic
+# | := 
+# automatic
+# < := 
+# automatic
+# ^ := 
+# automatic
+# ? := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=3/19=16%
+#  commands to execute (from `makefile', line 80):
+	$(call MKDIR,$(BUILDPATH))
+	$(call MKDIR,$(BINPATH))
+	$(call MKDIR,$(LIBPATH))
+	
+
+library: abr abr_gadget mimc256 mimcf512 mtree mtree_gadget pmtree_gadget sha256 sha512 benchmark
+#   
+Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 88):
+	$(AR) $(ARFLAGS) $(LIBOUTFLAGS)$(LIBPATH)/$(LIBNAME).$(LIBEXT) $(LIBS)
+	
+
+# Not a target:
+build/benchmark.d:
+#  A default, MAKEFILES, or -include/sinclude makefile.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0 
+%
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+testsuite:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 85):
+	@echo -e '#!/bin/sh\nSCRIPTPATH=$$(dirname "$$(readlink -f "$$0")")\n$(TARGETS_TEST_COMMAND)' > $(BINPATH)/test.sh
+	
+
+mimc256: build/test_mimc256.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `mimc256'
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 101):
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+	
+
+clean:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 74):
+	$(call RM,$(BUILDPATH))
+	$(call RM,$(BINPATH))
+	$(call RM,$(LIBPATH))
+	
+
+abr_gadget: build/test_abr_gadget.o
+#  Implicit rule search has n 
+ot been done.
+#  Implicit/static pattern stem: `abr_gadget'
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 98):
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+	
+
+# Not a target:
+build/benchmark.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+abr: build/test_abr.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `abr'
+#  Modification time never check 
+ed.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 95):
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+	
+
+mtree_gadget: build/test_mtree_gadget.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `mtree_gadget'
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 110):
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+	
+
+pmtree_gadget: build/test_pmtree_gadget.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `pmtree_gadget'
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 113):
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+	
+
+# Not a target:
+build/test_mimc256.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+mtree: build/test_mtree.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `mtree'
+#  Modification ti 
+me never checked.
+#  File has not been updated.
+#  commands to execute (from `makefile', line 107):
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+	
+
+# files hash-table stats:
+# Load=29/1024=3%, Rehash=0, Collisions=5/76=7%
+# VPATH Search Paths
+
+# No `vpath' search paths.
+
+# No general (`VPATH' variable) search path.
+
+# # of strings in strcache: 2
+# # of strcache buffers: 1
+# strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
+# strcache free: total = 4069 / max = 4069 / min = 4069 / avg = 4069
+
+# Finished Make data base on Mon Apr 04 17:27:24 2022
+
+ 

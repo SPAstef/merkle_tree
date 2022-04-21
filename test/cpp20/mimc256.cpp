@@ -1,27 +1,26 @@
-#include "fixed_abr.hpp"
+#include "utils/mimc256.hpp"
 #include "utils/string_utils.hpp"
 #include <cstring>
 #include <iostream>
 
 static bool run_tests()
 {
+    uint8_t msg[Mimc256::BLOCK_SIZE]{};
+    uint8_t dig[Mimc256::DIGEST_SIZE]{};
+    auto real_dig = "0d089f049d792a1cf51d9f40a2e9cea4c49a676fe1baa4b82ba9371e3a2b5734"_x;
+
     bool check = true;
     bool all_check = true;
-
-    static constexpr size_t HEIGHT = 4;
-
-    std::vector<uint8_t> data(FixedAbr<HEIGHT, Sha256>::INPUT_SIZE);
-    auto real_digest = "e54f319bda1edc07b45f34a5b6452a2c75bee8332a65ecf5c1803534b9b6e372"_x;
 
     std::cout << std::boolalpha;
 
     std::cout << "Hashing... ";
     check = true;
 
-    FixedAbr<HEIGHT, Sha256> tree(data);
+    Mimc256::hash_oneblock(dig, msg);
+    check = memcmp(dig, real_dig.data(), sizeof(dig)) == 0;
 
-    check = memcmp(tree.digest(), real_digest.data(), real_digest.size()) == 0;
-
+    std::cout << hexdump(dig) << '\n';
     std::cout << check << '\n';
     all_check &= check;
 
@@ -30,8 +29,8 @@ static bool run_tests()
 
 int main()
 {
-    std::cout << "\n==== Testing ABR ====\n";
-
+    std::cout << "\n==== Testing MIMC256 ====\n";
+    
     bool all_check = run_tests();
 
     std::cout << "\n==== " << (all_check ? "ALL TESTS SUCCEEDED" : "SOME TESTS FAILED")

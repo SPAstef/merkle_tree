@@ -1,5 +1,5 @@
 # Enables debug mode
-DEBUG := 1
+DEBUG := 0
 # Override default compiler and flags
 OVERRIDE_DEFAULT_CXX := 1
 # Measure performance in tests
@@ -7,22 +7,22 @@ MEASURE_PERFORMANCE := 0
 
 LIBNAME := libabr
 
-TARGETS_ONLYTEST := abr mtree mtree_gadget sha256 sha512
+TARGETS_ONLYTEST := fixed_abr fixed_mtree mimc256 mimc512f mtree_gadget sha256 sha512
 TARGETS_TEST :=
-TARGETS_NOTEST := 
+TARGETS_NOTEST :=
 
 ifeq ($(CXX), )
     CXX := c++
-    CXXFLAGS := -O3 -march=native -std=c++11
+    CXXFLAGS := -O3 -march=native -std=c++17
 endif
 
 ifeq ($(OVERRIDE_DEFAULT_CXX), 1)
     CXX := c++
-    CXXFLAGS := -O3 -march=native -std=c++11
+    CXXFLAGS := -O3 -march=native -std=c++17
 endif
 
 ifeq ($(DEBUG), 1)
-    CXXFLAGS += -g -O1 -Wall
+    CXXFLAGS = -std=c++17 -g -Wall
 endif
 
 TESTPATH := test
@@ -36,7 +36,7 @@ BUILDPATH := build
 BINPATH := bin
 LIBPATH := lib
 
-LDFLAGS := -lff -lgmp -lsnark -lprocps
+LDFLAGS := -lff -lgmp -lgmpxx -lsnark -lprocps
 AR := ar
 ARFLAGS := r
 CXXFLAGS += -fopenmp
@@ -90,10 +90,20 @@ library: $(TARGETS)
 
 ###################### BEGIN RULES ######################
 
-abr:  %: $(BUILDPATH)/test_%.$(OEXT)
+#### TARGET_ONLYTEST ####
+#abr_gadget:  %: $(BUILDPATH)/test_%.$(OEXT)
+#	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+
+fixed_abr:  %: $(BUILDPATH)/test_%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
-mtree:  %: $(BUILDPATH)/test_%.$(OEXT)
+fixed_mtree:  %: $(BUILDPATH)/test_%.$(OEXT)
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+
+mimc256:  %: $(BUILDPATH)/test_%.$(OEXT)
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+
+mimc512f:  %: $(BUILDPATH)/test_%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
 mtree_gadget:  %: $(BUILDPATH)/test_%.$(OEXT)
@@ -104,6 +114,11 @@ sha256:  %: $(BUILDPATH)/test_%.$(OEXT)
 
 sha512:  %: $(BUILDPATH)/test_%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+
+
+#### TARGET_NOTEST ####
+#benchmark:  %: $(BUILDPATH)/%.$(OEXT)
+#	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
 ###################### END RULES ######################
 

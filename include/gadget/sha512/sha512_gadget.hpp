@@ -12,6 +12,7 @@
 #ifndef SHA512_GADGET_HPP_
 #define SHA512_GADGET_HPP_
 
+#include "utils/sha512.hpp"
 #include <libsnark/common/data_structures/merkle_tree.hpp>
 #include <libsnark/gadgetlib1/gadgets/basic_gadgets.hpp>
 #include <libsnark/gadgetlib1/gadgets/hashes/hash_io.hpp>
@@ -72,6 +73,11 @@ namespace libsnark
         public:
             typedef libff::bit_vector hash_value_type;
             typedef merkle_authentication_path merkle_authentication_path_type;
+            typedef Sha512 Base;
+
+            static constexpr size_t DIGEST_SIZE = Base::DIGEST_SIZE;
+            static constexpr size_t DIGEST_VARS = DIGEST_SIZE * CHAR_BIT;
+            static constexpr size_t BLOCK_SIZE = Base::BLOCK_SIZE;
 
             std::shared_ptr<sha512_compression_function_gadget<FieldT>> f;
 
