@@ -20,7 +20,7 @@
             "name": "(Linux) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/pmtree_gadget",
+            "program": "${workspaceFolder}/bin/abr_gadget",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

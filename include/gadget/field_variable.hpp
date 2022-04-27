@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils/string_utils.hpp"
 #include <gmpxx.h>
 #include <libsnark/gadgetlib1/gadgets/basic_gadgets.hpp>
 
@@ -44,5 +45,16 @@ public:
 
     const auto &operator[](size_t i) const { return vars[i]; }
 
+    auto &operator[](size_t i) { return vars[i]; }
+
     size_t size() const { return vars.size(); }
+
+    auto begin() { return vars.begin(); }
+
+    auto end() { return vars.end(); }
+
+    auto begin() const { return vars.begin(); }
+
+    auto end() const { return vars.end(); }
+
 };

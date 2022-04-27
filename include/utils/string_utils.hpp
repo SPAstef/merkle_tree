@@ -7,6 +7,11 @@
 #include <random>
 #include <string>
 
+#include <gmpxx.h>
+#include <libff/algebra/fields/bigint.hpp>
+
+#include "bit_pack.hpp"
+
 #if __cplusplus >= 202002L
 
     #include <ranges>
@@ -195,10 +200,21 @@ std::string hexdump(T *arr, size_t sz, bool upper = false, size_t spacing = 0)
     return s;
 }
 
+
 template<bool reverse = false, typename Iter>
 std::string hexdump(const Iter &first, const Iter &last, bool upper = false, size_t spacing = 0)
 {
     return hexdump<reverse>(&*first, std::distance(first, last), upper, spacing);
+}
+
+template<bool reverse = false>
+std::string hexdump(const std::vector<bool> &v, bool upper = false, size_t spacing = 0)
+{
+    std::vector<uint8_t> w(v.size() / CHAR_BIT + (v.size() % CHAR_BIT != 0));
+
+    pack_bits(w.data(), v);
+
+    return hexdump<reverse>(w.begin(), w.end(), upper, spacing);
 }
 
 
@@ -215,6 +231,18 @@ std::string hexdump(const T (&arr)[sz], bool upper = false, size_t spacing = 0)
     return hexdump<reverse>(arr, sz, upper, spacing);
 }
 #endif
+
+template<bool reverse = false, long limbs = 4>
+std::string hexdump(const libff::bigint<limbs> &x, bool upper = false, size_t spacing = 0)
+{
+    uint8_t buff[limbs * 8]{}; // limbs are 64-bit wide
+    mpz_class tmp;
+
+    x.to_mpz(tmp.get_mpz_t());
+    mpz_export(buff, NULL, 1, 1, 0, 0, tmp.get_mpz_t());
+
+    return hexdump<reverse>(buff, upper, spacing);
+}
 
 #if __cplusplus >= 202002L
 inline std::string random_string(size_t len, const std::string &alphabet)

@@ -1,14 +1,5 @@
 #pragma once
 
-#ifdef _WIN32
-    #include <intrin.h>
-#else
-    #include <x86intrin.h>
-#endif
-#include <bit>
-#include <cinttypes>
-#include <cmath>
-
 #ifndef CURVE_ALT_BN128
     #define CURVE_ALT_BN128
 #endif
@@ -22,6 +13,7 @@ class Mimc512F
 public:
     using FieldT = libff::Fr<libff::default_ec_pp>;
     using Bigint = libff::bigint<FieldT::num_limbs>;
+    using FieldTP = std::pair<FieldT, FieldT>;
 
     static constexpr size_t BLOCK_SIZE = 128;
     static constexpr size_t DIGEST_SIZE = 64;
@@ -361,55 +353,53 @@ public:
         }
     } init{};
 
-    Mimc512F() = delete;
 
-    static std::pair<FieldT, FieldT> hash_field(const FieldT &x1, const FieldT &y1,
-                                                const FieldT &x2, const FieldT &y2)
+    static inline void cube(FieldT &x)
     {
-        std::pair<FieldT, FieldT> h{x1, y1};
-        FieldT t{x1};
+        FieldT t{x};
+        x *= t;
+        x *= t;
+    }
+
+    static FieldTP hash_field(const FieldTP &x, const FieldTP &y)
+    {
+        FieldTP h{x.first, x.first};
+        FieldT old;
 
         // optimize first round
-        h.first *= h.first;
-        h.first *= h.first;
-        h.first += h.second;
-        h.second = t;
+        cube(h.first);
+        h.first += x.second;
 
         for (size_t i = 0; i < ROUNDS_N - 2; ++i)
         {
-            t = h.first;
+            old = h.first;
             h.first += round_cf[i];
-            h.first *= h.first;
-            h.first *= h.first;
+            cube(h.first);
             h.first += h.second;
-            h.second = t;
+            h.second = old;
         }
-        // optimize last round
-        h.first += round_cf[ROUNDS_N - 1];
-        h.first *= h.first;
-        h.first *= h.first;
+        // optimize last round (we don't need h.second)
+        h.first += round_cf[ROUNDS_N - 2];
+        cube(h.first);
         h.first += h.second;
 
         // We use the Davis-Meyer construction
         FieldT k{h.first};
 
         // optimize first round
-        h = {x2, y2};
-        t = h.first;
+        h = {y.first, y.first};
         h.first += k;
-        h.first *= h.first;
-        h.first *= h.first;
-        h.first += h.second;
-        h.second = t;
+        cube(h.first);
+        h.first += y.second;
+
         for (size_t i = 0; i < ROUNDS_N - 1; ++i)
         {
-            t = h.first;
+            old = h.first;
             h.first += k;
             h.first += round_cf[i];
-            h.first *= h.first;
-            h.first *= h.first;
+            cube(h.first);
             h.first += h.second;
-            h.second = t;
+            h.second = old;
         }
         h.first += k;
 
@@ -419,55 +409,63 @@ public:
     static void hash_oneblock(uint8_t *digest, const void *message)
     {
         mpz_class tmp;
-
-        memset(digest, 0, DIGEST_SIZE);
+        FieldTP x;
 
         mpz_import(tmp.get_mpz_t(), FIELD_SIZE, 1, 1, 0, 0, message);
-        FieldT x1{Bigint{tmp.get_mpz_t()}};
+        x.first = Bigint{tmp.get_mpz_t()};
 
         mpz_import(tmp.get_mpz_t(), FIELD_SIZE, 1, 1, 0, 0, (const char *)message + FIELD_SIZE);
-        FieldT y1{Bigint{tmp.get_mpz_t()}};
+        x.second = Bigint{tmp.get_mpz_t()};
 
+        FieldTP y;
         mpz_import(tmp.get_mpz_t(), FIELD_SIZE, 1, 1, 0, 0, (const char *)message + DIGEST_SIZE);
-        FieldT x2{Bigint{tmp.get_mpz_t()}};
+        y.first = Bigint{tmp.get_mpz_t()};
 
         mpz_import(tmp.get_mpz_t(), FIELD_SIZE, 1, 1, 0, 0,
                    (const char *)message + DIGEST_SIZE + FIELD_SIZE);
-        FieldT y2{Bigint{tmp.get_mpz_t()}};
+        y.second = Bigint{tmp.get_mpz_t()};
 
-        std::tie(x1, y1) = hash_field(x1, y1, x2, y2);
+        x = hash_field(x, y);
 
-        x1.as_bigint().to_mpz(tmp.get_mpz_t());
+        // mpz_export does not guarantee to fill all the bytes
+        memset(digest, 0, DIGEST_SIZE);
+
+        x.first.as_bigint().to_mpz(tmp.get_mpz_t());
         mpz_export(digest, NULL, 1, 1, 0, 0, tmp.get_mpz_t());
 
-        y1.as_bigint().to_mpz(tmp.get_mpz_t());
+        x.second.as_bigint().to_mpz(tmp.get_mpz_t());
         mpz_export(digest + FIELD_SIZE, NULL, 1, 1, 0, 0, tmp.get_mpz_t());
     }
 
-    static void field_add(void *x, const void *y)
+    static void hash_add(void *x, const void *y)
     {
         mpz_class tmp;
+        FieldT t1;
+        FieldT t2;
 
         mpz_import(tmp.get_mpz_t(), FIELD_SIZE, 1, 1, 0, 0, x);
-        FieldT xl{tmp.get_mpz_t()};
-        mpz_import(tmp.get_mpz_t(), FIELD_SIZE, 1, 1, 0, 0, (char *)x + FIELD_SIZE);
-        FieldT xr{tmp.get_mpz_t()};
-
+        t1 = Bigint{tmp.get_mpz_t()};
         mpz_import(tmp.get_mpz_t(), FIELD_SIZE, 1, 1, 0, 0, y);
-        FieldT yl{tmp.get_mpz_t()};
-        mpz_import(tmp.get_mpz_t(), FIELD_SIZE, 1, 1, 0, 0, (const char *)y + FIELD_SIZE);
-        FieldT yr{tmp.get_mpz_t()};
+        t2 = Bigint{tmp.get_mpz_t()};
 
-        xl += yl;
-        xr += yr;
+        t1 += t2;
 
-        memset(x, 0, DIGEST_SIZE);
-
-        xl.as_bigint().to_mpz(tmp.get_mpz_t());
+        memset(x, 0, FIELD_SIZE);
+        t1.as_bigint().to_mpz(tmp.get_mpz_t());
         mpz_export(x, NULL, 1, 1, 0, 0, tmp.get_mpz_t());
 
-        xr.as_bigint().to_mpz(tmp.get_mpz_t());
+        // right
+        mpz_import(tmp.get_mpz_t(), FIELD_SIZE, 1, 1, 0, 0, (char *)x + FIELD_SIZE);
+        t1 = Bigint{tmp.get_mpz_t()};
+        mpz_import(tmp.get_mpz_t(), FIELD_SIZE, 1, 1, 0, 0, (const char *)y + FIELD_SIZE);
+        t2 = Bigint{tmp.get_mpz_t()};
+
+        t1 += t2;
+
+        memset((char *)x + FIELD_SIZE, 0, FIELD_SIZE);
+        t1.as_bigint().to_mpz(tmp.get_mpz_t());
         mpz_export((char *)x + FIELD_SIZE, NULL, 1, 1, 0, 0, tmp.get_mpz_t());
     }
 
+    Mimc512F() = delete;
 }; // namespace sha256

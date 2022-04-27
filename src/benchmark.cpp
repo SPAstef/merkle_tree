@@ -3,7 +3,6 @@
 #include "utils/fixed_mtree.hpp"
 #include "gadget/mimc256/mimc256_gadget.hpp"
 #include "gadget/mtree_gadget.hpp"
-#include "gadget/pmtree_gadget.hpp"
 #include "utils/measure.hpp"
 #include "utils/mimc256.hpp"
 #include "utils/sha256.hpp"
@@ -219,17 +218,17 @@ bool test_pmtree()
             mpz_class tmp;
 
             mpz_import(tmp.get_mpz_t(), Hash::DIGEST_SIZE, 1, 1, 0, 0, tree.digest());
-            pb.val(out[0]) = FieldT{Mimc256::Bigint{tmp.get_mpz_t()}};
+            pb.val(out[0]) = FieldT{tmp.get_mpz_t()};
 
             mpz_import(tmp.get_mpz_t(), Hash::DIGEST_SIZE, 1, 1, 0, 0,
                        tree.get_node(TRANS_IDX)->get_digest());
-            pb.val(trans[0]) = FieldT{Mimc256::Bigint{tmp.get_mpz_t()}};
+            pb.val(trans[0]) = FieldT{tmp.get_mpz_t()};
 
             for (size_t i = 0, j = 1; i < other.size(); ++i, j += 1ULL << (tree_height - i))
             {
                 mpz_import(tmp.get_mpz_t(), Hash::DIGEST_SIZE, 1, 1, 0, 0,
                            tree.get_node(j)->get_digest());
-                pb.val(other[i]) = FieldT{Mimc256::Bigint{tmp.get_mpz_t()}};
+                pb.val(other[i]) = FieldT{tmp.get_mpz_t()};
             }
 
             gadget[0].generate_r1cs_witness();

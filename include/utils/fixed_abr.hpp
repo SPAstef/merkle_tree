@@ -50,10 +50,10 @@ public:
         memcpy(block, left, Hash::DIGEST_SIZE);
         memcpy(block + Hash::DIGEST_SIZE, right, Hash::DIGEST_SIZE);
 
-        Hash::field_add(block, middle);
-        Hash::field_add(block + Hash::DIGEST_SIZE, middle);
+        Hash::hash_add(block, middle);
+        Hash::hash_add(block + Hash::DIGEST_SIZE, middle);
         Hash::hash_oneblock(this->digest, block);
-        Hash::field_add(this->digest, right);
+        Hash::hash_add(this->digest, right);
     }
 
     const uint8_t *get_digest() const { return digest; }
@@ -94,6 +94,12 @@ class FixedAbr
 private:
     using Node = FixedAbrNode<Hash>;
 
+    /*
+    Nodes layout is as follows:
+    - The first LEAVES_N nodes contain the leaves
+    - The next INTERNAL_N nodes contain the "internal leaves" (aka middle nodes)
+    - The remaining nodes are the internal nodes of the tree
+    */
     std::vector<Node> nodes{};
     Node *root = nullptr;
 
@@ -129,12 +135,12 @@ public:
         size_t depth = height - 1;
         size_t last = 0;
 
-        // add leaves and internal hashes
+        // add leaves and middle nodes
         for (size_t i = 0; i < INPUT_N; ++i)
-            this->nodes[last++] = {data + Hash::BLOCK_SIZE * i, depth};
+            this->nodes[last++] = Node{data + Hash::BLOCK_SIZE * i, depth};
 
 
-        // build first internal layer
+        // build first internal layer (only hash, no addition)
         --depth;
         for (size_t i = 0; i < LEAVES_N; i += 2)
         {

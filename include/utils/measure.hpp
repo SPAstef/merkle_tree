@@ -10,6 +10,12 @@
 #include <iomanip>
 #include <iostream>
 
+#if __cplusplus >= 201703L
+    #define MEASURE_CONSTEXPR constexpr
+#else
+    #define MEASURE_CONSTEXPR
+#endif
+
 template<int threads = 1, typename Fn> //
 double measure(Fn foo, size_t repeat = 1, size_t times = 1, const char *name = nullptr,
                bool output = true)
@@ -31,38 +37,25 @@ double measure(Fn foo, size_t repeat = 1, size_t times = 1, const char *name = n
         uint64_t c_start = __rdtsc();
         auto start = clk::now();
 
-#if __cplusplus >= 201703L
-        if constexpr (threads > 1)
-#else
-        if (threads > 1)
-#endif
+        if MEASURE_CONSTEXPR (threads > 1)
         {
 #pragma omp parallel for num_threads(threads)
             for (size_t j = 0; j < repeat; ++j)
             {
-#if __cplusplus >= 201703L
-                if constexpr (std::is_invocable<Fn, size_t>::value)
+                if MEASURE_CONSTEXPR (std::is_invocable<Fn, size_t>::value)
                     foo(j);
                 else
                     foo();
-#else
-                foo();
-#endif
             }
         }
         else
         {
             for (size_t j = 0; j < repeat; ++j)
             {
-#if __cplusplus >= 201703L
-                if constexpr (std::is_invocable<Fn, size_t>::value)
-                    if (std::is_invocable<Fn, size_t>::value)
-                        foo(j);
-                    else
-                        foo();
-#else
-                foo();
-#endif
+                if MEASURE_CONSTEXPR (std::is_invocable<Fn, size_t>::value)
+                    foo(j);
+                else
+                    foo();
             }
         }
 
@@ -78,8 +71,11 @@ double measure(Fn foo, size_t repeat = 1, size_t times = 1, const char *name = n
         cpi_avg = (cpi_avg * i + cpi) / (i + 1);
         ops_avg = (ops_avg * i + ops) / (i + 1);
         if (output)
+        {
             out << std::setw(16) << clocks << std::setw(16) << elap_ms << std::setw(16) << cpi
                 << ops << '\n';
+            out.flush();
+        }
     }
 
     elap_avg /= 1000000;
@@ -90,7 +86,10 @@ double measure(Fn foo, size_t repeat = 1, size_t times = 1, const char *name = n
                 << std::setw(16) << clocks_avg << std::setw(16) << elap_avg << std::setw(16)
                 << cpi_avg << std::setw(16) << ops_avg << '\n';
         out << "\n\n";
+        out.flush();
     }
 
     return elap_avg;
 }
+
+#undef MEASURE_CONSTEXPR

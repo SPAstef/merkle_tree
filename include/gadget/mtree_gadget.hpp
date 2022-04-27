@@ -1,8 +1,8 @@
 #pragma once
 
+#include "gadget/field_variable.hpp"
 #include "utils/bit_pack.hpp"
 #include "utils/string_utils.hpp"
-#include "gadget/field_variable.hpp"
 
 #include <boost/type_traits.hpp>
 #include <boost/typeof/typeof.hpp>
@@ -30,11 +30,11 @@ public:
     using super = libsnark::gadget<FieldT>;
 
     static inline constexpr size_t DIGEST_VARS = GadHash::DIGEST_VARS;
-    static inline constexpr bool DIGEST_SIZE = GadHash::DIGEST_SIZE;
+    static inline constexpr size_t DIGEST_SIZE = GadHash::DIGEST_SIZE;
     static inline constexpr bool HASH_ISBOOLEAN = DIGEST_SIZE < DIGEST_VARS;
 
     using DigVar = typename std::conditional_t<HASH_ISBOOLEAN, libsnark::digest_variable<FieldT>,
-                                      field_variable<FieldT>>;
+                                               field_variable<FieldT>>;
     using Protoboard = libsnark::protoboard<FieldT>;
 
 private:

@@ -1,5 +1,5 @@
 # Enables debug mode
-DEBUG := 0
+DEBUG := 1
 # Override default compiler and flags
 OVERRIDE_DEFAULT_CXX := 1
 # Measure performance in tests
@@ -7,7 +7,15 @@ MEASURE_PERFORMANCE := 0
 
 LIBNAME := libabr
 
-TARGETS_ONLYTEST := fixed_abr fixed_mtree mimc256 mimc512f mtree_gadget sha256 sha512
+TARGETS_ONLYTEST := abr_gadget \
+    fixed_abr \
+    fixed_mtree \
+    mimc256 \
+    mimc512f \
+    mtree_gadget \
+    sha256 \
+    sha512
+
 TARGETS_TEST :=
 TARGETS_NOTEST :=
 
@@ -91,8 +99,8 @@ library: $(TARGETS)
 ###################### BEGIN RULES ######################
 
 #### TARGET_ONLYTEST ####
-#abr_gadget:  %: $(BUILDPATH)/test_%.$(OEXT)
-#	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+abr_gadget:  %: $(BUILDPATH)/test_%.$(OEXT)
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
 fixed_abr:  %: $(BUILDPATH)/test_%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)

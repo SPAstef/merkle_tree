@@ -115,7 +115,8 @@
         "numbers": "cpp",
         "semaphore": "cpp",
         "cfenv": "cpp",
-        "__bit_reference": "cpp"
+        "__bit_reference": "cpp",
+        "__preprocessor": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"
 }

@@ -31,11 +31,12 @@ using GadSha256 = libsnark::sha256_two_to_one_hash_gadget<FieldT>;
 using GadSha512 = libsnark::sha512::sha512_two_to_one_hash_gadget<FieldT>;
 
 using GadMimc256 = mimc256_two_to_one_hash_gadget<FieldT>;
-//using GadMimc512F = mimc512f_two_to_one_hash_gadget<FieldT>;
+using GadMimc512F = mimc512f_two_to_one_hash_gadget<FieldT>;
 
 template<size_t tree_height, typename Hash, typename GadHash>
 bool test_mtree()
 {
+    using Mtree = FixedMTree<tree_height, Hash>;
     using DigVar = libsnark::digest_variable<FieldT>;
 
     static constexpr size_t DIGEST_VARS = GadHash::DIGEST_VARS;
@@ -43,9 +44,11 @@ bool test_mtree()
     static std::mt19937 rng{std::random_device{}()};
 
     // Build tree
-    std::vector<uint8_t> data(FixedMTree<tree_height, Hash>::INPUT_SIZE);
+    std::vector<uint8_t> data(Mtree::INPUT_SIZE);
     std::generate(data.begin(), data.end(), std::ref(rng));
-    FixedMTree<tree_height, Hash> tree{data.begin(), data.end()};
+    Mtree tree{data.begin(), data.end()};
+
+    std::cout << '\n' << tree << '\n';
 
     // Extract our transaction
     libff::bit_vector trans_bv(DIGEST_VARS);
@@ -78,11 +81,26 @@ bool test_mtree()
         other[i].generate_r1cs_constraints();
     gadget.generate_r1cs_constraints();
 
+
     //    out.generate_r1cs_witness(out_bv);
     trans.generate_r1cs_witness(trans_bv);
     for (size_t i = 0; i < other.size(); ++i)
         other[i].generate_r1cs_witness(other_bv[i]);
     gadget.generate_r1cs_witness();
+
+    {
+        std::cout << '\n'
+                  << "Vanilla output:\t" << hexdump(tree.digest(), Hash::DIGEST_SIZE) << '\n';
+
+        uint8_t buff[Hash::DIGEST_SIZE]{};
+        std::vector<bool> buff_bv(DIGEST_VARS);
+
+        for (size_t i = 0; i < DIGEST_VARS; ++i)
+            buff_bv[i] = pb.val(out.bits[i]).as_ulong();
+        pack_bits(buff, buff_bv);
+
+        std::cout << "ZKP output:\t" << hexdump(buff) << '\n';
+    }
 
     bool result;
     auto keypair = libsnark::r1cs_ppzksnark_generator<ppT>(pb.get_constraint_system());
@@ -98,6 +116,7 @@ bool test_mtree()
 template<size_t tree_height, typename Hash, typename GadHash>
 bool test_pmtree()
 {
+    using Mtree = FixedMTree<tree_height, Hash>;
     using DigVar = field_variable<FieldT>;
 
     static constexpr size_t DIGEST_VARS = GadHash::DIGEST_VARS;
@@ -105,9 +124,13 @@ bool test_pmtree()
     static std::mt19937 rng{std::random_device{}()};
 
     // Build tree
-    std::vector<uint8_t> data(FixedMTree<tree_height, Hash>::INPUT_SIZE);
-    std::generate(data.begin(), data.end(), std::ref(rng));
-    FixedMTree<tree_height, Hash> tree{data.begin(), data.end()};
+    std::vector<uint8_t> data(Mtree::INPUT_SIZE);
+    //std::generate(data.begin(), data.end(), std::ref(rng));
+    Mtree tree{data.begin(), data.end()};
+
+    std::cout << '\n' << tree << '\n';
+
+    // There is no need to extract anything as field_variable does that for us
 
     // Test Gadget
     libsnark::protoboard<FieldT> pb;
@@ -133,6 +156,16 @@ bool test_pmtree()
         other[i].generate_r1cs_witness(tree.get_node(j)->get_digest());
     gadget.generate_r1cs_witness();
 
+    {
+        std::cout << "Vanilla output:\t" << hexdump(tree.digest(), Hash::DIGEST_SIZE) << '\n';
+
+        std::cout << "ZKP output:\t";
+
+        for (auto &&x : out)
+            std::cout << hexdump(pb.val(x).as_bigint());
+        std::cout << '\n';
+    }
+
     bool result;
     auto keypair = libsnark::r1cs_ppzksnark_generator<ppT>(pb.get_constraint_system());
     auto proof = libsnark::r1cs_ppzksnark_prover<ppT>(keypair.pk, pb.primary_input(),
@@ -157,7 +190,7 @@ static bool run_tests()
     std::cout << "SHA256... ";
     std::cout.flush();
     {
-        check = test_mtree<TREE_HEIGHT, Sha256, GadSha256>();
+        //check = test_mtree<TREE_HEIGHT, Sha256, GadSha256>();
     }
     std::cout << check << '\n';
     all_check &= check;
@@ -165,8 +198,9 @@ static bool run_tests()
     std::cout << "SHA512... ";
     std::cout.flush();
     {
-        check = test_mtree<TREE_HEIGHT, Sha512, GadSha512>();
+        //check = test_mtree<TREE_HEIGHT, Sha512, GadSha512>();
     }
+
     std::cout << check << '\n';
     all_check &= check;
 
@@ -177,15 +211,15 @@ static bool run_tests()
     }
     std::cout << check << '\n';
     all_check &= check;
-    /*
-    std::cout << "MiMC512f... ";
+
+    std::cout << "MiMC512F... ";
     std::cout.flush();
     {
-        check = test_mtree<TREE_HEIGHT, Mimc512F, GadMimc512F>();
+        check = test_pmtree<TREE_HEIGHT, Mimc512F, GadMimc512F>();
     }
     std::cout << check << '\n';
     all_check &= check;
-*/
+
 
     return all_check;
 }

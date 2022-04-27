@@ -87,7 +87,7 @@ public:
             ((uint64_t *)digest)[i] = _bswap64(wv[i]);
     }
 
-    static void field_add(void *x, const void *y)
+    static void hash_add(void *x, const void *y)
     {
         uint8_t *xb = (uint8_t *)x;
         const uint8_t *yb = (const uint8_t *)y;

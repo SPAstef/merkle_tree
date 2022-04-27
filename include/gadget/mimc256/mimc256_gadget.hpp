@@ -19,6 +19,7 @@ public:
     using Constraint = libsnark::r1cs_constraint<FieldT>;
     using Parent = libsnark::gadget<FieldT>;
     using LC = libsnark::linear_combination<FieldT>;
+    using PbVar = libsnark::pb_variable<FieldT>;
     using DigVar = field_variable<FieldT>;
 
     static constexpr size_t ROUNDS_N = Base::ROUNDS_N;
@@ -26,29 +27,29 @@ public:
     static constexpr size_t DIGEST_VARS = 1;
     static constexpr size_t BLOCK_SIZE = Base::BLOCK_SIZE;
 
-    const DigVar A;
-    const DigVar B;
+    const DigVar x;
+    const DigVar y;
     const DigVar out;
 
 private:
-    static constexpr size_t TEMP_N = 2 + 2 * (ROUNDS_N - 1) + 2 + 2 * (ROUNDS_N - 2) + 1;
+    static constexpr size_t INTER_N = 2 + 2 * (ROUNDS_N - 1) + 2 + 2 * (ROUNDS_N - 2) + 1;
 
-    std::vector<DigVar> temp;
+    std::vector<PbVar> inter;
 
 public:
-    mimc256_two_to_one_hash_gadget(libsnark::protoboard<FieldT> &pb, const DigVar &A,
-                                   const DigVar &B, const DigVar &out,
+    mimc256_two_to_one_hash_gadget(libsnark::protoboard<FieldT> &pb, const DigVar &x,
+                                   const DigVar &y, const DigVar &out,
                                    const std::string &annotation_prefix) :
         Parent(pb, annotation_prefix),
-        A{A}, B{B}, out{out}, temp{}
+        x{x}, y{y}, out{out}, inter{}
     {
-        for (size_t i = 0; i < TEMP_N; ++i)
-            temp.emplace_back(pb, DIGEST_VARS, FMT("mimc256_temp_%llu", i));
+        for (size_t i = 0; i < INTER_N; ++i)
+            inter.emplace_back(pb, FMT("mimc256_inter_%llu", i));
     }
 
-    inline size_t constrain(const LC &a, const LC &b, const LC &c)
+    inline size_t constrain(const LC &x, const LC &y, const LC &z)
     {
-        this->pb.add_r1cs_constraint(Constraint(a, b, c), FMT(""));
+        this->pb.add_r1cs_constraint(Constraint(x, y, z), FMT(""));
 
         return 1;
     }
@@ -56,83 +57,90 @@ public:
     void generate_r1cs_constraints()
     {
         size_t i = 0;
+        LC t;
 
         // x^2
-        constrain(A[0], A[0], temp[i][0]);
+        i += constrain(x[0], x[0], inter[i]);
 
         // x^3
-        i += constrain(temp[i][0], A[0], temp[i + 1][0]);
+        i += constrain(inter[i - 1], x[0], inter[i]);
 
         // Loop body: (x + c)^3
         for (size_t j = 0; j < ROUNDS_N - 1; ++j)
         {
-            i += constrain(temp[i][0] + Base::round_cf[j], temp[i][0] + Base::round_cf[j],
-                           temp[i + 1][0]);
-            i += constrain(temp[i][0], temp[i][0], temp[i + 1][0]);
+            t = inter[i - 1] + Base::round_cf[j];
+            i += constrain(t, t, inter[i]);
+            i += constrain(inter[i - 1], t, inter[i]);
         }
 
         // (x + y)^3
-        i += constrain(temp[i][0] + B[0], temp[i][0] + B[0], temp[i + 1][0]);
-        i += constrain(temp[i][0], temp[i][0], temp[i + 1][0]);
+        t = inter[i - 1] + y[0];
+        i += constrain(t, t, inter[i]);
+        i += constrain(inter[i - 1], t, inter[i]);
 
         // Loop body: x = (x + y + c)^3
         for (size_t j = 0; j < ROUNDS_N - 2; ++j)
         {
-            i += constrain(temp[i][0] + B[0] + Base::round_cf[j],
-                           temp[i][0] + B[0] + Base::round_cf[j], temp[i + 1][0]);
-            i += constrain(temp[i][0], temp[i][0], temp[i + 1][0]);
+            t = inter[i - 1] + y[0] + Base::round_cf[j];
+            i += constrain(t, t, inter[i]);
+            i += constrain(inter[i - 1], t, inter[i]);
         }
-        // out = (x + y + c) ^ 3 + y <==> out - y = (x + y + c) ^ 3
-        i += constrain(temp[i][0] + B[0] + Base::round_cf[ROUNDS_N - 2],
-                       temp[i][0] + B[0] + Base::round_cf[ROUNDS_N - 2], temp[i + 1][0]);
-        i += constrain(temp[i][0], temp[i][0], out[0] - B[0]);
+        t = inter[i - 1] + y[0] + Base::round_cf[ROUNDS_N - 2];
+        constrain(t, t, inter[i]);
+        constrain(inter[i], t, out[0] - y[0]);
     }
 
     void generate_r1cs_witness()
     {
         auto &pb = this->pb;
         size_t i = 0;
+        FieldT t;
 
         // x^2
-        pb.lc_val(temp[i][0]) = pb.lc_val(A[0]) * pb.lc_val(A[0]);
-
+        pb.val(inter[i]) = pb.val(x[0]) * pb.val(x[0]);
+        ++i;
         // x^3
-        pb.lc_val(temp[i + 1][0]) = pb.lc_val(temp[i][0]) * pb.lc_val(A[0]);
+        pb.val(inter[i]) = pb.val(inter[i - 1]) * pb.val(x[0]);
         ++i;
 
         // Loop body: (x + c)^3
         for (size_t j = 0; j < ROUNDS_N - 1; ++j)
         {
-            pb.lc_val(temp[i + 1][0]) = (pb.lc_val(temp[i][0]) + Base::round_cf[j]) *
-                                        (pb.lc_val(temp[i][0]) + Base::round_cf[j]);
+            // (x + c)
+            t = pb.val(inter[i - 1]) + Base::round_cf[j];
+            pb.val(inter[i]) = t * t;
             ++i;
-            pb.lc_val(temp[i + 1][0]) = pb.lc_val(temp[i][0]) * pb.lc_val(temp[i][0]);
+
+            // ^3
+            pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
             ++i;
         }
 
-        // (x + y)^3
-        pb.lc_val(temp[i + 1][0]) = (pb.lc_val(temp[i][0]) + pb.lc_val(B[0])) *
-                                    (pb.lc_val(temp[i][0]) + pb.lc_val(B[0]));
+        // (x + y)^2
+        t = pb.val(inter[i - 1]) + pb.val(y[0]);
+        pb.val(inter[i]) = t * t;
         ++i;
-        pb.lc_val(temp[i + 1][0]) = pb.lc_val(temp[i][0]) * pb.lc_val(temp[i][0]);
+
+        // ^3
+        pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
         ++i;
 
         // Loop body: x = (x + y + c)^3
         for (size_t j = 0; j < ROUNDS_N - 2; ++j)
         {
-            pb.lc_val(
-                temp[i + 1][0]) = (pb.lc_val(temp[i][0]) + pb.lc_val(B[0]) + Base::round_cf[j]) *
-                                  (pb.lc_val(temp[i][0]) + pb.lc_val(B[0]) + Base::round_cf[j]);
+            t = pb.val(inter[i - 1]) + pb.val(y[0]) + Base::round_cf[j];
+            // (x + y + c)^2
+            pb.val(inter[i]) = t * t;
             ++i;
-            pb.lc_val(temp[i + 1][0]) = pb.lc_val(temp[i][0]) * pb.lc_val(temp[i][0]);
+            // ^3
+            pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
             ++i;
         }
-        // out = (x + y + c) ^ 3 + y <==> out - y = (x + y + c) ^ 3
-        pb.lc_val(temp[i + 1][0]) =
-            (pb.lc_val(temp[i][0]) + pb.lc_val(B[0]) + Base::round_cf[ROUNDS_N - 2]) *
-            (pb.lc_val(temp[i][0]) + pb.lc_val(B[0]) + Base::round_cf[ROUNDS_N - 2]);
-
-        ++i;
-        pb.lc_val(out[0]) = (pb.lc_val(temp[i][0]) * pb.lc_val(temp[i][0])) + pb.lc_val(B[0]);
+        // (x + y + c)^2
+        t = pb.val(inter[i - 1]) + pb.val(y[0]) + Base::round_cf[ROUNDS_N - 2];
+        pb.val(inter[i]) = t * t;
+        // ^3 + y
+        pb.val(out[0]) = pb.val(inter[i]) * t;
+        pb.val(out[0]) += pb.val(y[0]);
     }
 };

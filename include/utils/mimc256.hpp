@@ -1,14 +1,5 @@
 #pragma once
 
-#ifdef _WIN32
-    #include <intrin.h>
-#else
-    #include <x86intrin.h>
-#endif
-#include <bit>
-#include <cinttypes>
-#include <cmath>
-
 #ifndef CURVE_ALT_BN128
     #define CURVE_ALT_BN128
 #endif
@@ -189,8 +180,6 @@ public:
     };
     static inline FieldT round_cf[ROUNDS_N - 1]{};
 
-    Mimc256() = delete;
-
     static inline const struct init
     {
         init()
@@ -202,31 +191,36 @@ public:
         }
     } init{};
 
+    static inline void cube(FieldT &x)
+    {
+        FieldT t{x};
+        x *= t;
+        x *= t;
+    }
+
     static FieldT hash_field(const FieldT &x, const FieldT &y)
     {
+        // optimize first round
         FieldT h{x};
 
-        // optimize first round
-        h *= h;
-        h *= h;
+        cube(h);
+
         for (size_t i = 0; i < ROUNDS_N - 1; ++i)
         {
             h += round_cf[i];
-            h *= h;
-            h *= h;
+            cube(h);
         }
 
         // We use the Davies-Meyer construction
         // optimize first round
         h += y;
-        h *= h;
-        h *= h;
+        cube(h);
+
         for (size_t i = 0; i < ROUNDS_N - 1; ++i)
         {
             h += y;
             h += round_cf[i];
-            h *= h;
-            h *= h;
+            cube(h);
         }
         h += y;
 
@@ -238,10 +232,10 @@ public:
         mpz_class tmp;
 
         mpz_import(tmp.get_mpz_t(), DIGEST_SIZE, 1, 1, 0, 0, message);
-        FieldT x{Bigint{tmp.get_mpz_t()}};
+        FieldT x{tmp.get_mpz_t()};
 
         mpz_import(tmp.get_mpz_t(), DIGEST_SIZE, 1, 1, 0, 0, (const char *)message + DIGEST_SIZE);
-        FieldT y{Bigint{tmp.get_mpz_t()}};
+        FieldT y{tmp.get_mpz_t()};
 
         x = hash_field(x, y);
         x.as_bigint().to_mpz(tmp.get_mpz_t());
@@ -250,7 +244,7 @@ public:
         mpz_export(digest, NULL, 1, 1, 0, 0, tmp.get_mpz_t());
     }
 
-    static void field_add(void *x, const void *y)
+    static void hash_add(void *x, const void *y)
     {
         mpz_class tmp;
 
@@ -266,4 +260,6 @@ public:
         memset(x, 0, DIGEST_SIZE);
         mpz_export(x, NULL, 1, 1, 0, 0, tmp.get_mpz_t());
     }
+
+    Mimc256() = delete;
 };

@@ -19,12 +19,6 @@ static bool run_tests()
     static constexpr auto digest_sha512 =
         "8eb195cebaf15f4a0c277829505d9b4eedf0d0167183fea9ee74ec93eab6192f37d8857b5d8ba5573300357b92142c906eb9b4ffa6f0297f8c538b81865fef0d"_x;
 
-    static constexpr auto digest_mimc256 =
-        "1b61645b7180810e3ce2ba498b2cd1be8bbd95c83d7d8e809bdc7aca0ee02260"_x;
-
-    static constexpr auto digest_mimc512f =
-        "05788020a89e41845ca68cb6fcb581f0cce9521998bbe584856a758fa1f2a2f511cc1386a0f20cbdf758faa5b1371d8f2fde24293dbd44a91557062abeacb0a1"_x;
-
 
     std::cout << std::boolalpha;
 
@@ -50,6 +44,7 @@ static bool run_tests()
     std::cout << check << '\n';
     all_check &= check;
 
+/* There are no test vectors for MiMC, so we assume our implementation to be correct
     std::cout << "Hashing MiMC256... ";
     check = true;
     {
@@ -70,7 +65,7 @@ static bool run_tests()
         check = memcmp(tree.digest(), digest_mimc512f.data(), digest_mimc512f.size()) == 0;
     }
     std::cout << check << '\n';
-    all_check &= check;
+    all_check &= check;*/
 
     return all_check;
 }

@@ -48,7 +48,7 @@ public:
         for (size_t i = 0; i < node.depth; ++i)
             os << "    ";
 
-        os << "*: " << hexdump(node.digest, Hash::DIGEST_SIZE) << '\n';
+        os << "*: " << hexdump(node.digest, Hash::DIGEST_SIZE, false, 64) << '\n';
 
         if (node.l)
             os << *node.l;
