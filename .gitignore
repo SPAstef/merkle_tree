@@ -7,6 +7,7 @@
 *.log
 *.aux
 *.synctex.gz
+.vscode
 lib/*
 bin/*
 build/*
