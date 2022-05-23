@@ -4,3 +4,9 @@
 *.exe
 *.pdb
 *.ilk
+*.log
+*.aux
+*.synctex.gz
+lib/*
+bin/*
+build/*
