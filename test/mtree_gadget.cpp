@@ -3,6 +3,7 @@
 #include "gadget/mtree_gadget.hpp"
 #include "gadget/mimc256/mimc256_gadget.hpp"
 #include "gadget/mimc512f/mimc512f_gadget.hpp"
+#include "gadget/mimc512f_2k/mimc512f_2k_gadget.hpp"
 #include "gadget/sha256/sha256_gadget.hpp"
 #include "gadget/sha512/sha512_gadget.hpp"
 #include "utils/fixed_mtree.hpp"
@@ -32,6 +33,8 @@ using GadSha512 = libsnark::sha512::sha512_two_to_one_hash_gadget<FieldT>;
 
 using GadMimc256 = mimc256_two_to_one_hash_gadget<FieldT>;
 using GadMimc512F = mimc512f_two_to_one_hash_gadget<FieldT>;
+using GadMimc512F = mimc512f_two_to_one_hash_gadget<FieldT>;
+using GadMimc512F2K = mimc512f2k_two_to_one_hash_gadget<FieldT>;
 
 template<size_t tree_height, typename Hash, typename GadHash>
 bool test_mtree()
@@ -216,6 +219,14 @@ static bool run_tests()
     std::cout.flush();
     {
         check = test_pmtree<TREE_HEIGHT, Mimc512F, GadMimc512F>();
+    }
+    std::cout << check << '\n';
+    all_check &= check;
+
+    std::cout << "MiMC512F2K... ";
+    std::cout.flush();
+    {
+        check = test_pmtree<TREE_HEIGHT, Mimc512F2K, GadMimc512F2K>();
     }
     std::cout << check << '\n';
     all_check &= check;

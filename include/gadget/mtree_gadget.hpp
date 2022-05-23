@@ -56,7 +56,6 @@ public:
         std::string name_i{"hashI_"};
         std::string name_f{"foo_hash_"};
 
-
         inter.emplace_back(pb, DIGEST_VARS, FMT(ap, name_i, "0"));
         if (trans_idx & 1)
             foo_hash.emplace_back(pb, other[0], trans, inter[0], FMT(ap, name_f, "0"));

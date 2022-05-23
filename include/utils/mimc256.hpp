@@ -189,7 +189,7 @@ public:
             for (size_t i = 0; i < ROUNDS_N - 1; ++i)
                 round_cf[i] = round_c[i];
         }
-    } init{};
+    } init;
 
     static inline void cube(FieldT &x)
     {

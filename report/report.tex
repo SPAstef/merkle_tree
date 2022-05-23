@@ -1,0 +1,38 @@
+\documentclass{article}
+
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\newcommand{\BigO}{\mathcal{O}}
+\newcommand{\SmallO}{\textit{o}}
+\newcommand{\then}{\Rightarrow}
+\newcommand{\Ptime}{\textsc{P}}
+\newcommand{\NPtime}{\textsc{NP}}
+\newcommand{\NPcomp}{\textsc{NP-complete}}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{theorem}
+\newtheorem{theorem}{Theorem}
+
+\theoremstyle{example}
+\newtheorem{example}{Example}
+
+\author{Stefano Trevisani}
+\date{\today}
+\title{Implementing compact tree-hashing commitment verification in ZK-SNARK}
+
+\begin{document}
+\maketitle
+\include{sections/introduction.tex}
+\include{sections/hashes.tex}
+\include{sections/zksnark.tex}
+
+\section{The libsnark library}\label{sec:libsnark}
+
+\section{Experiments}\label{sec:experiments}
+
+\section{Conclusions and future directions}\label{sec:conclusions}
+\end{document}

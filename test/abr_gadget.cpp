@@ -3,6 +3,7 @@
 #include "gadget/abr_gadget.hpp"
 #include "gadget/mimc256/mimc256_gadget.hpp"
 #include "gadget/mimc512f/mimc512f_gadget.hpp"
+#include "gadget/mimc512f_2k/mimc512f_2k_gadget.hpp"
 #include "gadget/sha256/sha256_gadget.hpp"
 #include "gadget/sha512/sha512_gadget.hpp"
 #include "utils/fixed_abr.hpp"
@@ -30,6 +31,7 @@ using GadSha256 = libsnark::sha256_two_to_one_hash_gadget<FieldT>;
 using GadSha512 = libsnark::sha512::sha512_two_to_one_hash_gadget<FieldT>;
 using GadMimc256 = mimc256_two_to_one_hash_gadget<FieldT>;
 using GadMimc512F = mimc512f_two_to_one_hash_gadget<FieldT>;
+using GadMimc512F2K = mimc512f2k_two_to_one_hash_gadget<FieldT>;
 
 template<size_t tree_height, typename Hash, typename GadHash>
 bool test_tRee()
@@ -184,13 +186,6 @@ bool test_ptRee()
         pb, out, trans, other, middle, otherx, TRANS_IDX, tree_height, FMT("merkle_tree")};
 
     std::cout << '\n' << tree << '\n';
-    out.generate_r1cs_constraints();
-    trans.generate_r1cs_constraints();
-    other.generate_r1cs_constraints();
-    for (auto &&x : middle)
-        x.generate_r1cs_constraints();
-    for (auto &&x : otherx)
-        x.generate_r1cs_constraints();
     gadget.generate_r1cs_constraints();
 
     out.generate_r1cs_witness(tree.digest());
@@ -276,6 +271,14 @@ static bool run_tests()
     std::cout.flush();
     {
         check = test_ptRee<TREE_HEIGHT, Mimc512F, GadMimc512F>();
+    }
+    std::cout << check << '\n';
+    all_check &= check;
+
+    std::cout << "MiMC512F_2K... ";
+    std::cout.flush();
+    {
+        check = test_ptRee<TREE_HEIGHT, Mimc512F2K, GadMimc512F2K>();
     }
     std::cout << check << '\n';
     all_check &= check;

@@ -109,6 +109,8 @@ public:
     static constexpr size_t INPUT_N = LEAVES_N + INTERNAL_N;
     static constexpr size_t INPUT_SIZE = INPUT_N * Hash::BLOCK_SIZE;
 
+    FixedAbr() = default;
+
 #if __cplusplus >= 202002L
     template<std::ranges::range Range>
     FixedAbr(const Range &range) :
@@ -135,53 +137,114 @@ public:
         size_t depth = height - 1;
         size_t last = 0;
 
-        // add leaves and middle nodes
-        for (size_t i = 0; i < INPUT_N; ++i)
-            this->nodes[last++] = Node{data + Hash::BLOCK_SIZE * i, depth};
-
-
-        // build first internal layer (only hash, no addition)
-        --depth;
-        for (size_t i = 0; i < LEAVES_N; i += 2)
+        if constexpr (0) // serial code
         {
-            this->nodes[last] = Node{this->nodes[i].digest, this->nodes[i + 1].digest, depth};
+            // add leaves and middle nodes
+            for (size_t i = 0; i < INPUT_N; ++i)
+                this->nodes[last++] = Node{data + Hash::BLOCK_SIZE * i, depth};
 
-            this->nodes[last].l = &this->nodes[i];
-            this->nodes[last].r = &this->nodes[i + 1];
-            this->nodes[i].f = &this->nodes[last];
-            this->nodes[i + 1].f = &this->nodes[last];
-            ++last;
-        }
 
-        for (size_t i = INPUT_N, len = i + LEAVES_N / 2, e = LEAVES_N; depth > 0;
-             len += 1ULL << depth)
-        {
+            // build first internal layer (only hash, no addition)
             --depth;
-            while (i < len)
+            for (size_t i = 0; i < LEAVES_N; i += 2)
             {
-                this->nodes[last] = Node{this->nodes[i].digest, this->nodes[i + 1].digest,
-                                         this->nodes[e].digest, depth};
+                this->nodes[last] = Node{this->nodes[i].digest, this->nodes[i + 1].digest, depth};
 
                 this->nodes[last].l = &this->nodes[i];
-                this->nodes[last].e = &this->nodes[e];
                 this->nodes[last].r = &this->nodes[i + 1];
-
-                this->nodes[last].e->depth = depth + 1;
-
                 this->nodes[i].f = &this->nodes[last];
-                this->nodes[e].f = &this->nodes[last];
                 this->nodes[i + 1].f = &this->nodes[last];
-
-                i += 2;
                 ++last;
-                ++e;
+            }
+
+            for (size_t i = INPUT_N, len = i + LEAVES_N / 2, e = LEAVES_N; depth > 0;
+                 len += 1ULL << depth)
+            {
+                --depth;
+                while (i < len)
+                {
+                    this->nodes[last] = Node{this->nodes[i].digest, this->nodes[i + 1].digest,
+                                             this->nodes[e].digest, depth};
+
+                    this->nodes[last].l = &this->nodes[i];
+                    this->nodes[last].e = &this->nodes[e];
+                    this->nodes[last].r = &this->nodes[i + 1];
+
+                    this->nodes[last].e->depth = depth + 1;
+
+                    this->nodes[i].f = &this->nodes[last];
+                    this->nodes[e].f = &this->nodes[last];
+                    this->nodes[i + 1].f = &this->nodes[last];
+
+                    i += 2;
+                    ++last;
+                    ++e;
+                }
+            }
+        }
+        else // parallel code
+        {
+            // add leaves and middle nodes
+#pragma omp parallel for
+            for (size_t i = 0; i < INPUT_N; ++i)
+                this->nodes[i] = Node{data + Hash::BLOCK_SIZE * i, depth};
+            last = INPUT_N;
+
+
+            // build first internal layer (only hash, no addition)
+            --depth;
+            for (size_t i = 0; i < LEAVES_N; i += 2)
+            {
+                this->nodes[last] = Node{this->nodes[i].digest, this->nodes[i + 1].digest, depth};
+
+                this->nodes[last].l = &this->nodes[i];
+                this->nodes[last].r = &this->nodes[i + 1];
+                this->nodes[i].f = &this->nodes[last];
+                this->nodes[i + 1].f = &this->nodes[last];
+                ++last;
+            }
+
+            for (size_t i = INPUT_N, len = i + LEAVES_N / 2, e = LEAVES_N; depth > 0;
+                 len += 1ULL << depth)
+            {
+                --depth;
+                size_t iters = (len - i) >> 1;
+#pragma omp parallel for
+                for (size_t j = 0; j < iters; ++j)
+                {
+                    size_t k = i + j * 2;
+                    size_t l = last + j;
+                    size_t f = e + j;
+
+                    this->nodes[l] = Node{this->nodes[k].digest, this->nodes[k + 1].digest,
+                                          this->nodes[f].digest, depth};
+
+                    this->nodes[l].l = &this->nodes[k];
+                    this->nodes[l].e = &this->nodes[f];
+                    this->nodes[l].r = &this->nodes[k + 1];
+
+                    this->nodes[l].e->depth = depth + 1;
+
+                    this->nodes[k].f = &this->nodes[l];
+                    this->nodes[f].f = &this->nodes[l];
+                    this->nodes[k + 1].f = &this->nodes[l];
+                }
+                i += iters * 2;
+                last += iters;
+                e += iters;
             }
         }
     }
 
-    const uint8_t *digest() const { return root->digest; }
+    const uint8_t *digest() const
+    {
+        return root->digest;
+    }
 
-    const Node *get_node(size_t i) const { return &nodes[i]; }
+    const Node *get_node(size_t i) const
+    {
+        return &nodes[i];
+    }
 
     friend std::ostream &operator<<(std::ostream &os, const FixedAbr &tree)
     {

@@ -1,0 +1,40 @@
+\section{Introduction}
+One of the biggest revolutions of the last decade has been the widespread adoption of
+blockchain-based technologies. In particular, cryptocurrencies like Bitcoin or Ethereum are
+widely known even among the non-crypto-enthusiasts and a huge market is growing around them.
+There are highly interesting applications of the blockchain even outside the financial world:
+in fact, anything which requires some degree of `verifiability' in a non-trusted environment can
+benefit from using a blockchain.
+Tipically, a block of the chain does not correspond to a single transaction, as the blockchain
+would become too big to be stored: many transactions are inserted into a tree data-structure,
+called Merkle Tree (MT), which is computed bottom-up and whose root is then inserted into the blockchain.
+In a traditional setup (e.g.\ the aformentioned cryptocurrencies), all the data which is required
+to build a block of the blockchain is of public knowledge: when an Ethereum transaction happens,
+the details of that transaction are shared with the network for it to be validated.
+Of course, there are many scenarios were one would like the data to remain secret, as there could
+be risks for privacy (e.g.\ transactions) or for intellectual property (e.g.\ algorithms).
+
+Zero-Knowledge Succint Non-interactive ARgument of Knowledge\\ (ZK-SNARK) systems are cryptographic
+frameworks which allow for a party to convince other parties that he `knows something' without
+revealing anything else.
+For example, one could convice other users that the hash of a transaction is valid without
+revealing the details of that transaction.
+ZK systems work over prime fields, and hashing algorithms like SHA-256, which are quite efficient
+in a `vanilla' scenario, can become extremely slow when translated.
+For this reason, new hashing algorithms like MiMCHash have been designed with the ZK scenario in
+mind, and Augmented Binary tRee (ABR) tries to improve Merkle Trees by processing more transactions
+without requiring more hash function calls.
+
+In the remainder of the report, for clarity we will always have in mind the cryptocurrency scenario,
+but we want to make clear that all the other use-cases are the same\footnote[1]{Up to isomorphism, of
+	course.}.
+In Section~\ref{sec:vanilla}, we introduce hash functions and tree-based modes of hashing.
+In Section~\ref{sec:zksnark}, we introduce ZK-SNARK systems and brifely describe how they can be
+implemented.
+In Section~\ref{sec:libsnark}, we introduce \texttt{libsnark}, a C\texttt{++} library that provides
+many facilities to implement ZKSNARK algorithms with relative ease, and we will discuss the
+implementation of MiMC, MTs and ABRs using this library.
+In Section~\ref{sec:experiments}, we perform some experiments to compare MiMC with SHA, and MTs
+with ABRs in a ZK setting.
+Finally, in Section~\ref{sec:conclusions} we draw our conclusions and discuss possible future work
+directions.

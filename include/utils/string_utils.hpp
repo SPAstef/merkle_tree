@@ -7,8 +7,10 @@
 #include <random>
 #include <string>
 
-#include <gmpxx.h>
-#include <libff/algebra/fields/bigint.hpp>
+#ifndef _WIN32
+    #include <gmpxx.h>
+    #include <libff/algebra/fields/bigint.hpp>
+#endif
 
 #include "bit_pack.hpp"
 
@@ -52,16 +54,13 @@ std::ostream &operator<<(std::ostream &os, const Iter &it)
 // Convert an ASCII character to an hex digit
 constexpr inline uint8_t ascii_to_digit(char c)
 {
-    uint8_t x = 0;
+    c -= '0'
+    if (c > 9)
+        c -= 'A' - '0' - 10;
+    if (c > 15)
+        c -= 'a' - 'A';
 
-    if ('0' <= c && c <= '9')
-        x = c - '0' + 0x0;
-    else if ('A' <= c && c <= 'F')
-        x = c - 'A' + 0xA;
-    else if ('a' <= c && c <= 'f')
-        x = c - 'a' + 0xa;
-
-    return x;
+    return c;
 }
 
 template<std::ranges::range Range>
@@ -232,6 +231,7 @@ std::string hexdump(const T (&arr)[sz], bool upper = false, size_t spacing = 0)
 }
 #endif
 
+#ifndef _WIN32
 template<bool reverse = false, long limbs = 4>
 std::string hexdump(const libff::bigint<limbs> &x, bool upper = false, size_t spacing = 0)
 {
@@ -243,19 +243,16 @@ std::string hexdump(const libff::bigint<limbs> &x, bool upper = false, size_t sp
 
     return hexdump<reverse>(buff, upper, spacing);
 }
+#endif
 
-#if __cplusplus >= 202002L
-inline std::string random_string(size_t len, const std::string &alphabet)
+inline std::string random_string(size_t len, std::string_view alphabet)
 {
     static std::mt19937_64 rng{std::random_device{}()};
 
     std::uniform_int_distribution<size_t> dist{0, alphabet.size() - 1};
     std::string str(len, 0);
 
-    for (auto &&x : str)
-        x = alphabet[dist(rng)];
+    std::generate(str.begin(), str.end(), [&]() { return alphabet[dist(rng)]; });
 
     return str;
 }
-
-#endif

@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <omp.h>
 #include <vector>
 
 #if __cplusplus >= 202002L
@@ -100,31 +101,69 @@ public:
         const uint8_t *data = (const uint8_t *)vdata;
         size_t depth = height - 1;
 
-        // add leaves
-        for (size_t i = 0; i < LEAVES_N; ++i)
-            this->nodes[i] = {data + Hash::BLOCK_SIZE * i, depth};
-
-        // build tree bottom-up
-        for (size_t i = 0, last = LEAVES_N, len = LEAVES_N; depth > 0; len += 1ULL << depth)
+        if constexpr (0) // serial code
         {
-            --depth;
-            while (i < len)
-            {
-                this->nodes[last] = {this->nodes[i].digest, this->nodes[i + 1].digest, depth};
 
-                this->nodes[last].l = &this->nodes[i];
-                this->nodes[last].r = &this->nodes[i + 1];
-                this->nodes[i].f = &this->nodes[last];
-                this->nodes[i + 1].f = &this->nodes[last];
-                i += 2;
-                ++last;
+            // add leaves
+            for (size_t i = 0; i < LEAVES_N; ++i)
+                this->nodes[i] = {data + Hash::BLOCK_SIZE * i, depth};
+
+            // build tree bottom-up
+            for (size_t i = 0, last = LEAVES_N, len = LEAVES_N; depth > 0; len += 1ULL << depth)
+            {
+                --depth;
+                while (i < len)
+                {
+                    this->nodes[last] = {this->nodes[i].digest, this->nodes[i + 1].digest, depth};
+
+                    this->nodes[last].l = &this->nodes[i];
+                    this->nodes[last].r = &this->nodes[i + 1];
+                    this->nodes[i].f = &this->nodes[last];
+                    this->nodes[i + 1].f = &this->nodes[last];
+                    i += 2;
+                    ++last;
+                }
+            }
+        }
+        else // parallel code
+        {
+#pragma omp parallel for
+            // add leaves
+            for (size_t i = 0; i < LEAVES_N; ++i)
+                this->nodes[i] = {data + Hash::BLOCK_SIZE * i, depth};
+
+            // build tree bottom-up
+            for (size_t i = 0, last = LEAVES_N, len = LEAVES_N; depth > 0; len += 1ULL << depth)
+            {
+                size_t iters = (len - i) >> 1;
+                --depth;
+#pragma omp parallel for
+                for (size_t j = 0; j < iters; ++j)
+                {
+                    size_t k = i + j * 2;
+                    size_t l = last + j;
+                    this->nodes[l] = {this->nodes[k].digest, this->nodes[k + 1].digest, depth};
+
+                    this->nodes[l].l = &this->nodes[k];
+                    this->nodes[l].r = &this->nodes[k + 1];
+                    this->nodes[k].f = &this->nodes[l];
+                    this->nodes[k + 1].f = &this->nodes[l];
+                }
+                last += iters;
+                i += iters * 2;
             }
         }
     }
 
-    const uint8_t *digest() const { return root->digest; }
+    const uint8_t *digest() const
+    {
+        return root->digest;
+    }
 
-    const Node *get_node(size_t i) const { return &nodes[i]; }
+    const Node *get_node(size_t i) const
+    {
+        return &nodes[i];
+    }
 
     friend std::ostream &operator<<(std::ostream &os, const FixedMTree &tree)
     {
