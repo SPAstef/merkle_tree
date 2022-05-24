@@ -37,6 +37,23 @@ hybrid quantum algorithm that can factorize numbers in polynomial time.
 While still far from usable in practical cases, its existence proves that one must be extremely
 careful when talking about the hardness of problems, especially when applied to cryptography.
 
+\subsection{Prime fields}
+While computational models operate over binary strings, that is, elements of \({\{0, 1\}}^*\),
+where \(*\) indicates Kleene's closure, in cryptography these strings are often interpreted as
+elements of some algebraic structure, tipically \emph{fields}.
+A field is any set equipped with two binary functions (operations), called field addition
+(denoted \(\oplus \)) and field multiplication (denoted \(\otimes \)), which, in simple terms, have all
+the nice properties of addition and multiplications over complex numbers (\(\mathbb{C}\) is a field,
+where \(\oplus \equiv +\) and \(\otimes \equiv \times \)).
+The most common field used to represent bits is of course the \emph{boolean field} \(\mathbb{B}\),
+where \(\oplus \equiv \textsc{xor}\) and \(\otimes \equiv \textsc{and}\).
+Strings of bits of length \(n\) can be interpreted as elements of a \emph{finite field} 
+\(\mathbb{Z}_{q}\), where \(\oplus \) and \(\otimes \) are defined respectively as integer addition 
+and multiplication modulo \(q\), with either \(q = 2^n\) or \(q\) being some prime number 
+smaller than \(2^n\) (in this case, all bit strings representing integers in the interval 
+\([q, 2^n-1]\) must be reduced modulo \(q\)).
+When \(q\) is prime, 
+
 \subsection{Hash functions}
 Hash functions are a fundamental tool in many fields of computer science, and cryptography is
 arguably the most prominent.
@@ -73,50 +90,48 @@ For collision resistance, an ideal CHF requires about \(2^{n/2}\) evaluations to
 Tipically, a CHF is built by applying some known secure constructions to functions which are
 simpler to devise.
 \begin{definition}[Pseudorandom keyed permutation]
-	Given \(l, n \in \mathbb{N}\), an \(l/n\)(-bit) pseudorandom keyed permutation (PKP) is any 
+	Given \(l, n \in \mathbb{N}\), an \(l/n\)(-bit) pseudorandom keyed permutation (PKP) is any
 	bijective function:
 	\[F\colon {\{0, 1\}}^l \times {\{0, 1\}}^n \mapsto {\{0, 1\}}^l\]
 	which is hard to distinguish from an uniform random distribution.
 \end{definition}
 
-\noindent PKPs are often built by iterating a keyed permutation \(F\) for some number \(r\) of 
+\noindent PKPs are often built by iterating a keyed permutation \(F\) for some number \(r\) of
 rounds, since \(F\) by itself might be relatively easy to invert.
 A block cipher is a pseudorandom keyed permutation which changes the key being used in each
 round through a key-scheduling function.
 Unkeyed permutations can be derived from keyed ones simply by fixing the key to some arbitrary
 value.
 \begin{definition}[One-way compression function]
-	Given \(l_1, l_2, n \in \mathbb{N}\), an \(l_1/n/l_2\)(-bit) one-way compression function (OWCF) 
+	Given \(l_1, l_2, n \in \mathbb{N}\), an \(l_1/n/l_2\)(-bit) one-way compression function (OWCF)
 	is any function:
 	\[F\colon {\{0, 1\}}^{l_1} \times {\{0, 1\}}^n \mapsto {\{0, 1\}}^{l_2}\]
 \end{definition}
 
 \noindent There are many known ways to build OWCFs from pseudorandom keyed
 permutations, and, in turn, CHFs from OWCFs.
-We are going to use the Davies-Meyer and the Merkle-Damg\r{a}rd constructions respectively. 
+We are going to use the Davies-Meyer and the Merkle-Damg\r{a}rd constructions respectively.
 \begin{theorem}[Davies-Meyer construction]
 	Given a \(l/n\) pseudorandom keyed permutation \(E\), some \(i, k \in \mathbb{N}\), some
 	\(v \in {\{0, 1\}}^l\), and some \(m \in {\{0, 1\}}^{kn}\), then any function \(F_E\) such that:
 	\begin{align*}
 		 & F_{E,i}(v, m) =
 		\begin{cases}
-			E(v, m_1)                & i = 1         \\
-			E(F_{E, i-1}(v, m), m_i) & 2 \le i \le k \\
+			E(v, m_{\range{1}{n}})                      & i = 1         \\
+			E(F_{E, i-1}(v, m), m_{\range{i(n-1)}{in}}) & 2 \le i \le k \\
 		\end{cases} \\
 		 & F_E = F_{E, k}
 	\end{align*}
 	is a \(l/kn/l\) OWCF\@.
 \end{theorem}
 \begin{theorem}[Merkle-Damg\r{a}rd construction]
-	Given a \(l_1/n/l_2\) OWCF \(F\), some \(v \in {(0, 1)}^{l_1}\), some \(m \in {(0, 1)}^*\) and 
-	some padding function:
-	\[P(m)\colon {(0, 1)}^{|m|} \mapsto {(0, 1)}^{|m| + (|m| \bmod l_1)}\]
-	such that:
-	\[\forall m, m' \in {\{0, 1\}}^*\colon (|m| = |m'| \then |P(m)| = |P(m')|) \wedge (|m| \neq |m'| \then
-		m_{|P(m)|} \neq m'_{|P(m')|})\]
+	Given a \(l_1/n/l_2\) OWCF \(F\), some \(k \in \mathbb{N}\), some \(v \in {\{0, 1\}}^{l_1}\),
+	some \(m \in {\{0, 1\}}^*\) and some padding funcion:
+	\[P(m)\colon {\{0, 1\}}^{|m|} \mapsto {\{0, 1\}}^{|m| + (-|m| \bmod n) + kn}\]
+	such that, \(\forall m, m' \in {\{0, 1\}}^*\colon \)
+	\[(|m| = |m'| \then |P(m)| = |P(m')|) \land (|m| \neq |m'| \then m_{|P(m)|} \neq m'_{|P(m')|})\]
 	then any function \(H_F\) such that:
 	\begin{align*}
-		 &                                                              \\
 		 & H_{F, i}(v, m) =
 		\begin{cases}
 			F(v, m_1)                & i = 1            \\
@@ -124,24 +139,24 @@ We are going to use the Davies-Meyer and the Merkle-Damg\r{a}rd constructions re
 		\end{cases} \\
 		 & H_F = H_{F, |P(m)|}
 	\end{align*}
-	is a CHF\@.
+	is a cryptographic hash function.
 \end{theorem}
 
-\noindent For any message \(m\), the digest \(h = H(m)\), where \(H\) is an \(n\) CHF, can be
-used as a \emph{binding commitment} to \(m\) in a prover-verifier scenario: the verifier is
-convinced, with overwhelming confidence (\(1 - \frac{1}{2^n}\)) that the prover knows \(m\) simply
-by asking him to share \(h\).
-What if the prover wanted to commit to a list of \(k\) messages?
-Of course, he could share with the verifier an hash for each one of the messages: this would
-require an \(\BigO(k)\) communication cost and a \(\BigO(k)\) verification cost.
-A better alternative would be for the prover to share \(H(\{m_1, \dots, m_k\})\): in this case
-we would have a \(\BigO(1)\) communication cost, but still have a \(\BigO(k)\) verification cost.
-Furthermore, the verification step cannot be parallelized.
-For this reason, tree hash modes have been introduced to both reduce verification cost and allow
-for parallel computation.
+\subsection{Tree hash modes}
+An important application of CHFs is in \emph{prover-verifier games}:
+for any message \(m\), the digest \(h = H(m)\), where \(H\) is an \(n\) CHF, can be
+used as a \emph{binding commitment} for \(m\): a verifier is convinced that the prover knows \(m\)
+simply by asking him to share \(h\), with overwhelming confidence (\(\approx 1 - \frac{1}{2^n}\)).
+
+If the prover wants to commit to a list of \(k\) messages, a possibility would be to share with the
+verifier the hash of every message: this would require a \(\BigO(k)\) communication cost and a
+\(\BigO(k)\) verification cost.
+A slightly better alternative would be for the prover to share \(H(\{m_1, \dots, m_k\})\): the
+communication cost would only be \(\BigO(1)\), but verification would still cost \(\BigO(k)\).
 \begin{definition}[Merkle Tree]
-	Given \(k \in \mathbb{N}\), a CHF \(H\) and a set of messages \(S = \{m_1, \dots, m_{|S|}\} \),
-	with \(|S| = 2^{k-1}\), a Merkle Tree (MT) is a complete binary tree of height \(k\) such that:
+	Given some \(k \in \mathbb{N}\), a CHF \(H\) and a set of messages
+	\(S = \{m_1, \dots, m_{s^{k-1}} \mid \forall i\colon m_i \in {\{0, 1\}}^*\} \),
+	a Merkle Tree (MT) is a complete binary tree of height \(k\) such that:
 	\begin{enumerate}
 		\item The leaf nodes \(\nu_1, \dots, \nu_{2^{k-1}}\) contain \(H(m_1), \dots,
 		      H(m_{2^{k-1}})\).
@@ -153,11 +168,14 @@ for parallel computation.
 \noindent By using Merkle trees, the prover only needs to send to the verifier, as a commitment for
 some message \(m_i\) among \(k = 2^{\lfloor\log_2(k)\rfloor}\) messages, the contents of the
 co-path from the leaf containing \(m_i\) to the root (plus the hash of \(m_i\)): this requires just
-\(\BigO(\log_2(k))\)
-communication effort and \(\BigO(\log_2(k))\) verification effort.
+\(\BigO(\log_2(k))\) communication effort and \(\BigO(\log_2(k))\) verification effort.
+Another advantage of Merkle trees is that bottom-up construction is very easy to parallelize,
+and its usefulness can be appreciated even more when considering a scenario where different
+messages actually belong to different provers.
 \begin{definition}[Augmented Binary tRee]
-	Given \(k \in \mathbb{N}\), a CHF \(H\), and a set of messages \(S = \{m_1, \dots, m_{|S|}\} \),
-	with \(|S| = 2^{k-1} + 2^{k-2}-1\), an Augmented Binary tRee (ABR) is a complete binary tree of
+	Given some \(k \in \mathbb{N}\), a CHF \(H\), and a set of messages
+	\(S = \{m_1, \dots, m_{2^{k-1} + 2^{k-2}-1} \mid \forall i\colon m_i \in {\{0, 1\}}^*\} \),
+	an Augmented Binary tRee (ABR) is a complete binary tree of
 	height \(k\) augmented with \emph{middle} nodes, such that:
 	\begin{enumerate}
 		\item The leaf nodes \(\nu_{1}, \dots, \nu_{2^{k-1}}\) contain \(H(m_1), \dots,
