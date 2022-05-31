@@ -1,0 +1,89 @@
+\subsection{Hash functions}
+Hash functions are a fundamental tool in many fields of computer science, and cryptography is
+arguably the most prominent.
+Formally, an hash function is any function \(H\colon {\{0, 1\}}^{*} \mapsto {\{0, 1\}}^n\), that
+is any function which maps arbitrarly long \emph{messages} to fixed-size \emph{digests}.
+From the definition, it is immediate to see that there are an infinite number of messages which map
+to the same digest.
+While an operation like truncation is a (very simple) hash function, in cryptography we are
+interested in functions that provide additional guarantees: the assumption is that a digest sohuld
+represent a message in a one-way fashion: while there are infinite messages which map to the same
+digest, it must be hard to find them.
+Ideally, a cryptographic hash function should behave like a perfect random function.
+This is of course impossible, as the output of an hash function must only depend deterministically
+on its input; the aim then is to build functions which are hard to distinguish from a random
+function.
+\begin{definition}[Cryptographic hash function]
+	Given \(n \in \mathbb{N}\), an \emph{\(n\)(-bit) cryptographic hash function (CHF)} is any
+	function \(H\colon {\{0, 1\}}^{*} \mapsto {\{0, 1\}}^n\) which satisfies the following properties:
+	\begin{itemize}
+		\item \textbf{Collision resistance}: It is hard to find two messages \(m_1, m_2\) such
+		      that \(H(m_1) = H(m_2)\).
+		\item \textbf{Preimage resistance}: Given some digest \(h\), it is hard to find a
+		      message \(m\) such that \(H(m) = h\) (\(H\) is a one-way function).
+		\item \textbf{Second preimage resistance}: Given some message \(m_1\), it is hard to
+		      find a message \(m_2\) such that \(H(m_1) = H(m_2)\).
+	\end{itemize}
+\end{definition}
+
+\noindent While some of the requirements might seem redundant (for example, if it is hard for an
+attacker to find a collision for chosen messages, it must be hard when one is fixed),
+the difference usually lies in how exactly we define hardness for each property.
+For collision resistance, an ideal CHF requires about \(2^{n/2}\) evaluations to find a collision
+(birthday paradox), while for preimage resistance it would require about \(2^n\) evaluations.
+Tipically, a CHF is built by applying some known secure constructions to functions which are
+simpler to devise.
+\begin{definition}[Pseudorandom keyed permutation]
+	Given \(l, n \in \mathbb{N}\), an \emph{\(l/n\)(-bit) pseudorandom keyed permutation (PKP)} is
+	any bijective function:
+	\[F\colon {\{0, 1\}}^l \times {\{0, 1\}}^n \mapsto {\{0, 1\}}^l\]
+	which is hard to distinguish from an uniform random distribution.
+\end{definition}
+
+\noindent PKPs are often built by iterating a keyed permutation \(F\) for some number \(r\) of
+rounds, since \(F\) by itself might be relatively easy to invert.
+A block cipher is a pseudorandom keyed permutation which changes the key being used in each
+round through a key-scheduling function.
+Unkeyed permutations can be derived from keyed ones simply by fixing the key to some arbitrary
+value.
+\begin{definition}[One-way compression function]
+	Given \(l_1, l_2, n \in \mathbb{N}\), an \emph{\(l_1/n/l_2\)(-bit) one-way compression function
+		(OWCF)}
+	is any function:
+	\[F\colon {\{0, 1\}}^{l_1} \times {\{0, 1\}}^n \mapsto {\{0, 1\}}^{l_2}\]
+\end{definition}
+
+\noindent There are many known ways to build OWCFs from pseudorandom keyed
+permutations, and, in turn, CHFs from OWCFs.
+We will introduce the Davies-Meyer and the Merkle-Damg\r{a}rd constructions respectively, as 
+those are the ones of interest to us.
+\begin{theorem}[Davies-Meyer construction]
+	Given a \(l/n\) pseudorandom keyed permutation \(E\), some \(i, k \in \mathbb{N}\), some
+	\(v \in {\{0, 1\}}^l\), and some \(m \in {\{0, 1\}}^{kn}\), then any function \(F_E\) such that:
+	\begin{align*}
+		 & F_{E,i}(v, m) =
+		\begin{cases}
+			E(v, m_{\range{1}{n}})                      & i = 1         \\
+			E(F_{E, i-1}(v, m), m_{\range{i(n-1)}{in}}) & 2 \le i \le k \\
+		\end{cases} \\
+		 & F_E = F_{E, k}
+	\end{align*}
+	is a \(l/kn/l\) OWCF\@.
+\end{theorem}
+\begin{theorem}[Merkle-Damg\r{a}rd construction]
+	Given a \(l_1/n/l_2\) OWCF \(F\), some \(k \in \mathbb{N}\), some \(v \in {\{0, 1\}}^{l_1}\),
+	some \(m \in {\{0, 1\}}^*\) and some padding funcion:
+	\[P(m)\colon {\{0, 1\}}^{|m|} \mapsto {\{0, 1\}}^{|m| + (-|m| \bmod n) + kn}\]
+	such that, \(\forall m, m' \in {\{0, 1\}}^*\colon \)
+	\[(|m| = |m'| \then |P(m)| = |P(m')|) \land (|m| \neq |m'| \then m_{|P(m)|} \neq m'_{|P(m')|})\]
+	then any function \(H_F\) such that:
+	\begin{align*}
+		 & H_{F, i}(v, m) =
+		\begin{cases}
+			F(v, m_1)                & i = 1            \\
+			F(H_{F, i-1}(v, m), m_i) & 1 < i \le |P(m)| \\
+		\end{cases} \\
+		 & H_F = H_{F, |P(m)|}
+	\end{align*}
+	is a cryptographic hash function.
+\end{theorem}

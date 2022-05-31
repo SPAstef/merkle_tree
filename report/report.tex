@@ -3,6 +3,10 @@
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{tikz}
 
 \newcommand{\BigO}{\mathcal{O}}
 \newcommand{\SmallO}{\textit{o}}
@@ -11,6 +15,13 @@
 \newcommand{\NPtime}{\textsc{NP}}
 \newcommand{\NPcomp}{\textsc{NP-complete}}
 \newcommand{\range}[2]{{{#1}\dots{#2}}}
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+
+\makeatletter
+\newcommand*{\transpose}{{\mathpalette\@transpose{}}}
+\newcommand*{\@transpose}[2]{\raisebox{\depth}{\(\m@th#1\intercal \)}}
+
+\hypersetup{hidelinks}
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
@@ -27,8 +38,10 @@
 
 \begin{document}
 \maketitle
+\clearpage
+\tableofcontents
 \include{sections/introduction.tex}
-\include{sections/hashes.tex}
+\include{sections/preliminaries.tex}
 \include{sections/zksnark.tex}
 
 \section{The libsnark library}\label{sec:libsnark}

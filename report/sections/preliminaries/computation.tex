@@ -1,0 +1,27 @@
+\subsection{Computational models and complexity}
+A \emph{computational model} (or model of computation) is any kind of `device', either physical or
+mathematical, which is able to compute algorithms to solve problems.
+A particularly interesting class of problems are \emph{decision problems}, the ones that can be
+answered with `yes' (or `accept', or \(\top \)) or `no' (or `reject', or \(\bot \)).
+Every computational model is able to \emph{decide} only a subclass of all decision problems, and
+even then, not all can be solved \emph{efficiently}, that is, by using an amount of resources
+(tipically, time and space) which is upper-bounded by some polynomial function of the input length.
+Problems for which a polynomial bound doesen't exist or isn't known are said to be \emph{hard} for
+the computational model.
+For example, finding solutions to boolean equations (the \textsc{sat} problem) is believed to be
+hard for deterministic Turing machines, but it is easy for non-deterministic ones.
+Unfortunately, non-deterministic Turing machines (along with any other non-deterministic model of
+computation) are more of a mathematical tool than anything, and there seems to be no practical way
+to efficiently solve the problems which would take Non-deterministic Polynomial time (NP-complete 
+problems) as stated by the strong Church-Turing thesis.
+While it is widely belived that efficiently solving NP-complete problems is impossible, there are 
+some problems which lie in a `gray zone' between \textsc{NP-complete} and \textsc{P} (i.e.\ 
+problems which can be solved in deterministic polynomial time): they are believed to be hard for 
+deterministic models (hence, they are not in \textsc{P}), but there is no proof that they are 
+\textsc{NP-complete}.
+The most famous of such problems is factorization: with the advent of quantum-computing, 
+which challenges the strong Church-Turing thesis, Shor devised an efficient quantum algorithm 
+for factorizing numbers.
+While still far from usable in practical cases, its existence proves that one must be extremely
+careful when talking about the hardness of problems, especially when applied to cryptography, 
+and must always make clear assumptions on the underlying model of computation.

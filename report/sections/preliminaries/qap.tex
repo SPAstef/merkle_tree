@@ -1,0 +1,123 @@
+\subsection{Quadratic Arithmetic Programs}
+A problem with R1CS is that solutions have size linear in the number of multiplication gates of
+the corresponding arithmetic circuit.
+This can be solved by using Quadratic Arithmetic Programs.
+\begin{definition}[Quadratic Arithmetic Program]
+	Given a field \(\mathbb{F}\) and some \(n,m \in \mathbb{N}\), a
+	\emph{\(n/m\) Quadratic Arithmetic Program (QAP)} over \(\mathbb{F}\) is any quadruple:
+	\[ \mathcal{Q} = (t, \bm{v}, \bm{w}, \bm{y}) \mid {t \in \mathbb{F}[x]} \land
+		{\bm{v},\bm{w},\bm{y} \in {\mathbb{F}[x]}^n}\]
+	For which it holds that:
+	\[\forall i\colon \deg(\bm{v}_i)+1 = \deg(\bm{w}_i)+1 = \deg(\bm{y}_i)+1 = \deg(t) = m\]
+	A \emph{valid assignment} to a QAP \(\mathcal{Q}\) is any vector:
+	\[\bm{s} \in \mathbb{F}^n \mid (\bm{v}\bm{s})(\bm{w}\bm{s}) - \bm{y}\bm{s} \bmod t = 0\]
+	Then, the polynomials \(p = (\bm{v}\bm{s})(\bm{w}\bm{s}) - \bm{y}\bm{s}\)
+	and \(h = \frac{p}{t}\) are a \emph{solution} to \(\mathcal{Q}\).
+\end{definition}
+
+\noindent Just like it was possible to represent any \(n/m\) arithmetic circuit \(\phi \) with an
+\(n/(n+m+1)\) R1CS \(\mathcal{C}\), we can, in turn, represent any \(n/m\) R1CS
+\(\mathcal{C} = (\bm{A}, \bm{B}, \bm{C})\) with a \(n/m\) QAP \(\mathcal{Q}\).
+First, we choose some arbitrary
+\(\bm{z} \in \mathbb{F}^n \mid \forall i,j\colon \bm{z}_i \neq \bm{z}_j\)
+(usually, \(\bm{z} = \begin{pmatrix}1 & \cdots & n\end{pmatrix}\)).
+Let \(\bm{Z} \in \mathbb{F}^{m \times n} \mid \forall i\colon \bm{Z}_i = \bm{z}\), then:
+\[\mathcal{Q} = (t, \bm{v}, \bm{w}, \bm{y}) = \left(
+	\prod_{i}{(x - \bm{z}_i)},
+	L(\bm{Z}, \bm{A}^\transpose),
+	L(\bm{Z}, \bm{B}^\transpose),
+	L(\bm{Z}, \bm{C}^\transpose)
+	\right)
+\]
+To make things more clear, let's make an example:
+\begin{example}
+	We want to compute the \(3/6\) QAP \(\mathcal{Q} = (t, \bm{v}, \bm{w}, \bm{y})\) associated with
+	the \(3/6\) R1CS \(\mathcal{C} = (\bm{A}, \bm{B}, \bm{C})\) that we derived in
+	Example~\ref{ex:r1cs}.
+	First, we set:
+	\begin{align*}
+		 & \bm{z} = \begin{pmatrix}1 & 2 & 3\end{pmatrix} &  &
+		\bm{Z} = \begin{pmatrix}\bm{z}; \bm{z}; \bm{z}; \bm{z}; \bm{z}; \bm{z}\end{pmatrix}
+	\end{align*}
+	Then, we compute the target polynomial \(t\), the left and right input constraint polynomial
+	vectors \(\bm{v}\) and \(\bm{w}\), and the output constraint polynomial vector \(\bm{y}\)
+	(remember, we are working over \(\mathbb{F}_{13}\)).
+	Notice how the 2nd, 4th and 5th columns of \(\bm{A}\) form the canonical basis of
+	\(\mathbb{F}_{13}^3\), and since \(L\) is a linear operator, we can express all other polynomials
+	as linear combinations of \(L(\bm{z}, \bm{A}_2^\transpose), L(\bm{z}, \bm{A}_4^\transpose)\) and
+	\(L(\bm{z}, \bm{A}_5^\transpose)\):
+	\begin{align*}
+		 & t	 = (x - 1)(x - 2)(x - 3) = (x + 12)(x + 11)(x + 10) = x^3 + 7x^2 + 11x + 7 \\
+		 & \bm{v} = L(\bm{Z}, \bm{A}^{\transpose}) =
+		\begin{pmatrix}
+			L(\bm{z}, \bm{A}^{\transpose}_1) & \cdots & L(\bm{z}, \bm{A}^{\transpose}_6)
+		\end{pmatrix}
+		= {\begin{pmatrix}
+			   0               \\
+			   7x^2 + 4x + 3   \\
+			   0               \\
+			   12x^2 + 4x + 10 \\
+			   7x^2 + 5x + 1   \\
+			   0
+		   \end{pmatrix}}^\transpose                                           \\
+		 & \bm{w} =
+		\begin{pmatrix}
+			0 & \bm{v}_2 + \bm{v_4} & \bm{v}_5 & 0 & 0 & 0
+		\end{pmatrix}
+		= {\begin{pmatrix}
+			   0             \\
+			   6x^2 + 8x     \\
+			   7x^2 + 5x + 1 \\
+			   0             \\
+			   0             \\
+			   0
+		   \end{pmatrix}}^\transpose                                                \\
+		 & \bm{y} =
+		\begin{pmatrix}
+			8\bm{v}_4 & 0 & 9\bm{v}_4 & \bm{v}_2 & \bm{v}_4 & \bm{v}_5
+		\end{pmatrix}
+		=
+		{\begin{pmatrix}
+			 5x^2 + 6x + 2   \\
+			 0               \\
+			 4x^2 + 10x + 12 \\
+			 7x^2 + 4x + 3   \\
+			 12x^2 + 4x + 10 \\
+			 7x^2 + 5x + 1
+		 \end{pmatrix}}^\transpose
+	\end{align*}
+	Recall that a possible solution to the R1CS was:
+	\[\bm{s} = \begin{pmatrix} 1 & 2 & 3 & 4 & 12 & 10 \end{pmatrix}\]
+	Let's check if it is also a valid assignment for the QAP\@:
+	\begin{align*}
+		p	    = (\bm{v}\bm{s})(\bm{w}\bm{s}) - \bm{y}\bm{s}
+		 & = (3x^2 + 6x + 6)(7x^2 + 5x + 3) - (12x^2 + 7x + 11) \\
+		 & = 8x^4 + 5x^3 + 4x^2 + 2x + 7
+	\end{align*}
+	\[
+		h = \frac{p}{t} = \frac{8x^4 + 5x^3 + 4x^2 + 2x + 7}{x^3 + 7x^2 + 11x + 7} =
+		8x - 51 + \frac{273x^2 + 507x + 364}{x^3 + 7x^2 + 11x + 7} = 8x + 1
+	\]
+	Since:
+	\[ht = (8x + 1)(x^3 + 7x^2 + 11x + 7) = 8x^4 + 5x^3 + 4x^2 + 2x + 7 = p\]
+	this means that \(p\) and \(h\) are a solution to the QAP, and \(\bm{s}\) is a valid
+	assignment.
+\end{example}
+
+\noindent One might wonder how a solution \((p, h)\) to a QAP is more succint than the
+corresponding valid assigment \(\bm{s}\) of the associated R1CS: as a matter of fact, given an
+\(n/m\) arithmetic circuit, \(\bm{s}\) has size \(n+m+1\), while \(p\) can have degree 
+(and therefore encoding size) \(2(n-1)\).
+Furthermore, in a typical circuit, \(n \gg m\), so \((p, h)\) would approximately be twice the size 
+of \(\bm{s}\) when encoded.
+Now, \(p = ht \implies \forall x\colon p(x) = h(x)t(x)\); if we are working over a big field 
+(say, \(|\mathbb{F}| \approx 2^{256}\)), it is hard to find even a single value of \(x\) for which
+the equation holds.
+This means that we can accept as a solution, with high confindence (although not certainity)
+any couple of values \(x, y\) such that \(y \bmod t(x) = 0\). 
+
+Summing up: if \(y \bmod t(x) = 0\), we are \emph{almost sure} that \(y\) has been derived by 
+computing \(p(x)\), where \(p\) is a solution to our QAP\@.
+But if \(p\) is a solution to the QAP, then it derives from a valid assignment \(\bm{s}\) to the 
+associated R1CS, which in turn derives from a valid computation of the original arithmetic circuit.
+

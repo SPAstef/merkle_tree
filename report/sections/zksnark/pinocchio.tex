@@ -1,0 +1,37 @@
+
+\subsection{The Pinocchio Protocol}
+Pinocchio is composed of many different components, and requires quite a bit of mathematical
+background to be fully understood. We will not go into all of the mathematical and cryptographic
+details of the protocol, especially the ones involving \emph{elliptic curves},
+but we will still try to give a good idea of how the protocol works, and ultimately what
+determines its computational complexity.
+
+Pinocchio does not allow the encoding of arbitrary languages, i.e.\ it is not Turing complete, but
+we are restricted to arithmetic circuits over an arbitrary prime field \(\mathbb{F}_p\).
+The main limitation arising from this restriction is that we cannot express unbounded computation
+(e.g.\ loops whose exit condition depends on some non-constant value) in this framework.
+This issue can be mitigated by writing a circuit compiler in a Turing complete language which
+is able to synthesize parametrized arithmetic circuits on the fly.
+
+\noindent The reason we translate arithmetic circuits into R1CS is that they explicit all of the
+computation in terms of linear combinations, which allows us to use Lagrange interpolation to
+build polynomials over them.
+
+\noindent
+With all this in mind, the flow of the Pinocchio protocol is as follows:
+\begin{enumerate}
+	\item Encode an algorithm as an arithmetic circuit over some prime field \(\mathbb{F}_p\).
+	\item Compute the associated R1CS\@.
+	\item Compute the associated QAP\@.
+	\item Generate random values and instantiate an homomorphic encryption mapping
+	      (using elliptic curves) which depends on those values.
+	\item Generate the proof by encrypting the QAP with the homomorphic mapping.
+	\item Map again the proof to a new homomorphic space, and finally verify it.
+\end{enumerate}
+
+\noindent Due to the homomorphism of the mappings and the properties of QAPs and R1CSs, if the
+verification is successful, it means that the original algorithm was in fact correctly executed,
+with high probability.
+If the verification fails, then certainly the original algorithm was not executed correctly.
+The verifier learns cannot learn any additional information from this process without performing
+an infeasible amount of work, therefore this is indeed a ZK-SNARK protocol.
