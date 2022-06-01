@@ -20,34 +20,26 @@ of statements which, while able to convice someone of their truth, didn't leak i
 about how they were obtained.
 Zero-Knowledge systems proves particularly useful in \emph{ARgument of Knowledge} scenarios
 (ZK-ARK): the prover \(P\) wants to convince the verifier \(V\) that he
-knows a solution to some computational problem, assuming there is one, without revealing it.
-This becomes particularly handy when dealing with hard problems, like committing to some message
-\(m\) by computing some secure hash function \(h = H(m)\).
-Since \(H\) is a OWF, it would be too hard for \(V\) to `make-up' some fake \(m'\) which hashes 
-to \(h\), .
+knows a solution to some problem, assuming there is one, without revealing it.
 It must be noted though that known ZK-ARK systems do not guarantee the formal soundness of
 the proof: there is a small probability that, given some false statement \(\sigma \) and an
 (invalid) proof \(\pi \), then \(V(\pi) = \top \), so it is important to keep this probability
 small (say, \(2^{-128}\)).
-There are other nice additional properties that zero-knowledge systems might satisfy, making
-them even more interesting.
 \begin{definition}[ZK-SNARK]
-	Given a prover \(P\), a verifier \(V\), a statement \(\sigma \), and a ZK-ARK system to produce
-	a proof \(\pi \), if the system is:
+	Given a prover \(P\), a verifier \(V\), a statement \(\sigma \), and a proof \(\pi \), a 
+  Zero-Knowledge Non-interactive ARgument of Knowledge (ZK-SNARK) system is any ZK-ARK system 
+  which is:
 	\begin{itemize}
 		\item \textbf{Succint}: \(SPACE(\pi) = \SmallO(\log(\sigma))\).
 		\item \textbf{Non-interactive}: The only communication required by the system is the exchange
 		      of \(\sigma \) and \(\pi \).
 	\end{itemize}
-	then it is a Zero-Knowledge Non-interactive ARgument of Knowledge (ZK-SNARK) system.
 \end{definition}
 
-\noindent Succintness is an important property in a blockchain scenario, since we cannot
-afford to use too much space to store the proofs, and non-interactivity of the process allows for
-efficient verification when multiple parties are involved.
+\noindent Succintness is an important property in many scenarios, like blockchains, since we 
+cannot afford to use too much resources to transmit and store the proofs, and non-interactivity of 
+the process allows for efficient verification when multiple parties are involved.
 
 One of the most important applications of ZK-SNARK systems is in \emph{provable computation},
 where the prover wants to convince the verifier that he correctly performed some computation
 (e.g.\ a cryptocurrency transaction).
-A very famous ZK-SNARK system for verifiable computation is the \emph{Pinocchio} protocol,
-which was the first one efficient enough to be practical.
