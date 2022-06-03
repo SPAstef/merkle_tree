@@ -31,6 +31,8 @@ using GadMimc256 = mimc256_two_to_one_hash_gadget<FieldT>;
 using GadMimc512F = mimc512f_two_to_one_hash_gadget<FieldT>;
 using GadMimc512F2K = mimc512f2k_two_to_one_hash_gadget<FieldT>;
 
+std::ofstream log_file{"log.txt"};
+
 template<size_t tree_height, typename Hash, typename GadHash>
 bool test_tRee()
 {
@@ -85,8 +87,8 @@ bool test_tRee()
             unpack_bits(out_bv, tree.digest());
         },
         1, 1, "Tree Generation", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Test Gadget
     libsnark::protoboard<FieldT> pb;
@@ -115,8 +117,8 @@ bool test_tRee()
                                 tree_height, FMT("merkle_tree"));
         },
         1, 1, "Gadget construction", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     elap = measure(
         [&]()
@@ -131,8 +133,8 @@ bool test_tRee()
             gadget[0].generate_r1cs_constraints();
         },
         1, 1, "Constraint generation", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     elap = measure(
         [&]()
@@ -147,8 +149,8 @@ bool test_tRee()
             gadget[0].generate_r1cs_witness();
         },
         1, 1, "Witness generation", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     bool result;
     std::vector<libsnark::r1cs_ppzksnark_keypair<ppT>> keypair;
@@ -160,8 +162,8 @@ bool test_tRee()
                 libsnark::r1cs_ppzksnark_generator<ppT>(pb.get_constraint_system()));
         },
         1, 1, "Key generation", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     elap = measure(
         [&]()
@@ -170,8 +172,8 @@ bool test_tRee()
                                                          pb.auxiliary_input());
         },
         1, 1, "Proof generation", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     elap = measure(
         [&]()
@@ -180,8 +182,8 @@ bool test_tRee()
                                                                       pb.primary_input(), proof);
         },
         1, 1, "Proof verification", false);
-    std::cout << elap << '\n';
-    std::cout.flush();
+    log_file << elap << '\n';
+    log_file.flush();
 
 
     return result;
@@ -209,8 +211,8 @@ bool test_ptRee()
             tree = FixTree{data.begin(), data.end()};
         },
         1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // There is no need to extract anything as field_variable does that for us
 
@@ -240,13 +242,13 @@ bool test_ptRee()
                                 tree_height, FMT("merkle_tree"));
         },
         1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Generate constraints
     elap = measure([&]() { gadget[0].generate_r1cs_constraints(); }, 1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Generate witnesses
     elap = measure(
@@ -267,8 +269,8 @@ bool test_ptRee()
             gadget[0].generate_r1cs_witness();
         },
         1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Generate key
     bool result;
@@ -279,8 +281,8 @@ bool test_ptRee()
                 libsnark::r1cs_ppzksnark_generator<ppT>(pb.get_constraint_system()));
         },
         1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Generate proof
     libsnark::r1cs_ppzksnark_proof<ppT> proof;
@@ -291,8 +293,8 @@ bool test_ptRee()
                                                          pb.auxiliary_input());
         },
         1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Verify proof
     elap = measure(
@@ -302,8 +304,8 @@ bool test_ptRee()
                                                                       pb.primary_input(), proof);
         },
         1, 1, "", false);
-    std::cout << elap << '\n';
-    std::cout.flush();
+    log_file << elap << '\n';
+    log_file.flush();
 
 
     return result;
@@ -314,8 +316,8 @@ void test_tRee_from(const char *name)
 {
     if constexpr (first < last)
     {
-        std::cout << first << '\t';
-        std::cout.flush();
+        log_file << first << '\t';
+        log_file.flush();
 
         test_tRee<first, Hash, GadHash>();
 
@@ -328,8 +330,8 @@ void test_ptRee_from(const char *name)
 {
     if constexpr (first < last)
     {
-        std::cout << first << '\t';
-        std::cout.flush();
+        log_file << first << '\t';
+        log_file.flush();
 
         test_ptRee<first, Hash, GadHash>();
 
@@ -340,29 +342,29 @@ void test_ptRee_from(const char *name)
 int main()
 {
 
-    std::cout << std::boolalpha;
+    log_file << std::boolalpha;
     libff::inhibit_profiling_info = true;
     libff::inhibit_profiling_counters = true;
 
     ppT::init_public_params();
-/*    std::cout << "SHA256\n";
-    std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
+    log_file << "SHA256\n";
+    log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_tRee_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Sha256, GadSha256>("SHA256");
 
-    std::cout << "SHA512\n";
-    std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
+    log_file << "SHA512\n";
+    log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_tRee_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Sha512, GadSha512>("SHA512");
 
-    std::cout << "MiMC256\n";
-    std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
-    test_ptRee_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc256, GadMimc256>("MiMC256");*/
+    log_file << "MiMC256\n";
+    log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
+    test_ptRee_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc256, GadMimc256>("MiMC256");
 
-    std::cout << "MiMC512F\n";
-    std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
+    log_file << "MiMC512F\n";
+    log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_ptRee_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc512F, GadMimc512F>("MiMC512F");
 
-    std::cout << "MiMC512F_2K\n";
-    std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
+    log_file << "MiMC512F_2K\n";
+    log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_ptRee_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc512F2K, GadMimc512F2K>("MiMC512F_2K");
 
     return 0;

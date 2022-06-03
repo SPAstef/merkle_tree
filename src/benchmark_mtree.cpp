@@ -32,6 +32,8 @@ using GadMimc256 = mimc256_two_to_one_hash_gadget<FieldT>;
 using GadMimc512F = mimc512f_two_to_one_hash_gadget<FieldT>;
 using GadMimc512F2K = mimc512f2k_two_to_one_hash_gadget<FieldT>;
 
+std::ofstream log_file{"log.txt"};
+
 template<size_t tree_height, typename Hash, typename GadHash>
 bool test_mtree()
 {
@@ -73,8 +75,8 @@ bool test_mtree()
             unpack_bits(out_bv, tree.digest());
         },
         1, 1, "Tree Generation", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Test Gadget
     libsnark::protoboard<FieldT> pb;
@@ -97,8 +99,8 @@ bool test_mtree()
             gadget.emplace_back(pb, out[0], trans[0], other, TRANS_IDX, FMT("merkle_tree"));
         },
         1, 1, "Gadget construction", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     elap = measure(
         [&]()
@@ -110,8 +112,8 @@ bool test_mtree()
             gadget[0].generate_r1cs_constraints();
         },
         1, 1, "Constraint generation", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     elap = measure(
         [&]()
@@ -123,8 +125,8 @@ bool test_mtree()
             gadget[0].generate_r1cs_witness();
         },
         1, 1, "Witness generation", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     bool result;
     std::vector<libsnark::r1cs_ppzksnark_keypair<ppT>> keypair;
@@ -136,8 +138,8 @@ bool test_mtree()
                 libsnark::r1cs_ppzksnark_generator<ppT>(pb.get_constraint_system()));
         },
         1, 1, "Key generation", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     elap = measure(
         [&]()
@@ -146,8 +148,8 @@ bool test_mtree()
                                                          pb.auxiliary_input());
         },
         1, 1, "Proof generation", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     elap = measure(
         [&]()
@@ -156,8 +158,8 @@ bool test_mtree()
                                                                       pb.primary_input(), proof);
         },
         1, 1, "Proof verification", false);
-    std::cout << elap << '\n';
-    std::cout.flush();
+    log_file << elap << '\n';
+    log_file.flush();
 
 
     return result;
@@ -185,8 +187,8 @@ bool test_pmtree()
             tree = FixTree{data.begin(), data.end()};
         },
         1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Build Gadget
     libsnark::protoboard<FieldT> pb;
@@ -208,13 +210,13 @@ bool test_pmtree()
             gadget.emplace_back(pb, out[0], trans[0], other, TRANS_IDX, FMT("merkle_tree"));
         },
         1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Generate constraints
     elap = measure([&]() { gadget[0].generate_r1cs_constraints(); }, 1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Generate witnesses
     elap = measure(
@@ -229,8 +231,8 @@ bool test_pmtree()
             gadget[0].generate_r1cs_witness();
         },
         1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Generate key
     bool result;
@@ -241,8 +243,8 @@ bool test_pmtree()
                 libsnark::r1cs_ppzksnark_generator<ppT>(pb.get_constraint_system()));
         },
         1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Generate proof
     libsnark::r1cs_ppzksnark_proof<ppT> proof;
@@ -253,8 +255,8 @@ bool test_pmtree()
                                                          pb.auxiliary_input());
         },
         1, 1, "", false);
-    std::cout << elap << '\t';
-    std::cout.flush();
+    log_file << elap << '\t';
+    log_file.flush();
 
     // Verify proof
     elap = measure(
@@ -264,8 +266,8 @@ bool test_pmtree()
                                                                       pb.primary_input(), proof);
         },
         1, 1, "", false);
-    std::cout << elap << '\n';
-    std::cout.flush();
+    log_file << elap << '\n';
+    log_file.flush();
 
 
     return result;
@@ -276,8 +278,8 @@ void test_mtree_from(const char *name)
 {
     if constexpr (first < last)
     {
-        std::cout << first << '\t';
-        std::cout.flush();
+        log_file << first << '\t';
+        log_file.flush();
 
         test_mtree<first, Hash, GadHash>();
 
@@ -290,8 +292,8 @@ void test_pmtree_from(const char *name)
 {
     if constexpr (first < last)
     {
-        std::cout << first << '\t';
-        std::cout.flush();
+        log_file << first << '\t';
+        log_file.flush();
 
         test_pmtree<first, Hash, GadHash>();
 
@@ -302,29 +304,29 @@ void test_pmtree_from(const char *name)
 int main()
 {
 
-    std::cout << std::boolalpha;
+    log_file << std::boolalpha;
     libff::inhibit_profiling_info = true;
     libff::inhibit_profiling_counters = true;
 
     ppT::init_public_params();
-    std::cout << "SHA256\n";
-    std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
+    log_file << "SHA256\n";
+    log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_mtree_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Sha256, GadSha256>("SHA256");
 
-    std::cout << "SHA512\n";
-    std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
+    log_file << "SHA512\n";
+    log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_mtree_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Sha512, GadSha512>("SHA512");
 
-    std::cout << "MiMC256\n";
-    std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
+    log_file << "MiMC256\n";
+    log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_pmtree_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc256, GadMimc256>("MiMC256");
 
-    std::cout << "MiMC512F\n";
-    std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
+    log_file << "MiMC512F\n";
+    log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_pmtree_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc512F, GadMimc512F>("MiMC512F");
 
-    std::cout << "MiMC512F_2K\n";
-    std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
+    log_file << "MiMC512F_2K\n";
+    log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_pmtree_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc512F2K, GadMimc512F2K>("MiMC512F_2K");
     return 0;
 }
