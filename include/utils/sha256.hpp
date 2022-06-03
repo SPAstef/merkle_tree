@@ -17,7 +17,7 @@ public:
 
     static void hash_oneblock(uint8_t *digest, const void *message)
     {
-        static constexpr uint32_t sha256_k[BLOCK_SIZE] = {
+        static constexpr uint32_t k[BLOCK_SIZE] = {
             0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4,
             0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe,
             0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f,
@@ -42,10 +42,11 @@ public:
             w[i] = (_rotr(w[i - 2], 17) ^ _rotr(w[i - 2], 19) ^ w[i - 2] >> 10) + w[i - 7] +
                    (_rotr(w[i - 15], 7) ^ _rotr(w[i - 15], 18) ^ w[i - 15] >> 3) + w[i - 16];
 
-        for (uint32_t j = 0; j < 64; j++)
+        for (uint32_t i = 0; i < 64; ++i)
         {
             uint32_t t1 = wv[7] + (_rotr(wv[4], 6) ^ _rotr(wv[4], 11) ^ _rotr(wv[4], 25)) +
-                          ((wv[4] & wv[5]) ^ (~wv[4] & wv[6])) + sha256_k[j] + w[j];
+                          ((wv[4] & wv[5]) ^ (~wv[4] & wv[6])) + k[i] + w[i];
+
             uint32_t t2 = (_rotr(wv[0], 2) ^ _rotr(wv[0], 13) ^ _rotr(wv[0], 22)) +
                           ((wv[0] & wv[1]) ^ (wv[0] & wv[2]) ^ (wv[1] & wv[2]));
 

@@ -1,12 +1,13 @@
 \section{ZK-SNARK}\label{sec:zksnark}
-We saw in Section~\ref{sec:vanilla} how a prover can convince a verifier about the knowledge of
+We saw in Section~\ref{sec:preliminaries} how a prover can convince a verifier about the knowledge of
 some message \(m\), with a high confidence and a small communication effort, by using a CHF \(H\).
 However, the underlying assumption was that \(m\) is known by the verifier: when the prover sends
 \(h\), the verifier can check whether \(H(m) = h\) and therefore accept or reject.
-In this Section, we will see how a prover can convince a verifier without the need to disclose 
+In this Section, we will see how a prover can convince a verifier without the need to disclose
 possibly secret information.
 In particular, we will focus on provable computation, that is, when the prover wants to convice
 the verifier that he correctly computed some function.
 
 \input{sections/zksnark/zkp.tex}
 \input{sections/zksnark/pinocchio.tex}
+\input{sections/zksnark/zkhash.tex}

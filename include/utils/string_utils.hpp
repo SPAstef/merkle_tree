@@ -54,7 +54,7 @@ std::ostream &operator<<(std::ostream &os, const Iter &it)
 // Convert an ASCII character to an hex digit
 constexpr inline uint8_t ascii_to_digit(char c)
 {
-    c -= '0'
+    c -= '0';
     if (c > 9)
         c -= 'A' - '0' - 10;
     if (c > 15)

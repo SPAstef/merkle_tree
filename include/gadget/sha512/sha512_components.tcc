@@ -14,7 +14,7 @@
 #ifndef SHA512_COMPONENTS_TCC_
 #define SHA512_COMPONENTS_TCC_
 
-namespace libsnark {
+namespace libsnark::sha512 {
 
 const unsigned long long SHA512_K[80] =  {
    0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,

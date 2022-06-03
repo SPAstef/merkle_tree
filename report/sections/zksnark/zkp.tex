@@ -2,15 +2,15 @@
 Before diving into provable computation, we must introduce tghe more general concept of Zero
 Knowledge Proof system.
 \begin{definition}[Zero-Knowledge Proof]
-	Given a prover \(P\) and a verifier \(V\), a secret \(x\), known only to \(P\), and some
-	statement \(\sigma \) of whose truth \(P\) wants to convince \(V\) by means of
-	some proof \(\pi \), we call a Zero-Knowledge Proof (ZKP) system any protocol which satisfies
-	the following properties:
+	Given a prover \(\mathcal{P}\) and a verifier \(\mathcal{V}\), a secret \(x\), known only to
+	\(\mathcal{P}\), and some statement \(\sigma \) of whose truth \(\mathcal{P}\) wants to convince
+	\(\mathcal{V}\) by means of some proof \(\pi \), we call a Zero-Knowledge Proof (ZKP) system any
+	protocol which satisfies the following properties:
 	\begin{itemize}
-		\item \textbf{Soundness}: \(\neg{\sigma} \implies V(\pi) = \bot \).
-		\item \textbf{Completeness}: \(\sigma \implies V(\pi) = \top \).
-		\item \textbf{Zero-Knowledge}: It is \emph{hard} for \(V\) to derive \(x\) given \(\sigma \)
-		      and \(\pi \).
+		\item \textbf{Soundness}: \(\neg{\sigma} \implies \mathcal{V}(\pi) = \bot \).
+		\item \textbf{Completeness}: \(\sigma \implies \mathcal{V}(\pi) = \top \).
+		\item \textbf{Zero-Knowledge}: It is \emph{hard} for \(\mathcal{V}\) to derive \(x\) given
+		      \(\sigma \) and \(\pi \).
 	\end{itemize}
 \end{definition}
 
@@ -19,16 +19,16 @@ advent of modern cryptography, researchers started considering the possibility o
 of statements which, while able to convice someone of their truth, didn't leak information
 about how they were obtained.
 Zero-Knowledge systems proves particularly useful in \emph{ARgument of Knowledge} scenarios
-(ZK-ARK): the prover \(P\) wants to convince the verifier \(V\) that he
+(ZK-ARK): the prover \(*\) wants to convince the verifier \(\mathcal{V}\) that he
 knows a solution to some problem, assuming there is one, without revealing it.
 It must be noted though that known ZK-ARK systems do not guarantee the formal soundness of
 the proof: there is a small probability that, given some false statement \(\sigma \) and an
-(invalid) proof \(\pi \), then \(V(\pi) = \top \), so it is important to keep this probability
+(invalid) proof \(\pi \), then \(\mathcal{V}(\pi) = \top \), so it is important to keep this probability
 small (say, \(2^{-128}\)).
 \begin{definition}[ZK-SNARK]
-	Given a prover \(P\), a verifier \(V\), a statement \(\sigma \), and a proof \(\pi \), a 
-  Zero-Knowledge Non-interactive ARgument of Knowledge (ZK-SNARK) system is any ZK-ARK system 
-  which is:
+	Given a prover \(\mathcal{P}\), a verifier \(\mathcal{V}\), a statement \(\sigma \), and a proof 
+	\(\pi \), a Zero-Knowledge Non-interactive ARgument of Knowledge (ZK-SNARK) system is any 
+	ZK-ARK system which is:
 	\begin{itemize}
 		\item \textbf{Succint}: \(SPACE(\pi) = \SmallO(\log(\sigma))\).
 		\item \textbf{Non-interactive}: The only communication required by the system is the exchange
@@ -36,8 +36,8 @@ small (say, \(2^{-128}\)).
 	\end{itemize}
 \end{definition}
 
-\noindent Succintness is an important property in many scenarios, like blockchains, since we 
-cannot afford to use too much resources to transmit and store the proofs, and non-interactivity of 
+\noindent Succintness is an important property in many scenarios, like blockchains, since we
+cannot afford to use too much resources to transmit and store the proofs, and non-interactivity of
 the process allows for efficient verification when multiple parties are involved.
 
 One of the most important applications of ZK-SNARK systems is in \emph{provable computation},

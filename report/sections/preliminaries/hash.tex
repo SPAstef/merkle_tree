@@ -42,9 +42,28 @@ simpler to devise.
 
 \noindent PKPs are often built by iterating a keyed permutation \(F\) for some number \(r\) of
 rounds, since \(F\) by itself might be relatively easy to invert.
-A block cipher is a pseudorandom keyed permutation which changes the key being used in each
-round through a key-scheduling function.
-Unkeyed permutations can be derived from keyed ones simply by fixing the key to some arbitrary
+A \emph{block cipher} is a pseudorandom keyed permutation which is easy to invert if we know
+the key (\emph{trapdoor function}), and which is iterated for a certain number of rounds using
+a different key everytime, which is provided by a key-scheduling function.
+\begin{theorem}[Feistel-Luby-Rackoff construction]
+	Given a \(l/n\) pseudorandom keyed permutation \(P\), some
+	\(m = (m_1, m_2) \mid m_1, m_2 \in {\{0, 1\}}^l\), some \(n > 3\), and some
+	\(k = (k_1, \dots, k_n) \mid \forall i\colon k_i \in {\{0, 1\}}^n}\), then the function \(E_P\)
+	such that:
+	\begin{align*}
+		 & E_{P, i}(m, k) = \begin{cases}
+			                    (m_1, m_2)                                  & i = 0         \\
+			                    ({E_{P, i-1}(m)}_2, m_1 \oplus P(m_2, k_i)) & 1 \le i \le n
+		                    \end{cases} \\
+		 & E_P	= E_{P,n}
+	\end{align*}
+	is a \(2l/k\) block cipher.
+	Here, \(\oplus \) denotes addition after reinterpreting the arguments as elements of some
+	field \(\mathbb{F}\) (tipically \(\mathbb{F}_{2^n}\)).
+
+\end{theorem}
+
+\noindent Unkeyed permutations can be derived from keyed ones simply by fixing the key to some arbitrary
 value.
 \begin{definition}[One-way compression function]
 	Given \(l_1, l_2, n \in \mathbb{N}\), an \emph{\(l_1/n/l_2\)(-bit) one-way compression function
@@ -55,18 +74,18 @@ value.
 
 \noindent There are many known ways to build OWCFs from pseudorandom keyed
 permutations, and, in turn, CHFs from OWCFs.
-We will introduce the Davies-Meyer and the Merkle-Damg\r{a}rd constructions respectively, as 
+We will introduce the Davies-Meyer and the Merkle-Damg\r{a}rd constructions respectively, as
 those are the ones of interest to us.
 \begin{theorem}[Davies-Meyer construction]
-	Given a \(l/n\) pseudorandom keyed permutation \(E\), some \(i, k \in \mathbb{N}\), some
-	\(v \in {\{0, 1\}}^l\), and some \(m \in {\{0, 1\}}^{kn}\), then any function \(F_E\) such that:
+	Given a \(l/n\) pseudorandom keyed permutation \(P\), some \(i, k \in \mathbb{N}\), some
+	\(v \in {\{0, 1\}}^l\), and some \(m \in {\{0, 1\}}^{kn}\), then the function \(F_P\) such that:
 	\begin{align*}
-		 & F_{E,i}(v, m) =
+		 & F_{P,i}(v, m) =
 		\begin{cases}
-			E(v, m_{\range{1}{n}})                      & i = 1         \\
-			E(F_{E, i-1}(v, m), m_{\range{i(n-1)}{in}}) & 2 \le i \le k \\
+			v                                           & i = 0         \\
+			E(F_{P, i-1}(v, m), m_{\range{i(n-1)}{in}}) & 1 \le i \le k \\
 		\end{cases} \\
-		 & F_E = F_{E, k}
+		 & F_P = F_{P, k}
 	\end{align*}
 	is a \(l/kn/l\) OWCF\@.
 \end{theorem}
@@ -76,12 +95,12 @@ those are the ones of interest to us.
 	\[P(m)\colon {\{0, 1\}}^{|m|} \mapsto {\{0, 1\}}^{|m| + (-|m| \bmod n) + kn}\]
 	such that, \(\forall m, m' \in {\{0, 1\}}^*\colon \)
 	\[(|m| = |m'| \then |P(m)| = |P(m')|) \land (|m| \neq |m'| \then m_{|P(m)|} \neq m'_{|P(m')|})\]
-	then any function \(H_F\) such that:
+	then the function \(H_F\) such that:
 	\begin{align*}
 		 & H_{F, i}(v, m) =
 		\begin{cases}
-			F(v, m_1)                & i = 1            \\
-			F(H_{F, i-1}(v, m), m_i) & 1 < i \le |P(m)| \\
+			v                        & i = 0              \\
+			F(H_{F, i-1}(v, m), m_i) & 1 \le i \le |P(m)| \\
 		\end{cases} \\
 		 & H_F = H_{F, |P(m)|}
 	\end{align*}

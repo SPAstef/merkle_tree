@@ -14,7 +14,7 @@
 
 #include <libsnark/gadgetlib1/gadgets/basic_gadgets.hpp>
 #include <libsnark/gadgetlib1/gadgets/hashes/hash_io.hpp>
-#include <libsnark/gadgetlib1/gadgets/hashes/sha512/sha512_aux.hpp>
+#include "sha512_aux.hpp"
 
 namespace libsnark
 {
@@ -109,6 +109,6 @@ namespace libsnark
 
 } // namespace libsnark
 
-#include <libsnark/gadgetlib1/gadgets/hashes/sha512/sha512_components.tcc>
+#include "sha512_components.tcc"
 
 #endif // SHA512_COMPONENTS_HPP_

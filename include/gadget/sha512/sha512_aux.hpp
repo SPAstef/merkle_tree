@@ -158,6 +158,6 @@ namespace libsnark
 
 } // namespace libsnark
 
-#include <libsnark/gadgetlib1/gadgets/hashes/sha512/sha512_aux.tcc>
+#include "sha512_aux.tcc"
 
 #endif // SHA512_AUX_HPP_

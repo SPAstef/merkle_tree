@@ -15,10 +15,10 @@
 \newcommand{\NPtime}{\textsc{NP}}
 \newcommand{\NPcomp}{\textsc{NP-complete}}
 \newcommand{\range}[2]{{{#1}\dots{#2}}}
-\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+\newcommand{\overbar}[1]{\mkern\ 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern\ 1.5mu}
 
 \makeatletter
-\newcommand*{\transpose}{{\mathpalette\@transpose{}}}
+\newcommand*{\transpose}{{\mathpalette\@transpose{}}} %chktex 21
 \newcommand*{\@transpose}[2]{\raisebox{\depth}{\(\m@th#1\intercal \)}}
 
 \hypersetup{hidelinks}
@@ -43,10 +43,7 @@
 \include{sections/introduction.tex}
 \include{sections/preliminaries.tex}
 \include{sections/zksnark.tex}
-
-\section{The libsnark library}\label{sec:libsnark}
-
-\section{Experiments}\label{sec:experiments}
+\include{sections/experiments.tex}
 
 \section{Conclusions and future directions}\label{sec:conclusions}
 \end{document}

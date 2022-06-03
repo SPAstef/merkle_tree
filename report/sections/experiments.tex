@@ -1,0 +1,15 @@
+\section{Experiments}\label{sec:experiments}
+We said that zero-knowledge provable computation is especially interesting in blockchain
+environments, like cryptocurrencies, where users commit to transactions by means of a tree-mode of
+hash.
+We implemented and tested several combinations of cryptographic primitives for tree-path
+verification, using the C\texttt{++} language and the facilities based on the Pinocchio protocol 
+provided by the \texttt{libsnark} library.
+In particular, we implemented:
+\begin{itemize}
+  \item Hash-agnostic Merkle trees.
+  \item Hash-agnostic ABRs.
+  \item SHA-256 (adapted from the versionprovided by \texttt{libsnark}).
+  \item SHA-512.
+  \item MiMC-256 (i.e.\ )
+\end{itemize}

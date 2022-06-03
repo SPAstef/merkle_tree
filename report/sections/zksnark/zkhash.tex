@@ -1,0 +1,45 @@
+\subsection{CHFs for ZK-SNARK systems}
+We mentioned that Pinocchio, like other ZK-SNARK systems, works on big prime fields.
+The most famous CHFs, like MD5 or the SHA families, make extensive use of bitwise operations,
+basically working on some field of the type \(\mathbb{F}_{2^n}\).
+When translating these hash functions as arithmetic cirtuits over a prime field \(\mathbb{F}_p\),
+we incur in a huge space and time overhead.
+\begin{example}
+	Consider some \(S, T \in {\{0, 1\}}^n\) for some \(n \in \mathbb{N}\), and assume we want to
+	compute \(S \mathbin{\textsc{xor}} T\).
+	If we work over \(\mathbb{F}_{2^n}\) the resulting arithmetic circuit would simply be
+	\(x \oplus y\), with \(x = \sum_{i}{S_{i}2^{i-1}}\) and \(y = \sum_{i}{T_{i}2^{i-1}}\).
+
+	On the other hand, to express the same operation over \(\mathbb{F}_p\) we consider \(S\) and
+	\(T\) as vectors
+	\(\bm{x}, \bm{y} \in \mathbb{F}^n \mid \forall i\colon \bm{x}_i = S_i \wedge \bm{y}_i = T_i\).
+	For a single-bit \textsc{xor} operation, we use the circuit \(x \oplus y - 2(x \otimes y) \);
+	to represent an n-bit \textsc{xor}, we concatenate \(n\) such circuits.
+	What required a single addition in \(\mathbb{F}_{2^n}\) requires \(3n\) additions and \(n\)
+	multiplications in \(\mathbb{F}_p\)!
+
+	Furthermore, since \(\bm{x}\) and \(\bm{y}\) are defined over \(\mathbb{F}_p^n\), we must also
+	guarantee that their elements are either \(0\) or \(1\), by explicitly adding the contraint
+	\((x)\otimes(x - 1) = 0\) for every \(x \in \bm{x}, \bm{y}\).
+\end{example}
+
+For this reason, we want CHFs which use native operations over \(\mathbb{F}_p\):
+while they are tipically much slower if implemented, say, in x86 assembly, they become
+immensely faster when implemented in a ZK-SNARK framework.
+
+\begin{definition}[MiMC primitives]
+	Given a finite field \(\mathbb{F}_p\), 
+  \(r = \left\lceil{\frac{\log_2(p)}{\log_2(3)}}\right\rceil \), some \(\bm{c} \in \mathbb{F}_p^r\) 
+  and the functions:
+	\[\forall i < r\colon f_i(x,k)\colon \mathbb{F}_p \times \mathbb{F}_p \mapsto \mathbb{F}_p =
+		x^3 \oplus k \oplus \bm{c}_i\]
+	the \emph{MiMC keyed permutation} is defined as:
+	\[E(x, k)\colon \mathbb{F}_p \times \mathbb{F}_p \mapsto \mathbb{F}_p =
+		(f_{r} \circ \dots \circ f_1)(x, k) \oplus k\]
+	By fixing \(k = 0\), we obtain the \emph{MiMC permutation} \(P(x)\).
+	By applying the Davies-Meyer construction to the MiMC permutation, we obtain the
+	\emph{MiMC compression function} \(C(x)\).
+	Finally, by applying the Merkle-Damg\r{a}rd construction to the MiMC compression function, we
+	obtain the \emph{MiMC hash function} \(H(x)\).
+\end{definition}
+

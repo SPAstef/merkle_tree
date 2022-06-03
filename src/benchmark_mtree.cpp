@@ -307,7 +307,7 @@ int main()
     libff::inhibit_profiling_counters = true;
 
     ppT::init_public_params();
-/*    std::cout << "SHA256\n";
+    std::cout << "SHA256\n";
     std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_mtree_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Sha256, GadSha256>("SHA256");
 
@@ -318,7 +318,6 @@ int main()
     std::cout << "MiMC256\n";
     std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_pmtree_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc256, GadMimc256>("MiMC256");
-*/
 
     std::cout << "MiMC512F\n";
     std::cout << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";

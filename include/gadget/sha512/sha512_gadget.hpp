@@ -16,7 +16,7 @@
 #include <libsnark/common/data_structures/merkle_tree.hpp>
 #include <libsnark/gadgetlib1/gadgets/basic_gadgets.hpp>
 #include <libsnark/gadgetlib1/gadgets/hashes/hash_io.hpp>
-#include <libsnark/gadgetlib1/gadgets/hashes/sha512/sha512_components.hpp>
+#include "sha512_components.hpp"
 
 namespace libsnark
 {
@@ -106,6 +106,6 @@ namespace libsnark
 
 } // namespace libsnark
 
-#include <libsnark/gadgetlib1/gadgets/hashes/sha512/sha512_gadget.tcc>
+#include "sha512_gadget.tcc"
 
 #endif // SHA512_GADGET_HPP_

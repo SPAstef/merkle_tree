@@ -48,7 +48,10 @@ public:
         x{x}, y{y}, out{out}, inter{}
     {
         for (size_t i = 0; i < INTER_N; ++i)
-            inter.emplace_back(pb, FMT("mimc512f_inter_%llu", i));
+        {
+            inter.emplace_back();
+            inter.back().allocate(pb, FMT(annotation_prefix, "_mimc512f_inter_%llu", i));
+        }
     }
 
     inline size_t constrain(const LC &x, const LC &y, const LC &z)

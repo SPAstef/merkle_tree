@@ -50,7 +50,7 @@ A field \(\mathbb{F}\) can also be extended to a monovariate polynomial ring \(\
 we will denote polynomials with lowercase letters (\(p, q, \dots \)).
 Operations over polynomials are naturally derived from the underlying field.
 Vectors and matrices of polynomials are denoted with the usual notation
-(\(\bm{p}, \bm{q}, \dots\) and \(\bm{P}, \bm{Q}, \dots\)).
+(\(\bm{p}, \bm{q}, \dots \) and \(\bm{P}, \bm{Q}, \dots \)).
 
 Given some \(\bm{x}, \bm{y} \in \mathbb{F}^n\), we can build the unique polynomial:
 \[p \mid {p \in \mathbb{F}[x]} \land {\deg(p) = n-1} \land {\forall i\colon p(\bm{x}_i) = \bm{y}_i}\]
@@ -108,10 +108,10 @@ deterministic algorithm is known that can efficiently compute the discrete logar
 		B(x^a, y^b) = {B(x, y)}^{ab}\]
 	If \(|\mathbb{G}| = |\mathbb{G}'|\), then \(B\) is \emph{order-preserving}, and if
 	\(\mathbb{G}_1 = \langle{g_1}\rangle \land \mathbb{G}_2 = \langle{g_2}\rangle \land
-	\mathbb{G}_{\transpose} = \langle{B(g_1, g_2)}\rangle \), then \(B\) is \emph{admissible}.
+	\mathbb{G}_{\transpose} = \langle{B(g_1, g_2)}\rangle \), then \(B\) is \emph{non-trivial}.
 \end{definition}
 
-\noindent We are interested in (order-preserving, admissible) bilinear maps where
+\noindent We are interested in order-preserving, non-trivial bilinear maps where
 \(\mathbb{G}_1 = \mathbb{G}_2 = \mathbb{G}\).
-Bilinar maps have many application in cryptography, as they are an essential tool to exploit the 
-hardness of the discrete logarithm problem.
+Bilinar maps have many application in cryptography, as they are used to exploit the hardness of 
+the discrete logarithm problem.
