@@ -17,29 +17,32 @@ which is able to build parametrized arithmetic circuits `on the fly'.
 Given an arithmetic circuit \(\phi \) over a prime field \(\mathbb{F}_p\), Pinocchio works as
 follows:
 \begin{enumerate}
-	\item Fix some generator \(g \in \mathbb{F}_p\) such that \(\mathbb{G} = \langle{g}\rangle \) and an
-	      order-preserving non-trivial bilinear map
-	      \(B\colon \mathbb{G} \times \mathbb{G} \mapsto \mathbb{G}_{\transpose}\).
+	\item Fix some generator \(g \in \mathbb{F}_p\) such that
+	      \(\mathbb{G} = \left\langle{g}\right\rangle \) and an order-preserving non-trivial bilinear
+	      map \(B\colon \mathbb{G} \times \mathbb{G} \mapsto \mathbb{G}_{\transpose}\).
 	\item Build the R1CS \(\mathcal{C}\) associated with \(\phi \).
 	\item Build the QAP \(\mathcal{Q}\) associated with \(\mathcal{C}\).
 	\item A trusted third party \(\mathcal{T}\) generates a set of random elements
 	      \(R \in \mathbb{F}_p\) which, together with \(g\), are used to build a \emph{prover key}
-	      \(K_{\mathcal{P}} \in \mathbb{G}\) of size \(\Theta(|\phi|)\) and a \emph{verifier key}
-	      \(K_{\mathcal{V}} \in \mathbb{G}\) of size \(\Theta(|\phi_{IO}|)\) (\(\phi_{IO}\)
-	      denotes the set of inputs and outputs of \(\phi \)).
+	      \(K_{\mathcal{P}} \in \mathbb{G}\) of size \(\Theta\left(\left|\phi\right|\right)\) and a
+	      \emph{verifier key} \(K_{\mathcal{V}} \in \mathbb{G}\) of size
+	      \(\Theta\left(\left|\phi_{IO}\right|\right)\).
 	      The random data is deleted immediately after use (\emph{toxic waste}).
 	\item The prover know executes \(\phi \), computes all the intermediate values, and uses them to
-	      solve \(\mathcal{C}\) and \(\mathcal{Q}\), finding a solution \((p, h)\) for \(\mathcal{Q}\).
-	\item The prover chooses some value \(x \in \mathbb{F}_p\) with which he computes \(p(x)\) and
-	      \(h(x)\), and uses \(K_{\mathcal{P}}\) to encrypt them, producing a proof of the kind
-	      \(k^{p(x)} = k^{t(x)h(x)}\), which has size \(\Theta(1)\), and is sent to the
-	      verifier.
+	      solve \(\mathcal{C}\) and \(\mathcal{Q}\), finding a solution \(\left(p, h\right)\) for
+	      \(\mathcal{Q}\).
+	\item The prover chooses some value \(x \in \mathbb{F}_p\) with which he computes
+	      \(p\left(x\right)\) and \(h\left(x\right)\), and uses \(K_{\mathcal{P}}\) to encrypt them,
+	      producing a proof of the kind \(k^{p(x)} =
+	      k^{t\left(x\right)h\left(x\right)}\), which has size \(\Theta\left(1\right)\), and is sent
+	      to the verifier.
 	\item The verifier uses the key \(K_{\mathcal{V}}\), exploiting the bilinear map \(B\), to
-	      verify that \(k^{p(x)} = k^{t(x)h(x)}\), which implies that \(p(x) = t(x)h(x)\), which
-	      implies with high probability that \(p = th\) which, as we know, implies that
-	      \(\phi \) was correctly executed.
+	      verify that \(k^{p\left(x\right)} = k^{t\left(x\right)h\left(x\right)}\), which implies
+	      that \(p\left(x\right) = t\left(x\right)h\left(x\right)\), which implies with
+	      high probability that \(p = th\) which, as we know, implies that \(\phi \) was correctly
+	      executed.
 \end{enumerate}
 
 \noindent Note how all the work that has to be done from steps 1 to 4 depends only on the
-circuit, not on some particular execution, so everything that has been computed in those steps 
+circuit, not on some particular execution, so everything that has been computed in those steps
 can be saved and reused later.

@@ -1,8 +1,9 @@
 \subsection{Hash functions}
 Hash functions are a fundamental tool in many fields of computer science, and cryptography is
 arguably the most prominent.
-Formally, an hash function is any function \(H\colon {\{0, 1\}}^{*} \mapsto {\{0, 1\}}^n\), that
-is any function which maps arbitrarly long \emph{messages} to fixed-size \emph{digests}.
+Formally, an hash function is any function \(H\colon {\left\{0, 1\right\}}^{*} \mapsto
+{\left\{0, 1\right\}}^n\), that is, any function which maps arbitrarly long \emph{messages} to
+fixed-size \emph{digests}.
 From the definition, it is immediate to see that there are an infinite number of messages which map
 to the same digest.
 While an operation like truncation is a (very simple) hash function, in cryptography we are
@@ -15,14 +16,15 @@ on its input; the aim then is to build functions which are hard to distinguish f
 function.
 \begin{definition}[Cryptographic hash function]
 	Given \(n \in \mathbb{N}\), an \emph{\(n\)(-bit) cryptographic hash function (CHF)} is any
-	function \(H\colon {\{0, 1\}}^{*} \mapsto {\{0, 1\}}^n\) which satisfies the following properties:
+	function \(H\colon {\left\{0, 1\right\}}^{*} \mapsto {\left\{0, 1\right\}}^n\) which satisfies
+	the following properties:
 	\begin{itemize}
 		\item \textbf{Collision resistance}: It is hard to find two messages \(m_1, m_2\) such
-		      that \(H(m_1) = H(m_2)\).
+		      that \(H\left(m_1\right) = H\left(m_2\right)\).
 		\item \textbf{Preimage resistance}: Given some digest \(h\), it is hard to find a
-		      message \(m\) such that \(H(m) = h\) (\(H\) is a one-way function).
+		      message \(m\) such that \(H\left(m\right) = h\) (\(H\) is a one-way function).
 		\item \textbf{Second preimage resistance}: Given some message \(m_1\), it is hard to
-		      find a message \(m_2\) such that \(H(m_1) = H(m_2)\).
+		      find a message \(m_2\) such that \(H\left(m_1\right) = H\left(m_2\right)\).
 	\end{itemize}
 \end{definition}
 
@@ -36,7 +38,7 @@ simpler to devise.
 \begin{definition}[Pseudorandom keyed permutation]
 	Given \(l, n \in \mathbb{N}\), an \emph{\(l/n\)(-bit) pseudorandom keyed permutation (PKP)} is
 	any bijective function:
-	\[F\colon {\{0, 1\}}^l \times {\{0, 1\}}^n \mapsto {\{0, 1\}}^l\]
+	\[F\colon {\left\{0, 1\right\}}^l \times {\left\{0, 1\right\}}^n \mapsto {\left\{0, 1\right\}}^l\]
 	which is hard to distinguish from an uniform random distribution.
 \end{definition}
 
@@ -47,14 +49,17 @@ the key (\emph{trapdoor function}), and which is iterated for a certain number o
 a different key everytime, which is provided by a key-scheduling function.
 \begin{theorem}[Feistel-Luby-Rackoff construction]
 	Given a \(l/n\) pseudorandom keyed permutation \(P\), some
-	\(m = (m_1, m_2) \mid m_1, m_2 \in {\{0, 1\}}^l\), some \(n > 3\), and some
-	\(k = (k_1, \dots, k_n) \mid \forall i\colon k_i \in {\{0, 1\}}^n}\), then the function \(E_P\)
-	such that:
+	\(m = \left(m_1, m_2\right) \mid m_1, m_2 \in {\left\{0, 1\right\}}^l\), some \(n > 3\), and some
+	\(k = \left(k_1, \dots, k_n\right) \mid \forall i\colon k_i \in {\left\{0, 1\right\}}^n\), then
+	the function \(E_P\) such that:
 	\begin{align*}
-		 & E_{P, i}(m, k) = \begin{cases}
-			                    (m_1, m_2)                                  & i = 0         \\
-			                    ({E_{P, i-1}(m)}_2, m_1 \oplus P(m_2, k_i)) & 1 \le i \le n
-		                    \end{cases} \\
+		 & E_{P, i}\left(m, k\right) =
+		\begin{cases}
+			\left(m_1, m_2\right)                                                        & i = 0
+			\\
+			\left({E_{P, i-1}\left(m\right)}_2, m_1 \oplus P\left(m_2, k_i\right)\right) & 1 \le
+			i \le n
+		\end{cases} \\
 		 & E_P	= E_{P,n}
 	\end{align*}
 	is a \(2l/k\) block cipher.
@@ -63,13 +68,16 @@ a different key everytime, which is provided by a key-scheduling function.
 
 \end{theorem}
 
-\noindent Unkeyed permutations can be derived from keyed ones simply by fixing the key to some arbitrary
-value.
+\noindent Unkeyed permutations can be derived from keyed ones simply by fixing the key to some
+arbitrary value.
 \begin{definition}[One-way compression function]
 	Given \(l_1, l_2, n \in \mathbb{N}\), an \emph{\(l_1/n/l_2\)(-bit) one-way compression function
 		(OWCF)}
 	is any function:
-	\[F\colon {\{0, 1\}}^{l_1} \times {\{0, 1\}}^n \mapsto {\{0, 1\}}^{l_2}\]
+	\[
+		F\colon {\left\{0, 1\right\}}^{l_1} \times {\left\{0, 1\right\}}^n \mapsto
+		{\left\{0, 1\right\}}^{l_2}
+	\]
 \end{definition}
 
 \noindent There are many known ways to build OWCFs from pseudorandom keyed
@@ -78,31 +86,45 @@ We will introduce the Davies-Meyer and the Merkle-Damg\r{a}rd constructions resp
 those are the ones of interest to us.
 \begin{theorem}[Davies-Meyer construction]
 	Given a \(l/n\) pseudorandom keyed permutation \(P\), some \(i, k \in \mathbb{N}\), some
-	\(v \in {\{0, 1\}}^l\), and some \(m \in {\{0, 1\}}^{kn}\), then the function \(F_P\) such that:
+	\(v \in {\left\{0, 1\right\}}^l\), and some \(m \in {\left\{0, 1\right\}}^{kn}\), then the
+	function \(F_P\) such that:
 	\begin{align*}
-		 & F_{P,i}(v, m) =
+		 & F_{P,i}\left(v, m\right) =
 		\begin{cases}
-			v                                           & i = 0         \\
-			E(F_{P, i-1}(v, m), m_{\range{i(n-1)}{in}}) & 1 \le i \le k \\
+			v                                                                         & i = 0
+			\\
+			E\left(F_{P, i-1}\left(v, m\right), m_{\left(i-1\right)n,\dots,in}\right) & 1 \le
+			i \le k
+			\\
 		\end{cases} \\
 		 & F_P = F_{P, k}
 	\end{align*}
 	is a \(l/kn/l\) OWCF\@.
 \end{theorem}
 \begin{theorem}[Merkle-Damg\r{a}rd construction]
-	Given a \(l_1/n/l_2\) OWCF \(F\), some \(k \in \mathbb{N}\), some \(v \in {\{0, 1\}}^{l_1}\),
-	some \(m \in {\{0, 1\}}^*\) and some padding funcion:
-	\[P(m)\colon {\{0, 1\}}^{|m|} \mapsto {\{0, 1\}}^{|m| + (-|m| \bmod n) + kn}\]
-	such that, \(\forall m, m' \in {\{0, 1\}}^*\colon \)
-	\[(|m| = |m'| \then |P(m)| = |P(m')|) \land (|m| \neq |m'| \then m_{|P(m)|} \neq m'_{|P(m')|})\]
+	Given a \(l_1/n/l_2\) OWCF \(F\), some \(k \in \mathbb{N}\), some
+	\(v \in {\left\{0, 1\right\}}^{l_1}\), some \(m \in {\left\{0, 1\right\}}^*\) and some padding
+	funcion:
+	\[
+		P\left(m\right)\colon {\left\{0, 1\right\}}^{\left|m\right|} \mapsto
+		{\left\{0, 1\right\}}^{\left|m\right| + \left(-\left|m\right| \bmod n\right) + kn}
+	\]
+	such that, \(\forall m, m' \in {\left\{0, 1\right\}}^*\colon \)
+	\[
+		\Bigl(\left|m\right| = \left|m'\right| \then \left|P\left(m\right)\right| =
+		\left|P\left(m'\right)\right|\Bigr) \land
+		\left(\left|m\right| \neq \left|m'\right| \then m_{\left|P\left(m\right)\right|} \neq
+		m'_{\left|P\left(m'\right)\right|}\right)
+	\]
 	then the function \(H_F\) such that:
 	\begin{align*}
-		 & H_{F, i}(v, m) =
+		 & H_{F, i}\left(v, m\right) =
 		\begin{cases}
-			v                        & i = 0              \\
-			F(H_{F, i-1}(v, m), m_i) & 1 \le i \le |P(m)| \\
+			v                                                                         & i = 0   \\
+			F\left(H_{F, i-1}\left(v, m\right), m_{\left(i-1\right)n,\dots,in}\right) & 1 \le i
+			\le \left|P\left(m\right)\right|
 		\end{cases} \\
-		 & H_F = H_{F, |P(m)|}
+		 & H_F = H_{F, \left|P\left(m\right)\right|}
 	\end{align*}
 	is a cryptographic hash function.
 \end{theorem}

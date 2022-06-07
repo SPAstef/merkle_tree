@@ -3,7 +3,7 @@
 \contentsline {subsection}{\numberline {2.1}Computational models and complexity}{4}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}Fields and groups}{4}{subsection.2.2}%
 \contentsline {subsection}{\numberline {2.3}Arithmetic Circuits}{6}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Rank-1 Constraint systems}{7}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.4}Rank-1 Constraint systems}{8}{subsection.2.4}%
 \contentsline {subsection}{\numberline {2.5}Quadratic Arithmetic Programs}{9}{subsection.2.5}%
 \contentsline {subsection}{\numberline {2.6}Hash functions}{11}{subsection.2.6}%
 \contentsline {subsection}{\numberline {2.7}Tree hash modes}{13}{subsection.2.7}%
@@ -12,4 +12,4 @@
 \contentsline {subsection}{\numberline {3.2}The Pinocchio Protocol}{16}{subsection.3.2}%
 \contentsline {subsection}{\numberline {3.3}CHFs for ZK-SNARK systems}{17}{subsection.3.3}%
 \contentsline {section}{\numberline {4}Experiments}{18}{section.4}%
-\contentsline {section}{\numberline {5}Conclusions and future directions}{19}{section.5}%
+\contentsline {section}{\numberline {5}Conclusions and future directions}{21}{section.5}%

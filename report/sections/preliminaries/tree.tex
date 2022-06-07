@@ -1,6 +1,6 @@
 \subsection{Tree hash modes}
 An important application of CHFs is in \emph{prover-verifier games}:
-for any message \(m\), the digest \(h = H(m)\), where \(H\) is an \(n\) CHF, can be
+for any message \(m\), the digest \(h = H\left(m\right)\), where \(H\) is an \(n\) CHF, can be
 used as a \emph{binding commitment} for \(m\): a verifier is convinced that the prover knows \(m\)
 simply by asking him to share \(h\), with overwhelming confidence (\(\approx 1 - \frac{1}{2^n}\)).
 While often referred to as if they were humans, provers and verifiers are formally described by
@@ -11,53 +11,56 @@ instance statement\footnote{Although humans can be  assimilated to a computation
 	his proof\dots}.
 
 If the prover wants to commit to a list of \(k\) messages, a possibility would be to share with the
-verifier the hash of every message: this would require a \(\BigO(k)\) communication cost and a
-\(\BigO(k)\) verification cost.
-A slightly better alternative would be for the prover to share \(H(\{m_1, \dots, m_k\})\): the
-communication cost would only be \(\BigO(1)\), but verification would still cost \(\BigO(k)\).
+verifier the hash of every message: this would require a \(\BigO\left(k\right)\) communication cost
+and a \(\BigO\left(k\right)\) verification cost.
+A slightly better alternative would be for the prover to share
+\(H\left(\left\{m_1, \dots, m_k\right\}\right)\): the communication cost would only be
+\(\BigO\left(1\right)\), but verification would still cost \(\BigO\left(k\right)\).
 \begin{definition}[Merkle Tree]
 	Given some \(k \in \mathbb{N}\), a CHF \(H\) and a set of messages
-	\(S = \{m_1, \dots, m_{s^{k-1}} \mid \forall i\colon m_i \in {\{0, 1\}}^*\} \),
-	a \emph{Merkle Tree (MT)} is a complete binary tree of height \(k\) such that:
+	\(S = \left\{m_1, \dots, m_{s^{k-1}} \mid \forall i\colon m_i \in
+	{\left\{0, 1\right\}}^*\right\} \), a \emph{Merkle Tree (MT)} is a complete binary tree of
+	height \(k\) such that:
 	\begin{enumerate}
-		\item The leaf nodes \(\nu_1, \dots, \nu_{2^{k-1}}\) contain \(H(m_1), \dots,
-		      H(m_{2^{k-1}})\).
-		\item Every other node \(\nu \) contains \(H(\nu_l, \nu_r)\), where \(\nu_l\) is the left
-		      child of \(\nu \) and \(\nu_r\) is the right child of \(\nu \).
+		\item The leaf nodes \(\nu_1, \dots, \nu_{2^{k-1}}\) contain \(H\left(m_1\right), \dots,
+		      H\left(m_{2^{k-1}}\right)\).
+		\item Every other node \(\nu \) contains \(H\left(\nu_l, \nu_r\right)\), where \(\nu_l\) is
+		      the left child of \(\nu \) and \(\nu_r\) is the right child of \(\nu \).
 	\end{enumerate}
 \end{definition}
 
 \noindent By using Merkle trees, the prover only needs to send to the verifier, as a commitment for
-some message \(m_i\) among \(k = 2^{\lfloor\log_2(k)\rfloor}\) messages, the contents of the
-co-path from the leaf containing \(m_i\) to the root (plus the hash of \(m_i\)): this requires just
-\(\BigO(\log_2(k))\) communication effort and \(\BigO(\log_2(k))\) verification effort.
+some message \(m_i\) among \(k = 2^{\left\lfloor\log_2(k)\right\rfloor}\) messages, the contents of
+the co-path from the leaf containing \(m_i\) to the root (plus the hash of \(m_i\)): this requires
+just \(\BigO\left(\log_2\left(k\right)\right)\) communication effort and
+\(\BigO\left(\log_2\left(k\right)\right)\) verification effort.
 Another advantage of Merkle trees is that bottom-up construction is very easy to parallelize,
 and its usefulness can be appreciated even more when considering a scenario where different
 messages actually belong to different provers.
 \begin{definition}[Augmented Binary tRee]
 	Given some \(k \in \mathbb{N}\), a CHF \(H\), and a set of messages
-	\(S = \{m_1, \dots, m_{2^{k-1} + 2^{k-2}-1} \mid \forall i\colon m_i \in {\{0, 1\}}^*\} \),
+	\(S = \left\{m_1, \dots, m_{2^{k-1} + 2^{k-2}-1} \mid \forall i\colon m_i \in
+	{\left\{0, 1\right\}}^*\right\} \),
 	an \emph{Augmented Binary tRee (ABR)} is a complete binary tree of
 	height \(k\) augmented with \emph{middle} nodes, such that:
 	\begin{enumerate}
-		\item The leaf nodes \(\nu_{1}, \dots, \nu_{2^{k-1}}\) contain \(H(m_1), \dots,
-		      H(m_{2^{k-1}})\).
+		\item The leaf nodes \(\nu_{1}, \dots, \nu_{2^{k-1}}\) contain \(H\left(m_1\right), \dots,
+		      H\left(m_{2^{k-1}}\right)\).
 		\item There are no middle nodes in the leaf layer.
-		\item The middle nodes \(\nu_{2^{k-1}+1}, \dots, \nu_{|S|}\) contain
-		      \(H(m_{2^{k-1}+1}), \dots, H(m_{|S|})\).
-		\item Every other node \(\nu \) contains \(H(\nu_l \oplus \nu_m, \nu_r \oplus \nu_m)
-		      \oplus \nu_r \), where \(\nu_l\) is the left child of \(\nu \), \(\nu_r\) is the right
-		      child of \(\nu \), and \(\nu_m\) is the middle child of \(\nu \), or
-		      \(0\) if \(\nu \) doesen't have a middle child.
+		\item The middle nodes \(\nu_{2^{k-1}+1}, \dots, \nu_{\left|S\right|}\) contain
+		      \(H\left(m_{2^{k-1}+1}\right), \dots, H\left(m_{\left|S\right|}\right)\).
+		\item Every other node \(\nu \) contains \(H\left(\nu_l \oplus \nu_m, \nu_r \oplus
+		      \nu_m\right) \oplus \nu_r \), where \(\nu_l\) is the left child of \(\nu \), \(\nu_r\)
+		      is the right child of \(\nu \), and \(\nu_m\) is the middle child of \(\nu \), or \(0\)
+		      if \(\nu \) doesen't have a middle child.
 	\end{enumerate}
 \end{definition}
 
-\noindent Notice the use of the \(\oplus \) operation inside the ABR\@: while messages of length \(n\)
-are usually treated as elements of \({\{0, 1\}}^n\), they can also be treated as \(n\)-bit integers
-over some field \(\mathbb{F}_q\): if \(q = 2^n\), then \(\oplus \) means bitwise \textsc{xor}
-(i.e.\ addition in \(\mathbb{F}_2\)), and if \(q = p\) for some prime \(p\), then
-\(\oplus \) means addition in the field \(\mathbb{F}_p\).
+\noindent Notice the use of the \(\oplus \) operation inside the ABR\@: while messages of length 
+\(n\) are usually treated as elements of \({\left\{0, 1\right\}}^n\), they can also be treated as 
+\(n\)-bit integers over some field \(\mathbb{F}_q\), so \(\oplus \) represents addition over the 
+field of choice.
 
-ABRs can store 50\% more messages than Merkle Trees for the same height, resulting in the
-same number of calls to \(H\), at the cost of performing 3 additional \(\oplus \) operations for
-every call (usually, \(TIME(\oplus) \ll TIME(H)\)).
+ABRs can store 50\% more messages than Merkle Trees for the same height, resulting in the same 
+number of calls to \(H\), at the cost of performing 3 additional \(\oplus \) operations for
+every call (usually, \(TIME\left(\oplus\right) \ll TIME\left(H\right)\)).

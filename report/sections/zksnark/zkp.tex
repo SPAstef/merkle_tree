@@ -7,8 +7,8 @@ Knowledge Proof system.
 	\(\mathcal{V}\) by means of some proof \(\pi \), we call a Zero-Knowledge Proof (ZKP) system any
 	protocol which satisfies the following properties:
 	\begin{itemize}
-		\item \textbf{Soundness}: \(\neg{\sigma} \implies \mathcal{V}(\pi) = \bot \).
-		\item \textbf{Completeness}: \(\sigma \implies \mathcal{V}(\pi) = \top \).
+		\item \textbf{Soundness}: \(\neg{\sigma} \implies \mathcal{V}\left(\pi\right) = \bot \).
+		\item \textbf{Completeness}: \(\sigma \implies \mathcal{V}\left(\pi\right) = \top \).
 		\item \textbf{Zero-Knowledge}: It is \emph{hard} for \(\mathcal{V}\) to derive \(x\) given
 		      \(\sigma \) and \(\pi \).
 	\end{itemize}
@@ -23,14 +23,15 @@ Zero-Knowledge systems proves particularly useful in \emph{ARgument of Knowledge
 knows a solution to some problem, assuming there is one, without revealing it.
 It must be noted though that known ZK-ARK systems do not guarantee the formal soundness of
 the proof: there is a small probability that, given some false statement \(\sigma \) and an
-(invalid) proof \(\pi \), then \(\mathcal{V}(\pi) = \top \), so it is important to keep this probability
-small (say, \(2^{-128}\)).
+(invalid) proof \(\pi \), then \(\mathcal{V}\left(\pi\right) = \top \), so it is important to keep
+this probability small (say, \(2^{-128}\)).
 \begin{definition}[ZK-SNARK]
-	Given a prover \(\mathcal{P}\), a verifier \(\mathcal{V}\), a statement \(\sigma \), and a proof 
-	\(\pi \), a Zero-Knowledge Non-interactive ARgument of Knowledge (ZK-SNARK) system is any 
+	Given a prover \(\mathcal{P}\), a verifier \(\mathcal{V}\), a statement \(\sigma \), and a proof
+	\(\pi \), a Zero-Knowledge Non-interactive ARgument of Knowledge (ZK-SNARK) system is any
 	ZK-ARK system which is:
 	\begin{itemize}
-		\item \textbf{Succint}: \(SPACE(\pi) = \SmallO(\log(\sigma))\).
+		\item \textbf{Succint}: \(SPACE\left(\pi\right) =
+		      \SmallO\left(\log\left(\sigma\right)\right)\).
 		\item \textbf{Non-interactive}: The only communication required by the system is the exchange
 		      of \(\sigma \) and \(\pi \).
 	\end{itemize}

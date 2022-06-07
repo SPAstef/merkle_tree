@@ -25,16 +25,13 @@ For this reason, new hashing algorithms like MiMCHash have been designed with th
 mind, and Augmented Binary tRee (ABR) tries to improve Merkle Trees by processing more transactions
 without requiring more hash function calls.
 
-In the remainder of the report, for clarity we will always have in mind the cryptocurrency scenario,
-but we want to make clear that all the other use-cases are the same\footnote[1]{Up to isomorphism, of
-	course.}.
-In Section~\ref{sec:preliminaries}, we introduce hash functions and tree-based modes of hashing.
-In Section~\ref{sec:zksnark}, we introduce ZK-SNARK systems and brifely describe how they can be
-implemented.
-In Section~\ref{sec:libsnark}, we introduce \texttt{libsnark}, a C\texttt{++} library that provides
-many facilities to implement ZKSNARK algorithms with relative ease, and we will discuss the
-implementation of MiMC, MTs and ABRs using this library.
-In Section~\ref{sec:experiments}, we perform some experiments to compare MiMC with SHA, and MTs
-with ABRs in a ZK setting.
-Finally, in Section~\ref{sec:conclusions} we draw our conclusions and discuss possible future work
+In Section~\ref{sec:preliminaries}, we introduce some basic notions of computational and complexity
+theory, group and field theory, hash functions and tree hash modes; we also introduce arithmetic
+circuits, Rank-1 Constraint Systems and Quadratic Arithmetic Programs, which are an essential tool
+for ZK-SNARK systems.
+In Section~\ref{sec:zksnark}, we introduce ZK-SNARK, and study the Pinocchio protocol, as well
+as the ZK-SNARK-friendly MiMC permutation.
+In Section~\ref{sec:experiments}, we compare our implementations of MiMC and ABRs with SHA and
+Merkle Trees using the \texttt{libsnark} library.
+Finally, in Section~\ref{sec:conclusions} we draw our conclusions and discuss possible future
 directions.

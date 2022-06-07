@@ -5,7 +5,10 @@
 \usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{bm}
+\usepackage{booktabs}
+\usepackage[justification=centering]{caption}
 \usepackage{hyperref}
+\usepackage{mleftright}
 \usepackage{tikz}
 
 \newcommand{\BigO}{\mathcal{O}}
@@ -21,6 +24,7 @@
 \newcommand*{\transpose}{{\mathpalette\@transpose{}}} %chktex 21
 \newcommand*{\@transpose}[2]{\raisebox{\depth}{\(\m@th#1\intercal \)}}
 
+\mleftright{}
 \hypersetup{hidelinks}
 
 \theoremstyle{definition}
@@ -44,6 +48,5 @@
 \include{sections/preliminaries.tex}
 \include{sections/zksnark.tex}
 \include{sections/experiments.tex}
-
-\section{Conclusions and future directions}\label{sec:conclusions}
+\include{sections/conclusions.tex}
 \end{document}

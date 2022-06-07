@@ -1,39 +1,39 @@
 \subsection{Fields and groups}
 While computational models tipically operate over binary strings, that is, elements of
-\({\{0, 1\}}^*\), where \(*\) indicates Kleene's closure, we often want to interpret such strings
-as elements of some algebraic structure.
+\({\left\{0, 1\right\}}^*\), where \(*\) indicates Kleene's closure, we often want to interpret
+such strings as elements of some algebraic structure.
 \begin{definition}
-	A \emph{field} is any triple \(\mathbb{F} = (F, \oplus, \otimes)\), where \(F\) is called
-	\emph{underlying set}, \(\oplus\colon F \times F \mapsto F\) is called \emph{field addition} and
-	\(\otimes\colon F \times F \mapsto F\) is called \emph{field multiplication}, such that both
-	addition and multiplication are commutative and associative, multiplication
-	distributes over addition, \(F\) contains an additive identity element \(0_{\mathbb{F}}\) and a
-	multiplicative identity element \(1_{\mathbb{F}}\), \(\forall x \in F\) there is an additive inverse
-	element \(-x\), and \(\forall x \in F\setminus \{0_{\mathbb{F}}\} \) there is a multiplicative
-	inverse
+	A \emph{field} is any triple \(\mathbb{F} = \left(F, \oplus, \otimes\right)\), where \(F\) is
+	called \emph{underlying set}, \(\oplus\colon F \times F \mapsto F\) is called
+	\emph{field addition} and \(\otimes\colon F \times F \mapsto F\) is called
+	\emph{field multiplication}, such that both addition and multiplication are commutative and
+	associative, multiplication distributes over addition, \(F\) contains an additive identity
+	element \(0_{\mathbb{F}}\) and a multiplicative identity element \(1_{\mathbb{F}}\),
+	\(\forall x \in F\) there is an additive inverse element \(-x\), and
+	\(\forall x \in F\setminus \left\{0_{\mathbb{F}}\right\} \) there is a multiplicative inverse
 	element \(x^{-1}\).
 \end{definition}
 
 \noindent For example, \(\mathbb{R}\) and \(\mathbb{C}\) are fields, as is Boole's algebra
-\(\mathbb{B} = (\{0, 1\}, \textsc{xor}, \textsc{and})\).
+\(\mathbb{B} = \left(\left\{0, 1\right\}, \textsc{xor}, \textsc{and}\right)\).
 We denote elements of a field \(\mathbb{F}\) (abusing notation, as they are actually
 elements of the underlying set \(F\)) with lowercase letters \(a, b, c\dots \) and variables over
 \(\mathbb{F}\) with lowercase letters \(x, y, z\dots \).
 
-If \(|\mathbb{F}| \in \mathbb{N}\), then \(\mathbb{F}\) is a \emph{finite field}.
+If \(\left|\mathbb{F}\right| \in \mathbb{N}\), then \(\mathbb{F}\) is a \emph{finite field}.
 We are particularly interested in finite fields of the kind:
-\[\mathbb{F}_{p^k} = (\{0, \dots, p^k-1\}, \oplus_p, \otimes_p)\]
+\[\mathbb{F}_{p^k} = \left(\left\{0, \dots, p^k-1\right\}, \oplus_p, \otimes_p\right)\]
 where \(p\) is a prime and \(\oplus_p, \otimes_p\) denote addition and
 multiplication modulo \(p\) (for example, \(\mathbb{B} = \mathbb{F}_2\)).
 Tipically, we consider \(n\)-bit strings either as elements of \(\mathbb{F}_{2^n}\) or of
-\(\mathbb{F}_{p^1}\), where \(\log_2(p) \approx n\).
+\(\mathbb{F}_{p^1}\), where \(\log_2\left(p\right) \approx n\).
 We will often use \(+\) in place of \(\oplus_p \) when denoting addition and omit \(\otimes_p \)
 when denoting multiplication, if \(\mathbb{F}\) is clear from the context.
 
 Any field \(\mathbb{F}\) can be extended to an \(n\)-dimensional vector space
 \(\mathbb{F}^n\), for some \(n \in \mathbb{N}\).
-We denote vectors in \(\mathbb{F}^n\) with lowercase bold letters (\(\bm{v}, \bm{w}, \dots \)), and
-the \(i\)th element of a vector \(\bm{v}\) with \(\bm{v}_i\).
+We denote vectors in \(\mathbb{F}^n\) with lowercase bold letters (\(\bm{v}, \bm{w}, \dots \)),
+and the \(i\)th element of a vector \(\bm{v}\) with \(\bm{v}_i\).
 Vector operations follow their natural definitions depending on the underlying field.
 We can also introduce matrices over \(\mathbb{F}^{n \times m}\) for some \(n, m \in \mathbb{N}\),
 which we denote with bold capital letters (\(\bm{A}, \bm{B}, \dots \)).
@@ -53,20 +53,26 @@ Vectors and matrices of polynomials are denoted with the usual notation
 (\(\bm{p}, \bm{q}, \dots \) and \(\bm{P}, \bm{Q}, \dots \)).
 
 Given some \(\bm{x}, \bm{y} \in \mathbb{F}^n\), we can build the unique polynomial:
-\[p \mid {p \in \mathbb{F}[x]} \land {\deg(p) = n-1} \land {\forall i\colon p(\bm{x}_i) = \bm{y}_i}\]
+\[
+	p \mid {p \in \mathbb{F}\left[x\right]} \land {\deg\left(p\right) = n-1} \land
+	{\forall i\colon p\left(\bm{x}_i\right) = \bm{y}_i}
+\]
 by using Lagrange interpolation:
 \[
-	p = L(\bm{x}, \bm{y}) =
+	p = L\left(\bm{x}, \bm{y}\right) =
 	\sum_{i}{\bm{y}_{i}\prod_{j \neq i}{\frac{x - \bm{x}_j}{\bm{x}_i - \bm{x}_j}}}
 \]
 We can extend Lagrange interpolation to any pair of matrices
 \(\bm{X}, \bm{Y} \in \mathbb{F}^{n\times m}\) by applying \(L\) to every row:
-\[L(\bm{X}, \bm{Y}) = (L(\bm{X}_1, \bm{Y}_1) \dots, L(\bm{X}_n, \bm{Y}_n)) \]
+\[
+	L\left(\bm{X}, \bm{Y}\right) =
+	\left(L\left(\bm{X}_1, \bm{Y}_1\right) \dots, L\left(\bm{X}_n, \bm{Y}_n\right)\right)
+\]
 
 \begin{definition}
-	A \emph{group} is a pair \(\mathbb{G} = (G, \odot)\), where \(G\) is called \emph{underlying set},
-	and \(\odot\colon G \times G \mapsto G\) is called \emph{group composition}, such that
-	composition is associative, there is a compositive identity element \(1_{\mathbb{G}}\), and
+	A \emph{group} is a pair \(\mathbb{G} = \left(G, \odot\right)\), where \(G\) is called
+	\emph{underlying set}, and \(\odot\colon G \times G \mapsto G\) is called \emph{group composition},
+	such that composition is associative, there is a compositive identity element \(1_{\mathbb{G}}\), and
 	\(\forall x \in \mathbb{G}\) there is a compositive inverse \(x^{-1}\).
 \end{definition}
 
@@ -76,42 +82,51 @@ We denote elements and variables over groups in the same way we do for fields.
 We can define \emph{group exponentiation} following the natural definition:
 \[\forall x \in \mathbb{G}, \forall n \in \mathbb{N}\colon x^n = \bigodot^{n}{x}\]
 
-Any group \(\mathbb{G}\) for which \(|\mathbb{G}| \in \mathbb{N}\) is a \emph{finite group}.
+Any group \(\mathbb{G}\) for which \(\left|\mathbb{G}\right| \in \mathbb{N}\) is a \emph{finite group}.
 We can build a finite group from a \emph{generator} set \(S\) and a composition operation
 \(\odot \) by closing \(S\) under \(\odot \):
 \begin{align*}
-	 & {\langle{S}\rangle}^i =
+	 & {\left\langle{S}\right\rangle}^i =
 	\begin{cases}
-		S                                                                                   & i = 0
+		S                                            & i = 0
 		\\
-		{\langle{S}\rangle}^{i-1} \cup \{x \odot y \mid x,y \in {\langle{S}\rangle}^{i-1}\} & i > 0
+		{\left\langle{S}\right\rangle}^{i-1} \cup \left\{x \odot y \mid x,y \in
+		{\left\langle{S}\right\rangle}^{i-1}\right\} & i > 0
 		\\
 	\end{cases}
 	\\
-	 & \mathbb{G} = \langle{S}\rangle =
-	(\min_{i}{{\langle{S}\rangle}^{i}} \mid {\langle{S}\rangle}^{i} = {\langle{S}\rangle}^{i-1}, \odot)
+	 & \mathbb{G} = \left\langle{S}\right\rangle =
+	\left(\min_{i}{{\left\langle{S}\right\rangle}^{i}} \mid
+	{\left\langle{S}\right\rangle}^{i} = {\left\langle{S}\right\rangle}^{i-1}, \odot\right)
 \end{align*}
 We are particularly interested in \emph{cyclic groups}, i.e.\ finite groups of the type
-\(\mathbb{G}_q(g) = \langle{g}\rangle = ({\{g^i \bmod q\}}_{i \in \mathbb{N}},
-\otimes_q)\), where \(g \in \mathbb{F}_p\) is called \emph{generator element} and
-\(\mathbb{F}_p\) is called \emph{underlying field}.
-Since every element of \(\mathbb{G}_q(g)\) is obtained by exponentiating \(g\), we can define a
-bijective \emph{discrete logarithm} function:
-\[\log_g\colon \mathbb{G}_q(g) \mapsto \mathbb{F}_p = \{(x, y) \mid x = g^y\} \]
+\(\mathbb{G}_q\left(g\right) = \langle{g}\rangle = \left({\left\{g^i \bmod q\right\}}_{i \in
+	\mathbb{N}}, \otimes_q\right)\), where \(g \in \mathbb{F}_p\) is called \emph{generator element}
+and \(\mathbb{F}_p\) is called \emph{underlying field}.
+Since every element of \(\mathbb{G}_q\left(g\right)\) is obtained by exponentiating \(g\), we can
+define a bijective \emph{discrete logarithm} function:
+\[
+	\log_g\colon \mathbb{G}_q\left(g\right) \mapsto \mathbb{F}_p =
+	\left\{\left(x, y\right) \mid x = g^y\right\}
+\]
 Cyclic groups are very interesting because, while it's easy to compute exponentiation, no
 deterministic algorithm is known that can efficiently compute the discrete logarithm.
 \begin{definition}
 	Given cyclic groups \(\mathbb{G}_1, \mathbb{G}_2, \mathbb{G}_{\transpose}\), a
 	\emph{bilinear map} is any function:
-	\[B\colon \mathbb{G}_1 \times \mathbb{G}_2 \mapsto \mathbb{G}_{\transpose} \mid
+	\[
+		B\colon \mathbb{G}_1 \times \mathbb{G}_2 \mapsto \mathbb{G}_{\transpose} \mid
 		\forall x \in \mathbb{G}_1, \forall y \in \mathbb{G}_2, \forall a,b \in \mathbb{Z}\colon
-		B(x^a, y^b) = {B(x, y)}^{ab}\]
-	If \(|\mathbb{G}| = |\mathbb{G}'|\), then \(B\) is \emph{order-preserving}, and if
-	\(\mathbb{G}_1 = \langle{g_1}\rangle \land \mathbb{G}_2 = \langle{g_2}\rangle \land
-	\mathbb{G}_{\transpose} = \langle{B(g_1, g_2)}\rangle \), then \(B\) is \emph{non-trivial}.
+		B\left(x^a, y^b\right) = {B\left(x, y\right)}^{ab}
+	\]
+	If \(\left|\mathbb{G}\right| = \left|\mathbb{G}'\right|\), then \(B\) is \emph{order-preserving},
+	and if \(\mathbb{G}_1 = \left\langle{g_1}\right\rangle \land \mathbb{G}_2 =
+	\left\langle{g_2}\right\rangle \land
+	\mathbb{G}_{\transpose} = \left\langle{B\left(g_1, g_2\right)}\right\rangle \), then \(B\) is
+	\emph{non-trivial}.
 \end{definition}
 
 \noindent We are interested in order-preserving, non-trivial bilinear maps where
 \(\mathbb{G}_1 = \mathbb{G}_2 = \mathbb{G}\).
-Bilinar maps have many application in cryptography, as they are used to exploit the hardness of 
+Bilinar maps have many application in cryptography, as they are used to exploit the hardness of
 the discrete logarithm problem.
