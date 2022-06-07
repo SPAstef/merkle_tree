@@ -36,12 +36,20 @@
 \theoremstyle{example}
 \newtheorem{example}{Example}
 
-\author{Stefano Trevisani}
+\author{Stefano Trevisani\footnote{Thanks to Massimo Del Prato for 
+working together on the project that led to this report.}}
 \date{\today}
 \title{Implementing compact tree-hashing commitment verification in ZK-SNARK}
 
 \begin{document}
 \maketitle
+\begin{abstract}
+	Practical Zero Knowledge systems for verifiable computation have been an hot research topic
+	of the last decade, particularly for their ties with blockchains and cryptocurrencies.
+	In this report, we study the ZK-SNARK system Pinocchio, and we implement the MiMC cryptographic
+	primitives, together with the ABR mode of hash, comparing them to the traditional SHA over Merkle
+	Tree which is tipically used in multiple-message commitment protocols.
+\end{abstract}
 \clearpage
 \tableofcontents
 \include{sections/introduction.tex}
