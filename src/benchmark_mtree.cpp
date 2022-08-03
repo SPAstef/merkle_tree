@@ -2,7 +2,7 @@
 
 #include "gadget/mimc256/mimc256_gadget.hpp"
 #include "gadget/mimc512f/mimc512f_gadget.hpp"
-#include "gadget/mimc512f_2k/mimc512f_2k_gadget.hpp"
+#include "gadget/mimc512f2k/mimc512f2k_gadget.hpp"
 #include "gadget/mtree_gadget.hpp"
 #include "gadget/sha256/sha256_gadget.hpp"
 #include "gadget/sha512/sha512_gadget.hpp"
@@ -39,7 +39,7 @@ bool test_mtree()
 {
     using GadTree = MTree_Gadget<FieldT, GadHash>;
     using DigVar = typename GadTree::DigVar;
-    using FixTree = FixedMTree<tree_height, Hash>;
+    using FixTree = FixedMTreePath<tree_height, Hash>;
 
     static constexpr size_t DIGEST_VARS = GadHash::DIGEST_VARS;
 
@@ -67,8 +67,8 @@ bool test_mtree()
             other_bv.resize(tree_height - 1);
             std::fill(other_bv.begin(), other_bv.end(), libff::bit_vector(DIGEST_VARS));
 
-            for (size_t i = 0, j = 1; i < other_bv.size(); ++i, j += 1ULL << (tree_height - i))
-                unpack_bits(other_bv[i], tree.get_node(j)->get_digest());
+            for (size_t i = 0; i < other_bv.size(); ++i)
+                unpack_bits(other_bv[i], tree.get_node(TRANS_IDX + i + 1)->get_digest());
 
             // Extract output node
             out_bv.resize(DIGEST_VARS);
@@ -170,7 +170,7 @@ bool test_pmtree()
 {
     using GadTree = MTree_Gadget<FieldT, GadHash>;
     using DigVar = typename GadTree::DigVar;
-    using FixTree = FixedMTree<tree_height, Hash>;
+    using FixTree = FixedMTreePath<tree_height, Hash>;
 
     static constexpr size_t DIGEST_VARS = GadHash::DIGEST_VARS;
 
@@ -225,8 +225,8 @@ bool test_pmtree()
             out[0].generate_r1cs_witness(tree.digest());
             trans[0].generate_r1cs_witness(tree.get_node(TRANS_IDX)->get_digest());
 
-            for (size_t i = 0, j = 1; i < other.size(); ++i, j += 1ULL << (tree_height - i))
-                other[i].generate_r1cs_witness(tree.get_node(j)->get_digest());
+            for (size_t i = 0; i < other.size(); ++i)
+                other[i].generate_r1cs_witness(tree.get_node(TRANS_IDX + i + 1)->get_digest());
 
             gadget[0].generate_r1cs_witness();
         },
@@ -325,8 +325,8 @@ int main()
     log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_pmtree_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc512F, GadMimc512F>("MiMC512F");
 
-    log_file << "MiMC512F_2K\n";
+    log_file << "MiMC512f2k\n";
     log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
-    test_pmtree_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc512F2K, GadMimc512F2K>("MiMC512F_2K");
+    test_pmtree_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc512F2K, GadMimc512F2K>("MiMC512f2k");
     return 0;
 }

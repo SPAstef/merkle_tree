@@ -14,43 +14,6 @@
 
 #include "bit_pack.hpp"
 
-#if __cplusplus >= 202002L
-
-    #include <ranges>
-
-// Print iterables (except std::string, std::string_view and char arrays)
-template<std::ranges::range Iter,
-         std::enable_if_t<!std::is_same_v<Iter, std::string> &&
-                              !std::is_same_v<Iter, std::string_view> &&
-                              !std::is_same_v<decltype(*std::begin(Iter{})), char>,
-                          bool> = true>
-std::ostream &operator<<(std::ostream &os, const Iter &it)
-{
-    using T = decltype(*std::begin(it));
-    using cast_type = std::conditional_t<std::is_convertible_v<T, unsigned char>, int, T>;
-
-    size_t fix_width = os.width();
-
-    os << std::setw(0) << '{';
-    if (std::begin(it) != std::end(it))
-    {
-        auto i = std::begin(it);
-        auto last = std::end(it);
-
-        for (--last; i != last; ++i)
-            if (fix_width)
-                os << std::setw(fix_width) << std::setfill('0') << static_cast<cast_type>(*i)
-                   << ", ";
-            else
-                os << static_cast<cast_type>(*i) << ", ";
-
-
-        os << static_cast<cast_type>(*i);
-    }
-
-    return os << '}';
-}
-
 // Convert an ASCII character to an hex digit
 constexpr inline uint8_t ascii_to_digit(char c)
 {
@@ -63,16 +26,6 @@ constexpr inline uint8_t ascii_to_digit(char c)
     return c;
 }
 
-template<std::ranges::range Range>
-constexpr void hexstring_to_range(std::string_view str, Range &out)
-{
-    auto out_it = std::ranges::begin(out);
-
-    for (size_t i = 0; i < str.size(); i += 2)
-        *out_it++ = ascii_to_digit(str[i]) << 4 | ascii_to_digit(str[i + 1]);
-}
-
-
 namespace detail
 {
     template<size_t sz>
@@ -80,7 +33,7 @@ namespace detail
     {
         std::array<uint8_t, sz / 2> v;
 
-        consteval StrToHex(const char (&str)[sz])
+        constexpr StrToHex(const char (&str)[sz])
         {
             for (size_t i = 0; i < v.size(); ++i)
                 v[i] = ascii_to_digit(str[i * 2]) << 4 | ascii_to_digit(str[i * 2 + 1]);
@@ -88,7 +41,7 @@ namespace detail
     };
 
     template<typename T, bool reverse = false>
-    consteval T str_to_t(const char *s, size_t sz)
+    constexpr T str_to_t(const char *s, size_t sz)
     {
         T x = 0;
 
@@ -104,29 +57,24 @@ namespace detail
 
 // Convert (at compile time) a string literal of hexadecimal digits to an std::array of
 // hexadecimal values.
-template<detail::StrToHex cvt>
-consteval auto operator""_x()
-{
-    return cvt.v;
-}
 
-    #define CAT0(x, y) x##y
-    #define CAT(x, y) CAT0(x, y)
+#define CAT0(x, y) x##y
+#define CAT(x, y) CAT0(x, y)
 
-    #define OPERATOR_STR_TO_INTTYPE_NAMED(sign, size, type, name)                                  \
-        consteval type name(const char *s, size_t sz)                                              \
-        {                                                                                          \
-            return detail::str_to_t<type, false>(s, sz);                                           \
-        }                                                                                          \
+#define OPERATOR_STR_TO_INTTYPE_NAMED(sign, size, type, name)                                      \
+    constexpr type name(const char *s, size_t sz)                                                  \
+    {                                                                                              \
+        return detail::str_to_t<type, false>(s, sz);                                               \
+    }                                                                                              \
                                                                                                    \
-        consteval type CAT(name, r)(const char *s, size_t sz)                                      \
-        {                                                                                          \
-            return detail::str_to_t<type, true>(s, sz);                                            \
-        }
+    constexpr type CAT(name, r)(const char *s, size_t sz)                                          \
+    {                                                                                              \
+        return detail::str_to_t<type, true>(s, sz);                                                \
+    }
 
-    #define OPERATOR_STR_TO_INTTYPE(sign, size)                                                    \
-        OPERATOR_STR_TO_INTTYPE_NAMED(sign, size, CAT(CAT(CAT(sign, int), size), _t),              \
-                                      CAT(CAT(operator""_, sign), size))
+#define OPERATOR_STR_TO_INTTYPE(sign, size)                                                        \
+    OPERATOR_STR_TO_INTTYPE_NAMED(sign, size, CAT(CAT(CAT(sign, int), size), _t),                  \
+                                  CAT(CAT(operator""_, sign), size))
 
 OPERATOR_STR_TO_INTTYPE(, 64)  // ""_64, ""_64r
 OPERATOR_STR_TO_INTTYPE(u, 64) // ""_u64, ""_u64r
@@ -137,12 +85,31 @@ OPERATOR_STR_TO_INTTYPE(u, 16) // ""_u16, ""_u16r
 OPERATOR_STR_TO_INTTYPE(, 8)   // ""_8, ""_8r
 OPERATOR_STR_TO_INTTYPE(u, 8)  // ""_u8, ""_u8r
 
-    #undef OPERATOR_STR_TO_INTTYPE
-    #undef OPERATOR_STR_TO_INTTYPE_NAMED
-    #undef CAT
-    #undef CAT0
+#undef OPERATOR_STR_TO_INTTYPE
+#undef OPERATOR_STR_TO_INTTYPE_NAMED
+#undef CAT
+#undef CAT0
 
+#if __cplusplus >= 202002L
+template<detail::StrToHex cvt>
+constexpr auto operator""_x()
+{
+    return cvt.v;
+}
+#else
+template<char... str>
+constexpr auto operator""_x()
+{
+    std::array<uint8_t, sizeof...(str)> s{str...};
+    std::array<uint8_t, (sizeof...(str) - 2) / 2> v;
+
+    for (size_t i = 0; i < v.size(); ++i)
+        v[i] = ascii_to_digit(s[(i + 1) * 2]) << 4 | ascii_to_digit(s[(i + 1) * 2 + 1]);
+
+    return v;
+}
 #endif
+
 
 // Print pairs
 template<typename T1, typename T2>
@@ -256,3 +223,50 @@ inline std::string random_string(size_t len, std::string_view alphabet)
 
     return str;
 }
+
+#if __cplusplus >= 202002L
+
+    #include <ranges>
+
+// Print iterables (except std::string, std::string_view and char arrays)
+template<std::ranges::range Range,
+         std::enable_if_t<!std::is_same_v<Range, std::string> &&
+                              !std::is_same_v<Range, std::string_view> &&
+                              !std::is_same_v<decltype(*std::begin(Range{})), char>,
+                          bool> = true>
+std::ostream &operator<<(std::ostream &os, const Range &it)
+{
+    using T = decltype(*std::begin(it));
+    using cast_type = std::conditional_t<std::is_convertible_v<T, unsigned char>, int, T>;
+
+    size_t fix_width = os.width();
+
+    os << std::setw(0) << '{';
+    if (std::begin(it) != std::end(it))
+    {
+        auto i = std::begin(it);
+        auto last = std::end(it);
+
+        for (--last; i != last; ++i)
+            if (fix_width)
+                os << std::setw(fix_width) << std::setfill('0') << static_cast<cast_type>(*i)
+                   << ", ";
+            else
+                os << static_cast<cast_type>(*i) << ", ";
+
+
+        os << static_cast<cast_type>(*i);
+    }
+
+    return os << '}';
+}
+
+template<std::ranges::range Range>
+constexpr void hexstring_to_range(std::string_view str, Range &out)
+{
+    auto out_it = std::ranges::begin(out);
+
+    for (size_t i = 0; i < str.size(); i += 2)
+        *out_it++ = ascii_to_digit(str[i]) << 4 | ascii_to_digit(str[i + 1]);
+}
+#endif

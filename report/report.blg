@@ -1,0 +1,62 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: report.aux
+Reallocating 'name_of_file' (item size: 1) to 26 items.
+A level-1 auxiliary file: sections/introduction.aux
+Reallocating 'name_of_file' (item size: 1) to 27 items.
+A level-1 auxiliary file: sections/preliminaries.aux
+Reallocating 'name_of_file' (item size: 1) to 21 items.
+A level-1 auxiliary file: sections/zksnark.aux
+Reallocating 'name_of_file' (item size: 1) to 25 items.
+A level-1 auxiliary file: sections/experiments.aux
+Reallocating 'name_of_file' (item size: 1) to 25 items.
+A level-1 auxiliary file: sections/conclusions.aux
+Reallocating 'name_of_file' (item size: 1) to 6 items.
+The style file: plain.bst
+Reallocating 'name_of_file' (item size: 1) to 11 items.
+Database file #1: biblio.bib
+Warning--empty publisher in Dang2015
+Warning--can't use both author and editor fields in DrosteK2009
+Warning--can't use both author and editor fields in Preneel2005
+You've used 16 entries,
+            2118 wiz_defined-function locations,
+            621 strings with 6940 characters,
+and the built_in function-call counts, 5084 in all, are:
+= -- 494
+> -- 218
+< -- 5
++ -- 90
+- -- 71
+* -- 285
+:= -- 832
+add.period$ -- 54
+call.type$ -- 16
+change.case$ -- 77
+chr.to.int$ -- 0
+cite$ -- 19
+duplicate$ -- 218
+empty$ -- 427
+format.name$ -- 71
+if$ -- 1105
+int.to.chr$ -- 0
+int.to.str$ -- 16
+missing$ -- 17
+newline$ -- 87
+num.names$ -- 34
+pop$ -- 125
+preamble$ -- 1
+purify$ -- 67
+quote$ -- 0
+skip$ -- 157
+stack$ -- 0
+substring$ -- 226
+swap$ -- 61
+text.length$ -- 5
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 52
+warning$ -- 3
+while$ -- 47
+width$ -- 18
+write$ -- 186
+(There were 3 warnings)

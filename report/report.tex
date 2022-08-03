@@ -7,6 +7,7 @@
 \usepackage{bm}
 \usepackage{booktabs}
 \usepackage[justification=centering]{caption}
+\usepackage{comment}
 \usepackage{hyperref}
 \usepackage{mleftright}
 \usepackage{tikz}
@@ -36,10 +37,10 @@
 \theoremstyle{example}
 \newtheorem{example}{Example}
 
-\author{Stefano Trevisani\footnote{I want to thank Massimo Del Prato for working together on the 
-project that led to this report, and Arnab Roy for suggesting the topic.}}
+\author{Stefano Trevisani\footnote{I would like to thank Massimo Del Prato for collaborating 
+with the project, Arnab Roy for supervisioning it, and Elisabeth Oswald for supporting the research.}}
 \date{\today}
-\title{Implementing compact tree-hashing commitment verification in ZK-SNARK}
+\title{Efficient Compact-Tree Commitment Verification in ZK-SNARK Settings}
 
 \begin{document}
 \maketitle
@@ -52,9 +53,13 @@ project that led to this report, and Arnab Roy for suggesting the topic.}}
 \end{abstract}
 \clearpage
 \tableofcontents
-\include{sections/introduction.tex}
-\include{sections/preliminaries.tex}
-\include{sections/zksnark.tex}
-\include{sections/experiments.tex}
-\include{sections/conclusions.tex}
+\input{sections/introduction.tex}
+\input{sections/preliminaries.tex}
+\input{sections/zksnark.tex}
+\input{sections/experiments.tex}
+\input{sections/conclusions.tex}
+
+\bibliographystyle{plain}
+\bibliography{biblio.bib}
+
 \end{document}

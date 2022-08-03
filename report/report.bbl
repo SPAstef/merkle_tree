@@ -1,0 +1,96 @@
+\begin{thebibliography}{10}
+
+\bibitem{AlbrechtGRRT2016}
+Martin Albrecht, Lorenzo Grassi, Christian Rechberger, Arnab Roy, and Tyge
+  Tiessen.
+\newblock Mimc: Efficient encryption and cryptographic hashing with minimal
+  multiplicative complexity.
+\newblock Cryptology ePrint Archive, Paper 2016/492, 2016.
+\newblock \url{https://eprint.iacr.org/2016/492}.
+
+\bibitem{AndreevaBR2021}
+Elena Andreeva, Rishiraj Bhattacharyya, and Arnab Roy.
+\newblock Compactness of hashing modes and efficiency beyond merkle tree.
+\newblock {\em CoRR}, abs/2104.15055, 2021.
+
+\bibitem{SassonCTV2013}
+Eli Ben-Sasson, Alessandro Chiesa, Eran Tromer, and Madars Virza.
+\newblock Succinct non-interactive zero knowledge for a von neumann
+  architecture.
+\newblock Cryptology ePrint Archive, Paper 2013/879, 2013.
+\newblock \url{https://eprint.iacr.org/2013/879}.
+
+\bibitem{Cook1971}
+Stephen~A. Cook.
+\newblock The complexity of theorem-proving procedures.
+\newblock In {\em Proceedings of the Third Annual ACM Symposium on Theory of
+  Computing}, STOC '71, pages 151--158, New York, NY, USA, 1971. Association
+  for Computing Machinery.
+
+\bibitem{Dang2015}
+Quynh~H. Dang.
+\newblock {\em Secure Hash Standard}.
+\newblock Jul 2015.
+
+\bibitem{DrosteK2009}
+Manfred Droste and Werner Kuich.
+\newblock {\em Semirings and Formal Power Series}, pages 3--28.
+\newblock Springer Berlin Heidelberg, Berlin, Heidelberg, 2009.
+
+\bibitem{Goldreich2002}
+Oded Goldreich.
+\newblock Zero-knowledge twenty years after its invention, 2002.
+\newblock oded@wisdom.weizmann.ac.il 12026 received 5 Dec 2002.
+
+\bibitem{MenezesOV2001}
+Alfred~J. Menezes, Paul~C. van Oorschot, and Scott~A. Vanstone.
+\newblock {\em Handbook of Applied Cryptography}.
+\newblock CRC Press, 2001.
+
+\bibitem{Merkle1988}
+Ralph~C. Merkle.
+\newblock A digital signature based on a conventional encryption function.
+\newblock In Carl Pomerance, editor, {\em Advances in Cryptology --- CRYPTO
+  '87}, pages 369--378, Berlin, Heidelberg, 1988. Springer Berlin Heidelberg.
+
+\bibitem{Merkle1979}
+Ralph~Charles Merkle.
+\newblock {\em Secrecy, Authentication, and Public Key Systems.}
+\newblock PhD thesis, Stanford University, Stanford, CA, USA, 1979.
+\newblock AAI8001972.
+
+\bibitem{NarayananBFMG2016}
+A.~Narayanan, J.~Bonneau, E.~Felten, A.~Miller, and S.~Goldfeder.
+\newblock {\em Bitcoin and Cryptocurrency Technologies: A Comprehensive
+  Introduction}.
+\newblock Princeton University Press, 2016.
+
+\bibitem{ParnoGHR2013}
+Bryan Parno, Craig Gentry, Jon Howell, and Mariana Raykova.
+\newblock Pinocchio: Nearly practical verifiable computation.
+\newblock Cryptology ePrint Archive, Paper 2013/279, 2013.
+\newblock \url{https://eprint.iacr.org/2013/279}.
+
+\bibitem{Preneel2005}
+Bart Preneel.
+\newblock {\em Davies--Meyer Hash Function}, pages 136--136.
+\newblock Springer US, Boston, MA, 2005.
+
+\bibitem{Rivest1990}
+Ronald~L. Rivest.
+\newblock The md5 message-digest algorithm.
+\newblock In {\em RFC}, 1990.
+
+\bibitem{Savage1997}
+John~E. Savage.
+\newblock {\em Models of Computation: Exploring the Power of Computing}.
+\newblock Addison-Wesley Longman Publishing Co., Inc., USA, 1st edition, 1997.
+
+\bibitem{Shor1994}
+P.W. Shor.
+\newblock Algorithms for quantum computation: discrete logarithms and
+  factoring.
+\newblock In {\em Proceedings 35th Annual Symposium on Foundations of Computer
+  Science}, pages 124--134, 1994.
+
+\end{thebibliography}

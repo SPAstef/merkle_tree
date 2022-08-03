@@ -1,8 +1,8 @@
 \subsection{CHFs for ZK-SNARK systems}
 We mentioned that Pinocchio, like other ZK-SNARK systems, works on big prime fields.
-The most famous CHFs, like MD5 or the SHA families, make extensive use of bitwise operations,
-basically working on some field of the type \(\mathbb{F}_{2^n}\).
-When translating these hash functions as arithmetic cirtuits over a prime field \(\mathbb{F}_p\),
+The most famous CHFs, like MD5~\cite{Rivest1990} or the SHA families, make extensive use of
+bit-wise operations, basically working on some field of the type \(\mathbb{F}_{2^n}\).
+When translating these hash functions as arithmetic circuits over a prime field \(\mathbb{F}_p\),
 we incur in a huge space and time overhead.
 \begin{example}
 	Consider some \(S, T \in {\left\{0, 1\right\}}^n\) for some \(n \in \mathbb{N}\), and assume we
@@ -20,15 +20,17 @@ we incur in a huge space and time overhead.
 	multiplications in \(\mathbb{F}_p\)!
 
 	Furthermore, since \(\bm{x}\) and \(\bm{y}\) are defined over \(\mathbb{F}_p^n\), we must also
-	guarantee that their elements are either \(0\) or \(1\), by explicitly adding the contraint
+	guarantee that their elements are either \(0\) or \(1\), by explicitly adding the constraint
 	\(\left(x\right) \otimes \left(x - 1\right) = 0\) for every \(x \in \bm{x}, \bm{y}\).
 \end{example}
 
+\noindent Having efficient CHFs for ZK systems is extremely important, as they are the fundamental
+building block of commitment protocols which are in turn the pivot of the secure transaction
+protocols used by cryptocurrencies like ZCash\footnote{\url{https://z.cash/}}.
 For this reason, we want CHFs which use native operations over \(\mathbb{F}_p\):
-while they are tipically much slower if implemented, say, in x86 assembly, they become
-immensely faster when implemented in a ZK-SNARK framework.
-
-\begin{definition}[MiMC primitives]
+while they are typically much slower when implemented, say, in x86 assembly, they become
+immensely faster in ZK-SNARK frameworks due to their extremely lower multiplicative complexity.
+\begin{definition}[MiMC primitives~\cite{AlbrechtGRRT2016}]
 	Given a finite field \(\mathbb{F}_p\),
 	\(r = \left\lceil{\frac{\log_2\left(p\right)}{\log_2\left(3\right)}}\right\rceil \), some
 	\(\bm{c} \in \mathbb{F}_p^r\) and the functions:
@@ -38,8 +40,6 @@ immensely faster when implemented in a ZK-SNARK framework.
 	\[E\left(x, k\right)\colon \mathbb{F}_p \times \mathbb{F}_p \mapsto \mathbb{F}_p =
 		\left(f_{r} \circ \dots \circ f_1\right)\left(x, k\right) \oplus k\]
 	By fixing \(k = 0\), we obtain the \emph{MiMC permutation} \(P\left(x\right)\).
-	By applying the Davies-Meyer construction to the MiMC permutation, we obtain the
-	\emph{MiMC compression function} \(C\left(x\right)\).
-	Finally, by applying the Merkle-Damg\r{a}rd construction to the MiMC compression function, we
+	By applying the Davies-Meyer and the Merkle-Damg\r{a}rd constructions to the MiMC permutation, we 
 	obtain the \emph{MiMC hash function} \(H\left(x\right)\).
 \end{definition}

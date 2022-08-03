@@ -112,8 +112,8 @@ To make things more clear, let's make an example:
 	assignment.
 \end{example}
 
-\noindent One might wonder how a solution \(\left(p, h\right)\) to a QAP is more succint than the
-corresponding valid assigment \(\bm{s}\) of the associated R1CS\@: as a matter of fact, given an
+\noindent One might wonder how a solution \(\left(p, h\right)\) to a QAP is more succinct than the
+corresponding valid assignment \(\bm{s}\) of the associated R1CS\@: as a matter of fact, given an
 \(n/m\) arithmetic circuit, \(\bm{s}\) has size \(n+m+1\), while \(p\) can have degree
 (and therefore encoding size) \(2\left(n-1\right)\).
 Furthermore, in a typical circuit, \(n \gg m\), so \(\left(p, h\right)\) would approximately be 
@@ -121,7 +121,7 @@ twice the size of \(\bm{s}\) when encoded.
 Now, \(p = ht \implies \forall x\colon p\left(x\right) = h\left(x\right)t\left(x\right)\); 
 if we are working over a big field (say, \(\left|\mathbb{F}\right| \approx 2^{256}\)), it is hard 
 to find even a single value of \(x\) for which the equation holds.
-This means that we can accept as a solution, with high confindence (although not certainity)
+This means that we can accept as a solution, with high confidence (although not certainty)
 any couple of values \(x, y\) such that \(y \bmod t\left(x\right) = 0\).
 
 Summing up: if \(y \bmod t\left(x\right) = 0\), we are \emph{almost sure} that \(y\) has been 

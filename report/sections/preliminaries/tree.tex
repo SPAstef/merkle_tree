@@ -16,7 +16,7 @@ and a \(\BigO\left(k\right)\) verification cost.
 A slightly better alternative would be for the prover to share
 \(H\left(\left\{m_1, \dots, m_k\right\}\right)\): the communication cost would only be
 \(\BigO\left(1\right)\), but verification would still cost \(\BigO\left(k\right)\).
-\begin{definition}[Merkle Tree]
+\begin{definition}[Merkle Tree~\cite{Merkle1988}]
 	Given some \(k \in \mathbb{N}\), a CHF \(H\) and a set of messages
 	\(S = \left\{m_1, \dots, m_{s^{k-1}} \mid \forall i\colon m_i \in
 	{\left\{0, 1\right\}}^*\right\} \), a \emph{Merkle Tree (MT)} is a complete binary tree of
@@ -37,7 +37,7 @@ just \(\BigO\left(\log_2\left(k\right)\right)\) communication effort and
 Another advantage of Merkle trees is that bottom-up construction is very easy to parallelize,
 and its usefulness can be appreciated even more when considering a scenario where different
 messages actually belong to different provers.
-\begin{definition}[Augmented Binary tRee]
+\begin{definition}[Augmented Binary tRee~\cite{AndreevaBR2021}]
 	Given some \(k \in \mathbb{N}\), a CHF \(H\), and a set of messages
 	\(S = \left\{m_1, \dots, m_{2^{k-1} + 2^{k-2}-1} \mid \forall i\colon m_i \in
 	{\left\{0, 1\right\}}^*\right\} \),
@@ -63,4 +63,4 @@ field of choice.
 
 ABRs can store 50\% more messages than Merkle Trees for the same height, resulting in the same 
 number of calls to \(H\), at the cost of performing 3 additional \(\oplus \) operations for
-every call (usually, \(TIME\left(\oplus\right) \ll TIME\left(H\right)\)).
+every call, whose cost is almost negligible, especially in ZK systems.

@@ -12,8 +12,11 @@ TARGETS_ONLYTEST := \
     fixed_abr \
     fixed_mtree \
     mimc256 \
+    mimc256_gadget \
     mimc512f \
-	mimc512f_2k \
+    mimc512f_gadget \
+	mimc512f2k \
+	mimc512f2k_gadget \
     mtree_gadget \
     sha256 \
     sha512
@@ -26,7 +29,7 @@ TARGETS_NOTEST := \
 
 ifeq ($(CXX), )
     CXX := c++
-    CXXFLAGS := -O3 -march=native -std=c++17
+    CXXFLAGS := -O3 -march=native -std=c++17 -Wall
 endif
 
 ifeq ($(OVERRIDE_DEFAULT_CXX), 1)
@@ -56,7 +59,7 @@ CXXFLAGS += -fopenmp
 OEXT := o
 LIBEXT := a
 PDB :=
-TARGETS_TEST_COMMAND := $(TARGETS_TEST:%=$$SCRIPTPATH/%;\n)$(TARGETS_ONLYTEST:%=$$SCRIPTPATH/%;\n)
+TARGETS_$(TEST_PRE)COMMAND := $(TARGETS_TEST:%=$$SCRIPTPATH/%;\n)$(TARGETS_ONLYTEST:%=$$SCRIPTPATH/%;\n)
 MKDIR = mkdir -p $(1)
 RM = rm -rf $(1)/*
 MV = mv $(1) $(2)/
@@ -80,6 +83,8 @@ LIBS := $(LIBSNAMES:%=$(BUILDPATH)/%.$(OEXT))
 
 DEP := $(OBJ:%.$(OEXT)=%.d) 
 
+TEST_PRE = test_
+
 all: dirs testsuite $(TARGETS) library
     
 
@@ -95,7 +100,7 @@ dirs:
 	$(call MKDIR,$(LIBPATH))
 
 testsuite:
-	@echo -e '#!/bin/sh\nSCRIPTPATH=$$(dirname "$$(readlink -f "$$0")")\n$(TARGETS_TEST_COMMAND)' > $(BINPATH)/test.sh
+	@echo -e '#!/bin/sh\nSCRIPTPATH=$$(dirname "$$(readlink -f "$$0")")\n$(TARGETS_$(TEST_PRE)COMMAND)' > $(BINPATH)/test.sh
 
 library: $(TARGETS)
 	$(AR) $(ARFLAGS) $(LIBOUTFLAGS)$(LIBPATH)/$(LIBNAME).$(LIBEXT) $(LIBS)
@@ -104,31 +109,40 @@ library: $(TARGETS)
 ###################### BEGIN RULES ######################
 
 #### TARGET_ONLYTEST ####
-abr_gadget:  %: $(BUILDPATH)/test_%.$(OEXT)
+abr_gadget:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
-fixed_abr:  %: $(BUILDPATH)/test_%.$(OEXT)
+fixed_abr:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
-fixed_mtree:  %: $(BUILDPATH)/test_%.$(OEXT)
+fixed_mtree:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
-mimc256:  %: $(BUILDPATH)/test_%.$(OEXT)
+mimc256:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
-mimc512f:  %: $(BUILDPATH)/test_%.$(OEXT)
+mimc256_gadget:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
-mimc512f_2k:  %: $(BUILDPATH)/test_%.$(OEXT)
+mimc512f:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
-mtree_gadget:  %: $(BUILDPATH)/test_%.$(OEXT)
+mimc512f_gadget:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
-sha256:  %: $(BUILDPATH)/test_%.$(OEXT)
+mimc512f2k:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
-sha512:  %: $(BUILDPATH)/test_%.$(OEXT)
+mimc512f2k_gadget:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+
+mtree_gadget:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+
+sha256:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
+	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
+
+sha512:  %: $(BUILDPATH)/$(TEST_PRE)%.$(OEXT)
 	$(CXX) $(CXXFLAGS) $^ -o $(BINPATH)/$@ $(LDFLAGS)
 
 
@@ -143,10 +157,10 @@ benchmark_abr:  %: $(BUILDPATH)/%.$(OEXT)
 
 -include $(DEP)
 
-$(BUILDPATH)/test_%.$(OEXT): $(TESTPATH)/%.cpp
+$(BUILDPATH)/$(TEST_PRE)%.$(OEXT): $(TESTPATH)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILDPATH)/test_%.$(OEXT): $(TESTPATH)/cpp20/%.cpp
+$(BUILDPATH)/$(TEST_PRE)%.$(OEXT): $(TESTPATH)/cpp20/%.cpp
 	$(CXX) $(CXX20FLAGS) -c $< -o $@
 
 $(BUILDPATH)/%.$(OEXT): $(SRCPATH)/%.cpp

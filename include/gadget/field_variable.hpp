@@ -7,12 +7,14 @@
 template<typename FieldT>
 class field_variable : public libsnark::gadget<FieldT>
 {
+private:
+    libsnark::pb_variable_array<FieldT> vars;
+
 public:
     using super = libsnark::gadget<FieldT>;
 
     static constexpr size_t FIELDT_SIZE = 32;
 
-    libsnark::pb_variable_array<FieldT> vars;
 
     field_variable(libsnark::protoboard<FieldT> &pb, const size_t num_vars,
                    const std::string &annotation_prefix) :
@@ -27,7 +29,7 @@ public:
     {
         for (size_t i = 0, n = std::min(contents.size(), vars.size()); i < n; ++i)
             this->pb.val(vars[i]) = contents[i];
-    };
+    }
 
     void generate_r1cs_witness(const void *data)
     {
@@ -41,7 +43,7 @@ public:
 
             this->pb.val(vars[i]) = FieldT{tmp.get_mpz_t()};
         }
-    };
+    }
 
     const auto &operator[](size_t i) const { return vars[i]; }
 
@@ -56,5 +58,4 @@ public:
     auto begin() const { return vars.begin(); }
 
     auto end() const { return vars.end(); }
-
 };

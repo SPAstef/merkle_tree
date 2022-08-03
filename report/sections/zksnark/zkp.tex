@@ -1,7 +1,7 @@
 \subsection{Zero Knowledge Proofs}
-Before diving into provable computation, we must introduce tghe more general concept of Zero
+Before diving into provable computation, we must introduce the more general concept of Zero
 Knowledge Proof system.
-\begin{definition}[Zero-Knowledge Proof]
+\begin{definition}[Zero-Knowledge Proof~\cite{Goldreich2002}]
 	Given a prover \(\mathcal{P}\) and a verifier \(\mathcal{V}\), a secret \(x\), known only to
 	\(\mathcal{P}\), and some statement \(\sigma \) of whose truth \(\mathcal{P}\) wants to convince
 	\(\mathcal{V}\) by means of some proof \(\pi \), we call a Zero-Knowledge Proof (ZKP) system any
@@ -14,9 +14,9 @@ Knowledge Proof system.
 	\end{itemize}
 \end{definition}
 
-\noindent While formal proofs have been known for millenia, only in the last century, with the
+\noindent While formal proofs have been known for millennia, only in the last century, with the
 advent of modern cryptography, researchers started considering the possibility of having proofs
-of statements which, while able to convice someone of their truth, didn't leak information
+of statements which, while able to convince someone of their truth, didn't leak information
 about how they were obtained.
 Zero-Knowledge systems proves particularly useful in \emph{ARgument of Knowledge} scenarios
 (ZK-ARK): the prover \(*\) wants to convince the verifier \(\mathcal{V}\) that he
@@ -25,19 +25,19 @@ It must be noted though that known ZK-ARK systems do not guarantee the formal so
 the proof: there is a small probability that, given some false statement \(\sigma \) and an
 (invalid) proof \(\pi \), then \(\mathcal{V}\left(\pi\right) = \top \), so it is important to keep
 this probability small (say, \(2^{-128}\)).
-\begin{definition}[ZK-SNARK]
+\begin{definition}[ZK-SNARK~\cite{SassonCTV2013}]
 	Given a prover \(\mathcal{P}\), a verifier \(\mathcal{V}\), a statement \(\sigma \), and a proof
 	\(\pi \), a Zero-Knowledge Non-interactive ARgument of Knowledge (ZK-SNARK) system is any
 	ZK-ARK system which is:
 	\begin{itemize}
-		\item \textbf{Succint}: \(SPACE\left(\pi\right) =
+		\item \textbf{Succinct}: \(SPACE\left(\pi\right) =
 		      \SmallO\left(\log\left(\sigma\right)\right)\).
 		\item \textbf{Non-interactive}: The only communication required by the system is the exchange
 		      of \(\sigma \) and \(\pi \).
 	\end{itemize}
 \end{definition}
 
-\noindent Succintness is an important property in many scenarios, like blockchains, since we
+\noindent Succinctness is an important property in many scenarios, like blockchains, since we
 cannot afford to use too much resources to transmit and store the proofs, and non-interactivity of
 the process allows for efficient verification when multiple parties are involved.
 

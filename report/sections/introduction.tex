@@ -1,30 +1,37 @@
 \section{Introduction}
 One of the biggest revolutions of the last decade has been the widespread adoption of
-blockchain-based technologies. In particular, cryptocurrencies like Bitcoin or Ethereum are
-widely known even among the non-crypto-enthusiasts and a huge market is growing around them.
-There are highly interesting applications of the blockchain even outside the financial world:
+blockchain-based technologies~\cite{NarayananBFMG2016}. 
+For example, cryptocurrencies like Bitcoin or Ethereum are widely known even among the 
+non-crypto-enthusiasts and a huge market is growing around them.
+There are other highly interesting applications for the blockchain outside the cryptocurrency world:
 in fact, anything which requires some degree of `verifiability' in a non-trusted environment can
-benefit from using a blockchain.
-Tipically, a block of the chain does not correspond to a single transaction, as the blockchain
-would become too big to be stored: many transactions are inserted into a tree data-structure,
-called Merkle Tree (MT), which is computed bottom-up and whose root is then inserted into the blockchain.
-In a traditional setup (e.g.\ the aformentioned cryptocurrencies), all the data which is required
-to build a block of the blockchain is of public knowledge: when an Ethereum transaction happens,
-the details of that transaction are shared with the network for it to be validated.
-Of course, there are many scenarios were one would like the data to remain secret, as there could
-be risks for privacy (e.g.\ transactions) or for intellectual property (e.g.\ algorithms).
+benefit from the usage of a blockchain technology.
+Typically, a block of the chain does not correspond to a single transaction, as the blockchain
+would grow too quickly for practical storage: many transactions are inserted into a tree 
+data-structure, called Merkle Tree (MT)~\cite{Merkle1988}, which is computed bottom-up and whose 
+root is then inserted into the blockchain.
+In a traditional setup (e.g.\ cryptocurrencies), all the data which is required to build a block of 
+the blockchain is of public knowledge: when a transaction happens, the details of that transaction 
+are shared with the network for it to be validated.
+There are however many scenarios where one would like for the data to remain secret, as there could
+be risks involving privacy violation (e.g.\ transactions) or intellectual property theft 
+(e.g.\ shared computation).
 
-Zero-Knowledge Succint Non-interactive ARgument of Knowledge\\ (ZK-SNARK) systems are cryptographic
-frameworks which allow for a party to convince other parties that he `knows something' without
-revealing anything else.
-For example, one could convice other users that the hash of a transaction is valid without
-revealing the details of that transaction.
-ZK systems work over prime fields, and hashing algorithms like SHA-256, which are quite efficient
-in a `vanilla' scenario, can become extremely slow when translated.
-For this reason, new hashing algorithms like MiMCHash have been designed with the ZK scenario in
-mind, and Augmented Binary tRee (ABR) tries to improve Merkle Trees by processing more transactions
-without requiring more hash function calls.
+Zero-Knowledge Succinct Non-interactive ARgument of Knowledge\\ (ZK-SNARK) systems are cryptographic
+frameworks which allow for a party to convince other parties about the knowledge of some secret 
+without revealing the secret.
+As a simple example, one would be able convince other parties that a transaction has been performed 
+honestly, but without revealing the details of the transaction.
+ZK-SNARK associate the claim made by the challenger with an instance of a problem which 
+is almost impossible to solve if the secrets involved in the claim are not actually true.
+Since ZK-SNARK over prime fields and groups, and traditional hashing algorithms, like 
+SHA-256~\cite{Dang2015}, are not efficient when adapted for these frameworks.
+For this reason, new hashing algorithms like MiMCHash~\cite{AlbrechtGRRT2016} have been designed 
+with the ZK scenario in mind, and the Augmented Binary tRee (ABR)~\cite{AndreevaBR2021} data 
+structure tries to improve on the compactness of Merkle Trees by processing more transactions with 
+the same amount of calls to the underlying hash function.
 
+\subsection*{Organization of this report}
 In Section~\ref{sec:preliminaries}, we introduce some basic notions of computational and complexity
 theory, group and field theory, hash functions and tree hash modes; we also introduce arithmetic
 circuits, Rank-1 Constraint Systems and Quadratic Arithmetic Programs, which are an essential tool

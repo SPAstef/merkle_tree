@@ -24,12 +24,15 @@ private:
     template<size_t, typename>
     friend class FixedMTree;
 
+    template<size_t, typename>
+    friend class FixedMTreePath;
+
 public:
     FixedMTreeNode() = default;
 
-    FixedMTreeNode(const uint8_t *block, size_t depth) : depth{depth}
+    FixedMTreeNode(const uint8_t *digest, size_t depth) : depth{depth}
     {
-        Hash::hash_oneblock(this->digest, block);
+        memcpy(this->digest, digest, Hash::DIGEST_SIZE);
     }
 
     FixedMTreeNode(const uint8_t *left, const uint8_t *right, size_t depth) : depth{depth}
@@ -92,7 +95,7 @@ public:
 
     FixedMTree(const void *vdata, size_t sz) : nodes((1ULL << height) - 1), root{&nodes.back()}
     {
-        if (sz / Hash::BLOCK_SIZE != LEAVES_N || sz % Hash::BLOCK_SIZE != 0)
+        if (sz != INPUT_SIZE)
         {
             std::cerr << "FixedMTree: Bad size of input data\n";
             return;
@@ -106,7 +109,8 @@ public:
 
             // add leaves
             for (size_t i = 0; i < LEAVES_N; ++i)
-                this->nodes[i] = {data + Hash::BLOCK_SIZE * i, depth};
+                this->nodes[i] = {data + Hash::BLOCK_SIZE * i,
+                                  data + Hash::BLOCK_SIZE * i + Hash::DIGEST_SIZE, depth};
 
             // build tree bottom-up
             for (size_t i = 0, last = LEAVES_N, len = LEAVES_N; depth > 0; len += 1ULL << depth)
@@ -130,7 +134,8 @@ public:
 #pragma omp parallel for
             // add leaves
             for (size_t i = 0; i < LEAVES_N; ++i)
-                this->nodes[i] = {data + Hash::BLOCK_SIZE * i, depth};
+                this->nodes[i] = {data + Hash::BLOCK_SIZE * i,
+                                  data + Hash::BLOCK_SIZE * i + Hash::DIGEST_SIZE, depth};
 
             // build tree bottom-up
             for (size_t i = 0, last = LEAVES_N, len = LEAVES_N; depth > 0; len += 1ULL << depth)
@@ -166,6 +171,90 @@ public:
     }
 
     friend std::ostream &operator<<(std::ostream &os, const FixedMTree &tree)
+    {
+        if (!tree.root)
+            return os;
+
+        return os << *tree.root;
+    }
+};
+
+template<size_t height, typename Hash>
+class FixedMTreePath
+{
+public:
+    using Node = FixedMTreeNode<Hash>;
+
+private:
+    static constexpr size_t NODES_N = 2 * height - 1;
+    std::vector<Node> nodes{};
+    Node *root = nullptr;
+
+public:
+    static constexpr size_t INPUT_SIZE = height * Hash::DIGEST_SIZE;
+
+    FixedMTreePath() = default;
+#if __cplusplus >= 202002L
+    template<std::ranges::range Range>
+    FixedMTreePath(const Range &range) :
+        FixedMTreePath(std::ranges::cdata(range),
+                       std::ranges::size(range) * sizeof(*std::ranges::cdata(range)))
+    {}
+#endif
+
+    template<typename Iter>
+    FixedMTreePath(const Iter begin, const Iter end) :
+        FixedMTreePath(&*begin, std::distance(begin, end) * sizeof(*begin))
+    {}
+
+    FixedMTreePath(const void *vdata, size_t sz) : nodes(NODES_N), root{&nodes.back()}
+    {
+        if (sz != INPUT_SIZE)
+        {
+            std::cerr << "FixedMTreePath: Bad size of input data\n";
+            return;
+        }
+
+        const uint8_t *data = (const uint8_t *)vdata;
+        size_t depth = height - 1;
+
+        // add leaves
+        this->nodes[0] = {data, depth};
+        this->nodes[1] = {data += Hash::DIGEST_SIZE, depth};
+
+        // build tree bottom-up
+        for (size_t i = 2; i < NODES_N - 1; i += 2)
+        {
+
+            --depth;
+            this->nodes[i] = {this->nodes[i - 2].digest, this->nodes[i - 1].digest, depth};
+            this->nodes[i].l = &this->nodes[i - 2];
+            this->nodes[i].r = &this->nodes[i - 1];
+            this->nodes[i - 2].f = &this->nodes[i];
+            this->nodes[i - 1].f = &this->nodes[i];
+
+            this->nodes[i + 1] = {data += Hash::DIGEST_SIZE, depth};
+        }
+        --depth;
+        this->nodes[NODES_N - 1] = {this->nodes[NODES_N - 3].digest,
+                                    this->nodes[NODES_N - 2].digest, depth};
+        this->nodes[NODES_N - 1].l = &this->nodes[NODES_N - 3];
+        this->nodes[NODES_N - 1].r = &this->nodes[NODES_N - 2];
+        this->nodes[NODES_N - 3].f = &this->nodes[NODES_N - 1];
+        this->nodes[NODES_N - 2].f = &this->nodes[NODES_N - 1];
+    }
+
+    const uint8_t *digest() const
+    {
+        return root->digest;
+    }
+
+    const Node *get_node(size_t i) const
+    {
+        return &nodes[i];
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const FixedMTreePath &tree)
     {
         if (!tree.root)
             return os;

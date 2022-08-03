@@ -3,7 +3,7 @@
 #include "gadget/abr_gadget.hpp"
 #include "gadget/mimc256/mimc256_gadget.hpp"
 #include "gadget/mimc512f/mimc512f_gadget.hpp"
-#include "gadget/mimc512f_2k/mimc512f_2k_gadget.hpp"
+#include "gadget/mimc512f2k/mimc512f2k_gadget.hpp"
 #include "gadget/sha256/sha256_gadget.hpp"
 #include "gadget/sha512/sha512_gadget.hpp"
 #include "utils/fixed_abr.hpp"
@@ -363,9 +363,9 @@ int main()
     log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
     test_ptRee_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc512F, GadMimc512F>("MiMC512F");
 
-    log_file << "MiMC512F_2K\n";
+    log_file << "MiMC512f2k\n";
     log_file << "Height\tTree\tGadget\tConstraint\tWitness\tKey\tProof\tVerify\n";
-    test_ptRee_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc512F2K, GadMimc512F2K>("MiMC512F_2K");
+    test_ptRee_from<MIN_TREE_HEIGHT, MAX_TREE_HEIGHT, Mimc512F2K, GadMimc512F2K>("MiMC512f2k");
 
     return 0;
 }

@@ -67,7 +67,9 @@ Table~\ref{tab:hash_mulcomp} shows the multiplicative complexity of the hash fun
 It is likely that the values for SHA-256 and SHA-512 can be significantly optimized, but are still
 in the range of the tens of thousands, with SHA-512 requiring \(\approx 2.5\times \) more
 multiplications than SHA-256.
-Tests of our implementations confirm our calculations.
+Tests of our implementations confirm the theoretical results\footnote{For more details on how the
+	various primitives have been implemented, refer to Massimo Del Prato's report, and the repository: 
+	\url{https://github.com/sca-research/merkle_tree}}.
 \begin{figure}[t]
 	\centering
 	\includegraphics[scale=0.33]{res/mtree_total.pdf}

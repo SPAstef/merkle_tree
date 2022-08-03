@@ -1,6 +1,6 @@
 
 \subsection{Arithmetic Circuits}
-Sequences of operations over field elements and variables can be neatly represented by
+A sequence of operations over field elements and variables can be neatly represented by
 \emph{arithmetic circuits}.
 \begin{definition}[Arithmetic circuit]
 	Given a field \(\mathbb{F}\), some \(n, m \in \mathbb{N}\), some constants
@@ -28,7 +28,7 @@ Sequences of operations over field elements and variables can be neatly represen
 			arithmetic circuits}
 	\end{align*}
 	An arithmetic circuit which does not contain multiplications and exponentiations by constants
-	is called \emph{(explicit) arithmetic circuit}.
+	is called \emph{explicit arithmetic circuit}.
 \end{definition}
 
 \noindent Every arithmetic circuit can be represented by a Directed Acyclic Graph (DAG),
@@ -39,13 +39,13 @@ from the field (\emph{constant vertices}) or one of the operations \(\oplus \)
 With an analogy to digital circuits, vertices are also called \emph{gates}.
 Only addition and multiplication vertices have incoming edges (exactly two), which represent the
 inputs of the operation, while the outgoing edge will represent the result.
-Vertices without ingoing edges are called \emph{input vertices}, while vertices without outgoing
+Vertices without incoming edges are called \emph{input vertices}, while vertices without outgoing
 edges are called \emph{output vertices}, together they are denoted \(\phi_{IO}\).
 
 It is possible, without affecting the expressive power, to transform an implicit arithmetic circuit
 into an explicit one by replacing exponentiations (multiplications) by some constant \(c\) with a
 a sequence of \(c\) multiplications (additions)\footnote{However, this transformation can affect
-	the succintness of a circuit and its DAG (unrolling \(x^c\) or \(cx\) requires \(\Theta(2^c)\)
+	the succinctness of a circuit and its DAG (unrolling \(x^c\) or \(cx\) requires \(\Theta(2^c)\)
 	space), but this won't be a problem for us.}.
 \begin{figure}
 	\centering
@@ -79,7 +79,7 @@ a sequence of \(c\) multiplications (additions)\footnote{However, this transform
 		\draw[->] (x2) to [bend right] (m3);
 
 	\end{tikzpicture}
-	\caption{DAG of the circuit in Example~1.
+	\caption{DAG of the circuit in Example~\ref{ex:circuit}.
 		We have the two variable/input vertices \(x_1\) and \(x_2\), the constant vertex \(5\), the
 		addition vertices \(a_1, \dots, a_5\) and the multiplication vertices \(m_1, m_2\) and
 		\(m_3\),

@@ -53,30 +53,25 @@ public:
         super(pb, ap),
         trans{trans}, other{other}, height{other.size() + 1}, idx{trans_idx}, out{out}
     {
-        std::string name_i{"hashI_"};
-        std::string name_f{"foo_hash_"};
-
-        inter.emplace_back(pb, DIGEST_VARS, FMT(ap, name_i, "0"));
+        inter.emplace_back(pb, DIGEST_VARS, FMT(""));
         if (trans_idx & 1)
-            foo_hash.emplace_back(pb, other[0], trans, inter[0], FMT(ap, name_f, "0"));
+            foo_hash.emplace_back(pb, other[0], trans, inter[0], FMT(""));
         else
-            foo_hash.emplace_back(pb, trans, other[0], inter[0], FMT(ap, name_f, "0"));
+            foo_hash.emplace_back(pb, trans, other[0], inter[0], FMT(""));
         trans_idx >>= 1;
 
         for (size_t i = 1; i < height - 2; ++i, trans_idx >>= 1)
         {
-            std::string ext{std::to_string(i)};
-
-            inter.emplace_back(pb, DIGEST_VARS, FMT(ap, name_i, ext));
+            inter.emplace_back(pb, DIGEST_VARS, FMT(""));
             if (trans_idx & 1)
-                foo_hash.emplace_back(pb, other[i], inter[i - 1], inter[i], FMT(ap, name_f, ext));
+                foo_hash.emplace_back(pb, other[i], inter[i - 1], inter[i], FMT(""));
             else
-                foo_hash.emplace_back(pb, inter[i - 1], other[i], inter[i], FMT(ap, name_f, ext));
+                foo_hash.emplace_back(pb, inter[i - 1], other[i], inter[i], FMT(""));
         }
         if (trans_idx & 1)
-            foo_hash.emplace_back(pb, other.back(), inter.back(), out, FMT(ap, "foo_hash_last"));
+            foo_hash.emplace_back(pb, other[height - 2], inter[height - 3], out, FMT(""));
         else
-            foo_hash.emplace_back(pb, inter.back(), other.back(), out, FMT(ap, "foo_hash_last"));
+            foo_hash.emplace_back(pb, inter[height - 3], other[height - 2], out, FMT(""));
     }
 
     void generate_r1cs_constraints()

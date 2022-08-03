@@ -3,7 +3,7 @@
 #include "gadget/abr_gadget.hpp"
 #include "gadget/mimc256/mimc256_gadget.hpp"
 #include "gadget/mimc512f/mimc512f_gadget.hpp"
-#include "gadget/mimc512f_2k/mimc512f_2k_gadget.hpp"
+#include "gadget/mimc512f2k/mimc512f2k_gadget.hpp"
 #include "gadget/sha256/sha256_gadget.hpp"
 #include "gadget/sha512/sha512_gadget.hpp"
 #include "utils/fixed_abr.hpp"
@@ -275,7 +275,7 @@ static bool run_tests()
     std::cout << check << '\n';
     all_check &= check;
 
-    std::cout << "MiMC512F_2K... ";
+    std::cout << "MiMC512f2k... ";
     std::cout.flush();
     {
         check = test_ptRee<TREE_HEIGHT, Mimc512F2K, GadMimc512F2K>();

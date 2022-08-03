@@ -2,18 +2,14 @@
 Hash functions are a fundamental tool in many fields of computer science, and cryptography is
 arguably the most prominent.
 Formally, an hash function is any function \(H\colon {\left\{0, 1\right\}}^{*} \mapsto
-{\left\{0, 1\right\}}^n\), that is, any function which maps arbitrarly long \emph{messages} to
+{\left\{0, 1\right\}}^n\), that is, any function which maps arbitrarily long \emph{messages} to
 fixed-size \emph{digests}.
 From the definition, it is immediate to see that there are an infinite number of messages which map
 to the same digest.
 While an operation like truncation is a (very simple) hash function, in cryptography we are
-interested in functions that provide additional guarantees: the assumption is that a digest sohuld
+interested in functions that provide additional guarantees: the assumption is that a digest should
 represent a message in a one-way fashion: while there are infinite messages which map to the same
 digest, it must be hard to find them.
-Ideally, a cryptographic hash function should behave like a perfect random function.
-This is of course impossible, as the output of an hash function must only depend deterministically
-on its input; the aim then is to build functions which are hard to distinguish from a random
-function.
 \begin{definition}[Cryptographic hash function]
 	Given \(n \in \mathbb{N}\), an \emph{\(n\)(-bit) cryptographic hash function (CHF)} is any
 	function \(H\colon {\left\{0, 1\right\}}^{*} \mapsto {\left\{0, 1\right\}}^n\) which satisfies
@@ -28,15 +24,15 @@ function.
 	\end{itemize}
 \end{definition}
 
-\noindent While some of the requirements might seem redundant (for example, if it is hard for an
-attacker to find a collision for chosen messages, it must be hard when one is fixed),
-the difference usually lies in how exactly we define hardness for each property.
-For collision resistance, an ideal CHF requires about \(2^{n/2}\) evaluations to find a collision
-(birthday paradox), while for preimage resistance it would require about \(2^n\) evaluations.
-Tipically, a CHF is built by applying some known secure constructions to functions which are
-simpler to devise.
+\noindent With high probability, an ideal CHF requires about \(2^{n/2}\) evaluations
+for collision resistance (birthday paradox), while for preimage resistance it would require about 
+\(2^n\) evaluations.
+A CHF can be built by applying some known secure construction to functions which are
+simpler to devise, specifically, we can derive a CHF from a one-way compression function (OWCF), 
+which in turn can be derived from a pseudorandom keyed permutation (PKP)~\cite{MenezesOV2001}.
+\begin{comment}	
 \begin{definition}[Pseudorandom keyed permutation]
-	Given \(l, n \in \mathbb{N}\), an \emph{\(l/n\)(-bit) pseudorandom keyed permutation (PKP)} is
+	Given \(l, n \in \mathbb{N}\), an \emph{\(l/n\)(-bit) pseudo-random keyed permutation (PKP)} is
 	any bijective function:
 	\[F\colon {\left\{0, 1\right\}}^l \times {\left\{0, 1\right\}}^n \mapsto {\left\{0, 1\right\}}^l\]
 	which is hard to distinguish from an uniform random distribution.
@@ -44,11 +40,11 @@ simpler to devise.
 
 \noindent PKPs are often built by iterating a keyed permutation \(F\) for some number \(r\) of
 rounds, since \(F\) by itself might be relatively easy to invert.
-A \emph{block cipher} is a pseudorandom keyed permutation which is easy to invert if we know
+A \emph{block cipher} is a pseudo-random keyed permutation which is easy to invert if we know
 the key (\emph{trapdoor function}), and which is iterated for a certain number of rounds using
-a different key everytime, which is provided by a key-scheduling function.
+a different key every time, which is provided by a key-scheduling function.
 \begin{theorem}[Feistel-Luby-Rackoff construction]
-	Given a \(l/n\) pseudorandom keyed permutation \(P\), some
+	Given a \(l/n\) pseudo-random keyed permutation \(P\), some
 	\(m = \left(m_1, m_2\right) \mid m_1, m_2 \in {\left\{0, 1\right\}}^l\), some \(n > 3\), and some
 	\(k = \left(k_1, \dots, k_n\right) \mid \forall i\colon k_i \in {\left\{0, 1\right\}}^n\), then
 	the function \(E_P\) such that:
@@ -64,7 +60,7 @@ a different key everytime, which is provided by a key-scheduling function.
 	\end{align*}
 	is a \(2l/k\) block cipher.
 	Here, \(\oplus \) denotes addition after reinterpreting the arguments as elements of some
-	field \(\mathbb{F}\) (tipically \(\mathbb{F}_{2^n}\)).
+	field \(\mathbb{F}\) (typically \(\mathbb{F}_{2^n}\)).
 
 \end{theorem}
 
@@ -79,13 +75,11 @@ arbitrary value.
 		{\left\{0, 1\right\}}^{l_2}
 	\]
 \end{definition}
-
-\noindent There are many known ways to build OWCFs from pseudorandom keyed
-permutations, and, in turn, CHFs from OWCFs.
+\end{comment}
 We will introduce the Davies-Meyer and the Merkle-Damg\r{a}rd constructions respectively, as
 those are the ones of interest to us.
-\begin{theorem}[Davies-Meyer construction]
-	Given a \(l/n\) pseudorandom keyed permutation \(P\), some \(i, k \in \mathbb{N}\), some
+\begin{theorem}[Davies-Meyer construction~\cite{Preneel2005}]
+	Given a \(l/n\) pseudo-random keyed permutation \(P\), some \(i, k \in \mathbb{N}\), some
 	\(v \in {\left\{0, 1\right\}}^l\), and some \(m \in {\left\{0, 1\right\}}^{kn}\), then the
 	function \(F_P\) such that:
 	\begin{align*}
@@ -101,10 +95,10 @@ those are the ones of interest to us.
 	\end{align*}
 	is a \(l/kn/l\) OWCF\@.
 \end{theorem}
-\begin{theorem}[Merkle-Damg\r{a}rd construction]
+\begin{theorem}[Merkle-Damg\r{a}rd construction~\cite{Merkle1979}]
 	Given a \(l_1/n/l_2\) OWCF \(F\), some \(k \in \mathbb{N}\), some
 	\(v \in {\left\{0, 1\right\}}^{l_1}\), some \(m \in {\left\{0, 1\right\}}^*\) and some padding
-	funcion:
+	function:
 	\[
 		P\left(m\right)\colon {\left\{0, 1\right\}}^{\left|m\right|} \mapsto
 		{\left\{0, 1\right\}}^{\left|m\right| + \left(-\left|m\right| \bmod n\right) + kn}

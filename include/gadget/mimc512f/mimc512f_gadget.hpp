@@ -6,7 +6,7 @@
 #include "gadget/field_variable.hpp"
 #include "utils/mimc512f.hpp"
 
-#if defined(__INTELLISENSE__) && 1
+#if defined(__INTELLISENSE__) && 0
     #include <libff/common/default_types/ec_pp.hpp>
 using FieldT = libff::Fr<libsnark::default_r1cs_ppzksnark_pp>;
 #else
@@ -141,7 +141,6 @@ public:
     void generate_r1cs_witness()
     {
         // Remember x = x0||x1 and y = y0||y1, h = 0||0
-        auto &pb = this->pb;
         size_t i = 0;
         FieldT t;
 
@@ -150,97 +149,97 @@ public:
         // Optimize first iteration
         // Optimize first round
         // h0 = x0^3
-        pb.val(inter[i]) = pb.val(x[0]) * pb.val(x[0]);
+        this->pb.val(inter[i]) = this->pb.val(x[0]) * this->pb.val(x[0]);
         ++i;
-        pb.val(inter[i]) = pb.val(inter[i - 1]) * pb.val(x[0]);
+        this->pb.val(inter[i]) = this->pb.val(inter[i - 1]) * this->pb.val(x[0]);
         ++i;
 
         // Optimize second round
         // h0 <- (h0+x0+c1)^3+h1 (h1 = 0)
-        t = pb.val(inter[i - 1]) + pb.val(x[0]) + Base::round_cf[0];
-        pb.val(inter[i]) = t * t;
+        t = this->pb.val(inter[i - 1]) + this->pb.val(x[0]) + Base::round_cf[0];
+        this->pb.val(inter[i]) = t * t;
         ++i;
-        pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
+        this->pb.val(inter[i]) = this->pb.val(inter[i - 1]) * t;
         ++i;
 
         // We don't need to do h1 <- h0, as we can reuse old intermediates
         for (size_t j = 1; j < ROUNDS_N - 1; ++j)
         {
             // h0 <- (h0+x0+c)^3+h1
-            t = pb.val(inter[i - 1]) + pb.val(x[0]) + Base::round_cf[j];
-            pb.val(inter[i]) = t * t;
+            t = this->pb.val(inter[i - 1]) + this->pb.val(x[0]) + Base::round_cf[j];
+            this->pb.val(inter[i]) = t * t;
             ++i;
             // (h1 = inter[i-4])
-            pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
-            pb.val(inter[i]) += pb.val(inter[i - 4]);
+            this->pb.val(inter[i]) = this->pb.val(inter[i - 1]) * t;
+            this->pb.val(inter[i]) += this->pb.val(inter[i - 4]);
             ++i;
         }
 
         // 2nd iteration
         // Optimize first round
-        t = pb.val(inter[i - 1]) + pb.val(x[1]);
-        pb.val(inter[i]) = t * t;
+        t = this->pb.val(inter[i - 1]) + this->pb.val(x[1]);
+        this->pb.val(inter[i]) = t * t;
         ++i;
-        pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
-        pb.val(inter[i]) += pb.val(inter[i - 4]);
+        this->pb.val(inter[i]) = this->pb.val(inter[i - 1]) * t;
+        this->pb.val(inter[i]) += this->pb.val(inter[i - 4]);
         ++i;
         for (size_t j = 0; j < ROUNDS_N - 1; ++j)
         {
-            t = pb.val(inter[i - 1]) + pb.val(x[1]) + Base::round_cf[j];
-            pb.val(inter[i]) = t * t;
+            t = this->pb.val(inter[i - 1]) + this->pb.val(x[1]) + Base::round_cf[j];
+            this->pb.val(inter[i]) = t * t;
             ++i;
-            pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
-            pb.val(inter[i]) += pb.val(inter[i - 4]);
+            this->pb.val(inter[i]) = this->pb.val(inter[i - 1]) * t;
+            this->pb.val(inter[i]) += this->pb.val(inter[i - 4]);
             ++i;
         }
 
         // 3rd iteration
-        t = pb.val(inter[i - 1]) + pb.val(y[0]);
-        pb.val(inter[i]) = t * t;
+        t = this->pb.val(inter[i - 1]) + this->pb.val(y[0]);
+        this->pb.val(inter[i]) = t * t;
         ++i;
-        pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
-        pb.val(inter[i]) += pb.val(inter[i - 4]);
+        this->pb.val(inter[i]) = this->pb.val(inter[i - 1]) * t;
+        this->pb.val(inter[i]) += this->pb.val(inter[i - 4]);
         ++i;
         for (size_t j = 0; j < ROUNDS_N - 1; ++j)
         {
-            t = pb.val(inter[i - 1]) + pb.val(y[0]) + Base::round_cf[j];
-            pb.val(inter[i]) = t * t;
+            t = this->pb.val(inter[i - 1]) + this->pb.val(y[0]) + Base::round_cf[j];
+            this->pb.val(inter[i]) = t * t;
             ++i;
-            pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
-            pb.val(inter[i]) += pb.val(inter[i - 4]);
+            this->pb.val(inter[i]) = this->pb.val(inter[i - 1]) * t;
+            this->pb.val(inter[i]) += this->pb.val(inter[i - 4]);
             ++i;
         }
 
         // 4th iteration
-        t = pb.val(inter[i - 1]) + pb.val(y[1]);
-        pb.val(inter[i]) = t * t;
+        t = this->pb.val(inter[i - 1]) + this->pb.val(y[1]);
+        this->pb.val(inter[i]) = t * t;
         ++i;
-        pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
-        pb.val(inter[i]) += pb.val(inter[i - 4]);
+        this->pb.val(inter[i]) = this->pb.val(inter[i - 1]) * t;
+        this->pb.val(inter[i]) += this->pb.val(inter[i - 4]);
         ++i;
         // skip last two rounds
         for (size_t j = 0; j < ROUNDS_N - 3; ++j)
         {
-            t = pb.val(inter[i - 1]) + pb.val(y[1]) + Base::round_cf[j];
-            pb.val(inter[i]) = t * t;
+            t = this->pb.val(inter[i - 1]) + this->pb.val(y[1]) + Base::round_cf[j];
+            this->pb.val(inter[i]) = t * t;
             ++i;
-            pb.val(inter[i]) = pb.val(inter[i - 1]) * t;
-            pb.val(inter[i]) += pb.val(inter[i - 4]);
+            this->pb.val(inter[i]) = this->pb.val(inter[i - 1]) * t;
+            this->pb.val(inter[i]) += this->pb.val(inter[i - 4]);
             ++i;
         }
         // explicit last two rounds, as we put the results in out[0] and out[1]
         // second to last round
-        t = pb.val(inter[i - 1]) + pb.val(y[1]) + Base::round_cf[ROUNDS_N - 3];
-        pb.val(inter[i]) = t * t;
+        t = this->pb.val(inter[i - 1]) + this->pb.val(y[1]) + Base::round_cf[ROUNDS_N - 3];
+        this->pb.val(inter[i]) = t * t;
         ++i;
-        pb.val(out[1]) = pb.val(inter[i - 1]) * t;
-        pb.val(out[1]) += pb.val(inter[i - 4]);
+        this->pb.val(out[1]) = this->pb.val(inter[i - 1]) * t;
+        this->pb.val(out[1]) += this->pb.val(inter[i - 4]);
 
         // last round
-        t = pb.val(out[1]) + pb.val(y[1]) + Base::round_cf[ROUNDS_N - 2];
-        pb.val(inter[i]) = t * t;
+        t = this->pb.val(out[1]) + this->pb.val(y[1]) + Base::round_cf[ROUNDS_N - 2];
+        this->pb.val(inter[i]) = t * t;
         ++i;
-        pb.val(out[0]) = pb.val(inter[i - 1]) * t;
-        pb.val(out[0]) += pb.val(inter[i - 3]);
+        this->pb.val(out[0]) = this->pb.val(inter[i - 1]) * t;
+        this->pb.val(out[0]) += this->pb.val(inter[i - 3]);
     }
 };

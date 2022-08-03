@@ -1,19 +1,20 @@
 \subsection{The Pinocchio Protocol}
 A very famous ZK-SNARK system for verifiable computation is the \emph{Pinocchio} protocol,
-which was the first one efficient enough to be practical.
+which was the first one efficient enough to be practical~\cite{ParnoGHR2013}.
 Pinocchio uses a lot of mathematical machinery, while we tried to introduce most of the required
 background in Section~\ref{sec:preliminaries}, it will still be not trivial to understand fully
 \emph{how}, and, more importantly, \emph{why}, it actually works.
-We will not go into all of the deep details of the protocol, especially for what concernes the
-last stages, but we will still try to explain it in all its parts.
+While it is out of the scope of this report to go into the deeper details of the protocol, we will 
+provide an overview of the main parts which are going to affect the design of secure and efficient 
+hash functions for ZK-SNARK.
 
 First of all, Pinocchio does not allow the encoding of arbitrary languages, i.e.\ it is not Turing
 complete, but we are restricted to arithmetic circuits over some big prime field \(\mathbb{F}_p\)
-(tipically, \(p \approx 2^{256}\)).
+(typically, \(p \approx 2^{256}\)).
 The main limitation arising from this restriction is that we can only express bounded computation
 (i.e.\ no loops whose length depends on some variable condition).
 This issue can be mitigated by writing a \emph{circuit synthesizer} in a Turing complete language
-which is able to build parametrized arithmetic circuits `on the fly'.
+which is able to build parameterized arithmetic circuits `on the fly'.
 Given an arithmetic circuit \(\phi \) over a prime field \(\mathbb{F}_p\), Pinocchio works as
 follows:
 \begin{enumerate}

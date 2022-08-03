@@ -1,7 +1,7 @@
 \subsection{Fields and groups}
-While computational models tipically operate over binary strings, that is, elements of
-\({\left\{0, 1\right\}}^*\), where \(*\) indicates Kleene's closure, we often want to interpret
-such strings as elements of some algebraic structure.
+While Turing machines typically operate over binary strings, that is, elements of
+\({\left\{0, 1\right\}}^*\), where \(*\) indicates Kleene's closure~\cite{DrosteK2009}, we often 
+want to interpret such strings as elements of some algebraic structure.
 \begin{definition}
 	A \emph{field} is any triple \(\mathbb{F} = \left(F, \oplus, \otimes\right)\), where \(F\) is
 	called \emph{underlying set}, \(\oplus\colon F \times F \mapsto F\) is called
@@ -14,18 +14,14 @@ such strings as elements of some algebraic structure.
 	element \(x^{-1}\).
 \end{definition}
 
-\noindent For example, \(\mathbb{R}\) and \(\mathbb{C}\) are fields, as is Boole's algebra
-\(\mathbb{B} = \left(\left\{0, 1\right\}, \textsc{xor}, \textsc{and}\right)\).
-We denote elements of a field \(\mathbb{F}\) (abusing notation, as they are actually
+\noindent We denote elements of a field \(\mathbb{F}\) (abusing notation, as they are actually
 elements of the underlying set \(F\)) with lowercase letters \(a, b, c\dots \) and variables over
 \(\mathbb{F}\) with lowercase letters \(x, y, z\dots \).
-
-If \(\left|\mathbb{F}\right| \in \mathbb{N}\), then \(\mathbb{F}\) is a \emph{finite field}.
-We are particularly interested in finite fields of the kind:
+We are particularly interested in \emph{finite fields} of the kind:
 \[\mathbb{F}_{p^k} = \left(\left\{0, \dots, p^k-1\right\}, \oplus_p, \otimes_p\right)\]
-where \(p\) is a prime and \(\oplus_p, \otimes_p\) denote addition and
-multiplication modulo \(p\) (for example, \(\mathbb{B} = \mathbb{F}_2\)).
-Tipically, we consider \(n\)-bit strings either as elements of \(\mathbb{F}_{2^n}\) or of
+where \(p\) is a prime number, \(z \in \mathbb{N}\) and \(\oplus_p, \otimes_p\) denote respectively 
+addition and multiplication modulo \(p\) (for example, the Boolean field \(\mathbb{B} = \mathbb{F}_2\)).
+Typically, we consider \(n\)-bit strings either as elements of \(\mathbb{F}_{2^n}\) or of
 \(\mathbb{F}_{p^1}\), where \(\log_2\left(p\right) \approx n\).
 We will often use \(+\) in place of \(\oplus_p \) when denoting addition and omit \(\otimes_p \)
 when denoting multiplication, if \(\mathbb{F}\) is clear from the context.
@@ -38,7 +34,9 @@ Vector operations follow their natural definitions depending on the underlying f
 We can also introduce matrices over \(\mathbb{F}^{n \times m}\) for some \(n, m \in \mathbb{N}\),
 which we denote with bold capital letters (\(\bm{A}, \bm{B}, \dots \)).
 The \(i\)th row of a matrix \(\bm{M}\) is denoted with \(\bm{M}_i\), and the \(j\)th element of
-the \(i\)th row is denoted with \(\bm{M}_{i,j}\).
+the \(i\)th row is denoted with \(\bm{M}_{i,j}\), and 
+\({\bm{M}}^\transpose \mid \forall i,j\colon {\bm{M}}^{\transpose}_{i,j} = \bm{M}_{j,i} \) is 
+the transpose of \(\bm{M}\).
 Matrix operations also follow their natural definitions over the underlying field.
 Given \(\bm{A} \in \mathbb{F}^{n \times m}, \bm{B} \in \mathbb{F}^{n \times m'}\),
 we denote with \(\begin{pmatrix}\bm{A} & \bm{B}\end{pmatrix}\) their concatenation along the rows,
@@ -76,9 +74,8 @@ We can extend Lagrange interpolation to any pair of matrices
 	\(\forall x \in \mathbb{G}\) there is a compositive inverse \(x^{-1}\).
 \end{definition}
 
-\noindent For example, \(\mathbb{Z}\) with only addition is a group (where \(1_{\mathbb{Z}} = 0\)),
-as is \(\mathbb{Q}\) with only multiplication and without \(0\) (as it's not invertible).
-We denote elements and variables over groups in the same way we do for fields.
+\noindent We denote objects over groups in the same way we do for fields.
+\begin{comment}
 We can define \emph{group exponentiation} following the natural definition:
 \[\forall x \in \mathbb{G}, \forall n \in \mathbb{N}\colon x^n = \bigodot^{n}{x}\]
 
@@ -99,6 +96,7 @@ We can build a finite group from a \emph{generator} set \(S\) and a composition 
 	\left(\min_{i}{{\left\langle{S}\right\rangle}^{i}} \mid
 	{\left\langle{S}\right\rangle}^{i} = {\left\langle{S}\right\rangle}^{i-1}, \odot\right)
 \end{align*}
+\end{comment}
 We are particularly interested in \emph{cyclic groups}, i.e.\ finite groups of the type
 \(\mathbb{G}_q\left(g\right) = \langle{g}\rangle = \left({\left\{g^i \bmod q\right\}}_{i \in
 	\mathbb{N}}, \otimes_q\right)\), where \(g \in \mathbb{F}_p\) is called \emph{generator element}
@@ -128,5 +126,5 @@ deterministic algorithm is known that can efficiently compute the discrete logar
 
 \noindent We are interested in order-preserving, non-trivial bilinear maps where
 \(\mathbb{G}_1 = \mathbb{G}_2 = \mathbb{G}\).
-Bilinar maps have many application in cryptography, as they are used to exploit the hardness of
+Bilinear maps have many application in cryptography, as they are used to exploit the hardness of
 the discrete logarithm problem.
